@@ -36,6 +36,6 @@ public class Mediador {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("Enviando mensaje: " + message.generarTrama());
+        System.out.println("Enviando comando: " + message.generarTrama());
     }
 }

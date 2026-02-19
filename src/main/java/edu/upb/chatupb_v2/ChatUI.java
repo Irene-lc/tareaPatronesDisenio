@@ -201,6 +201,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
         if (message instanceof Aceptar) {
             Aceptar aceptar = (Aceptar) message;
             Mediador.getInstance().addClient(aceptar.getIdUsuario(), socketClient);
+            idUsuarioActivo = aceptar.getIdUsuario();
         }
         if (message instanceof Mensaje) {
             Mensaje mensaje = (Mensaje) message;
