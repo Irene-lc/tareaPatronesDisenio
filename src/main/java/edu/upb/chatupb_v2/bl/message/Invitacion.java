@@ -3,7 +3,7 @@ package edu.upb.chatupb_v2.bl.message;
 import java.net.Socket;
 import java.util.regex.Pattern;
 
-public class Invitacion extends Message{
+public class Invitacion extends Message {
 
     private String idUsuario;
     private String nombre;
@@ -11,6 +11,7 @@ public class Invitacion extends Message{
     public Invitacion() {
         super("001");
     }
+
     public Invitacion(String idUsuario, String nombre) {
         super("001");
         this.idUsuario = idUsuario;
@@ -33,17 +34,17 @@ public class Invitacion extends Message{
     public String getIdUsuario() {
         return idUsuario;
     }
+
     public void setIdUsuario(String idUsuario) {
         this.idUsuario = idUsuario;
     }
+
     public String getNombre() {
         return nombre;
     }
+
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
-
-
-
 
 }

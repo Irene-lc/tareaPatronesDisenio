@@ -4,6 +4,7 @@
  */
 package edu.upb.chatupb_v2.bl.server;
 
+import edu.upb.chatupb_v2.bl.message.Aceptar;
 import edu.upb.chatupb_v2.bl.message.Invitacion;
 import edu.upb.chatupb_v2.bl.message.Message;
 
@@ -57,15 +58,18 @@ public class SocketClient extends Thread {
                 }
                 switch (split[0]) {
                     case "001": {
-//                        Invitacion inv = ;
+                        Invitacion inv = Invitacion.parse(message);
 //                        if (socketListener != null) {
 //                            socketListener.onInvitacion(inv);
 //                        }
-                        notificar(Invitacion.parse(message));
+//                        inv.setIp(ip);
+                        notificar(inv);
 //                    System.out.println(inv.generarTrama());
                     }
                     case "002": {
-
+                        Aceptar acept = Aceptar.parse(message);
+//                        acept.setIp(ip);
+                        notificar(acept);
                     }
                 }
             }
@@ -78,14 +82,23 @@ public class SocketClient extends Thread {
 
     public void notificar(Message message) {
         for (SocketListener listener : socketListener) {
-            java.awt.EventQueue.invokeLater(() -> listener.onMessage(message));
+            java.awt.EventQueue.invokeLater(() -> listener.onMessage(this, message));
         }
     }
 
-    public void send(String message) throws IOException {
-        message = message + System.lineSeparator();
+//    public void send(String message) throws IOException {
+//        message = message + System.lineSeparator();
+//        try {
+//            dout.write(message.getBytes("UTF-8"));
+//            dout.flush();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+    public void send(Message message) throws IOException {
+        String messageStr = message.generarTrama() + System.lineSeparator();
         try {
-            dout.write(message.getBytes("UTF-8"));
+            dout.write(messageStr.getBytes("UTF-8"));
             dout.flush();
         } catch (Exception e) {
             e.printStackTrace();
@@ -102,4 +115,7 @@ public class SocketClient extends Thread {
         }
     }
 
+    public String getIp() {
+        return ip;
+    }
 }

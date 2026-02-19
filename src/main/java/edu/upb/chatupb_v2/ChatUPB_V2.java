@@ -4,6 +4,7 @@
 package edu.upb.chatupb_v2;
 
 import edu.upb.chatupb_v2.bl.server.ChatServer;
+import edu.upb.chatupb_v2.bl.server.Mediador;
 
 /**
  * @author rlaredo
@@ -13,6 +14,7 @@ public class ChatUPB_V2 {
     public static void main(String[] args) {
         /* Create and display the form */
         final ChatUI chatUI = new ChatUI();
+        System.out.println(Mediador.getInstance().listaContactos);
         java.awt.EventQueue.invokeLater(new Runnable() {
             // lo que se hace dentro del hilo es solo del contexto del hilo
             public void run() {

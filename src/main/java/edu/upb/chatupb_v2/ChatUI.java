@@ -4,9 +4,11 @@
  */
 package edu.upb.chatupb_v2;
 
+import edu.upb.chatupb_v2.bl.message.Aceptar;
 import edu.upb.chatupb_v2.bl.message.Invitacion;
+import edu.upb.chatupb_v2.bl.message.Mensaje;
 import edu.upb.chatupb_v2.bl.message.Message;
-import edu.upb.chatupb_v2.bl.server.ChatServer;
+import edu.upb.chatupb_v2.bl.server.Mediador;
 import edu.upb.chatupb_v2.bl.server.SocketClient;
 import edu.upb.chatupb_v2.bl.server.SocketListener;
 
@@ -102,8 +104,10 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
         // TODO add your handling code here:
         try {
             client = new SocketClient(jtIp.getText().toString());
-            client.addListener(this);
+            client.addListener(this); // le estoy pasando una instancia de si mismo. se subscribe al socketclient ue se acaba de crear
             client.start();
+            Message message = new Invitacion("8179864", "Irene");
+            client.send(message);
 
         } catch (Exception e) {
         }
@@ -113,7 +117,8 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
         // TODO add your handling code here:
         if (client != null) {
             try {
-                client.send(jtMensaje.getText().toString());
+                String message = jtMensaje.getText().toString();
+                client.send(Mensaje.parse(message));
             } catch (Exception e) {
 
             }
@@ -162,12 +167,25 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
     private javax.swing.JTextField jtMensaje;
 
     @Override
-    public void onMessage(Message message) {
+    public void onMessage(SocketClient socketClient, Message message) {
         if (message instanceof Invitacion) {
             Invitacion invitacion = (Invitacion) message;
-            JOptionPane.showMessageDialog(this, "LLego la invitacion: " + invitacion);
+            int respuesta = JOptionPane.showConfirmDialog(this, "LLego la invitacion: " + invitacion
+                    , "Invitacion", JOptionPane.YES_NO_OPTION);
+            if (respuesta == JOptionPane.YES_OPTION) {
+                Mediador.getInstance().addClient(invitacion.getIdUsuario(), socketClient);
+                Message aceptar = new Aceptar("8179864", "Irene");
+                Mediador.getInstance().sendMessage(invitacion.getIdUsuario(), aceptar);
+            }
+            System.out.println("Llego la invitacion");
         }
-        System.out.println("Llego la invitacion");
+        if (message instanceof Aceptar) {
+            Aceptar aceotar = (Aceptar) message;
+            Mediador.getInstance().addClient(aceotar.getIdUsuario(), socketClient );
+
+            System.out.print("Aceptar: " + Mediador.getInstance().listaContactos + " ");
+        }
+
     }
     // End of variables declaration//GEN-END:variables
 }
