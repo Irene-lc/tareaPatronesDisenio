@@ -26,7 +26,7 @@ public class Mediador {
         this.listaContactos.remove(key);
     }
 
-    public void sendMessage(String key, Message message) {
+    public void sendMessage(String key, Message message) { //enviar mensajes tipo chat privado
         SocketClient cliente = this.listaContactos.get(key);
         if (cliente == null) {
             return;

@@ -7,6 +7,7 @@ package edu.upb.chatupb_v2.bl.server;
 import edu.upb.chatupb_v2.bl.message.Aceptar;
 import edu.upb.chatupb_v2.bl.message.Invitacion;
 import edu.upb.chatupb_v2.bl.message.Message;
+import edu.upb.chatupb_v2.bl.message.Rechazar;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -50,7 +51,7 @@ public class SocketClient extends Thread {
         try {
             String message;
             while ((message = br.readLine()) != null) {
-                System.out.println("Mensaje recibido: " + message);
+                System.out.println("Comando recibido: " + message);
 
                 String split[] = message.split(Pattern.quote("|"));
                 if (split.length == 0) {
@@ -71,6 +72,10 @@ public class SocketClient extends Thread {
                         Aceptar acept = Aceptar.parse(message);
 //                        acept.setIp(ip);
                         notificar(acept);
+                        break;
+                    case "003":
+                        Rechazar rechazar = Rechazar.parse(message);
+                        notificar(rechazar);
                         break;
                 }
             }
@@ -94,7 +99,7 @@ public class SocketClient extends Thread {
 //            e.printStackTrace();
 //        }
 //    }
-    public void send(Message message) throws IOException {
+    public void send(Message message) throws IOException { //enviar mensaje a quien me habló
         String messageStr = message.generarTrama() + System.lineSeparator();
         try {
             dout.write(messageStr.getBytes("UTF-8"));
