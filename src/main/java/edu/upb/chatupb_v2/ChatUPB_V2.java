@@ -14,7 +14,6 @@ public class ChatUPB_V2 {
     public static void main(String[] args) {
         /* Create and display the form */
         final ChatUI chatUI = new ChatUI();
-        System.out.println(Mediador.getInstance().listaContactos);
         java.awt.EventQueue.invokeLater(new Runnable() {
             // lo que se hace dentro del hilo es solo del contexto del hilo
             public void run() {

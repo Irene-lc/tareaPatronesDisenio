@@ -57,7 +57,7 @@ public class SocketClient extends Thread {
                     return;
                 }
                 switch (split[0]) {
-                    case "001": {
+                    case "001":
                         Invitacion inv = Invitacion.parse(message);
 //                        if (socketListener != null) {
 //                            socketListener.onInvitacion(inv);
@@ -65,16 +65,15 @@ public class SocketClient extends Thread {
 //                        inv.setIp(ip);
                         notificar(inv);
 //                    System.out.println(inv.generarTrama());
-                    }
-                    case "002": {
+                        break;
+
+                    case "002":
                         Aceptar acept = Aceptar.parse(message);
 //                        acept.setIp(ip);
                         notificar(acept);
-                    }
+                        break;
                 }
             }
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -86,7 +85,7 @@ public class SocketClient extends Thread {
         }
     }
 
-//    public void send(String message) throws IOException {
+    //    public void send(String message) throws IOException {
 //        message = message + System.lineSeparator();
 //        try {
 //            dout.write(message.getBytes("UTF-8"));

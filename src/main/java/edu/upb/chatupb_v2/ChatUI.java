@@ -169,6 +169,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
     @Override
     public void onMessage(SocketClient socketClient, Message message) {
         if (message instanceof Invitacion) {
+            System.out.println("Llego la invitacion");
             Invitacion invitacion = (Invitacion) message;
             int respuesta = JOptionPane.showConfirmDialog(this, "LLego la invitacion: " + invitacion
                     , "Invitacion", JOptionPane.YES_NO_OPTION);
@@ -177,7 +178,6 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
                 Message aceptar = new Aceptar("8179864", "Irene");
                 Mediador.getInstance().sendMessage(invitacion.getIdUsuario(), aceptar);
             }
-            System.out.println("Llego la invitacion");
         }
         if (message instanceof Aceptar) {
             Aceptar aceotar = (Aceptar) message;
