@@ -10,6 +10,7 @@ import edu.upb.chatupb_v2.bl.server.SocketClient;
 import edu.upb.chatupb_v2.bl.server.SocketListener;
 
 import javax.swing.*;
+import java.util.Random;
 
 /**
  *
@@ -18,6 +19,8 @@ import javax.swing.*;
 public class ChatUI extends javax.swing.JFrame implements SocketListener {
     SocketClient client;
     private String idUsuarioActivo;
+    private final String idMio = "8179864";
+    private final String nombre = "Irene";
 
 //    ChatServer chatServer;
 
@@ -106,10 +109,11 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
             client.addListener(this); // le estoy pasando una instancia de si mismo. se subscribe al socketclient ue se acaba de crear
             client.start();
             System.out.println("Enviando 001...");
-            Message message = new Invitacion("8179864", "Irene");
+            Message message = new Invitacion(idMio, nombre);
             client.send(message);
 
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }//GEN-LAST:event_jBtnConectarActionPerformed
 
@@ -123,7 +127,8 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
                     JOptionPane.showMessageDialog(this, "No hay usuario conectado");
                     return;
                 }
-                Message message = new Mensaje(idUsuarioActivo,"0", mensajeTxt);
+                Random r = new Random();
+                Message message = new Mensaje(idMio, r.toString(), mensajeTxt);
                 Mediador.getInstance().sendMessage(idUsuarioActivo, message);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -186,7 +191,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
 
             if (respuesta == JOptionPane.YES_OPTION) {
                 Mediador.getInstance().addClient(invitacion.getIdUsuario(), socketClient);
-                Message aceptar = new Aceptar("8179864", "Irene");
+                Message aceptar = new Aceptar(idMio, nombre);
                 Mediador.getInstance().sendMessage(invitacion.getIdUsuario(), aceptar);
                 idUsuarioActivo = invitacion.getIdUsuario();
             } else {
