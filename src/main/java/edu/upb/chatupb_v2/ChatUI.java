@@ -17,6 +17,8 @@ import javax.swing.*;
  */
 public class ChatUI extends javax.swing.JFrame implements SocketListener {
     SocketClient client;
+    private String idUsuarioActivo;
+
 //    ChatServer chatServer;
 
     /**
@@ -116,10 +118,11 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
         if (client != null) {
             try {
                 System.out.println("Enviando 007...");
-                String message = jtMensaje.getText().toString();
-                client.send(Mensaje.parse(message));
+                String mensajeTxt = jtMensaje.getText().toString();
+                Message message = new Mensaje(idUsuarioActivo,"0", mensajeTxt);
+                client.send(message);
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
     }//GEN-LAST:event_jBtnEnviarActionPerformed
@@ -181,6 +184,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
                 Mediador.getInstance().addClient(invitacion.getIdUsuario(), socketClient);
                 Message aceptar = new Aceptar("8179864", "Irene");
                 Mediador.getInstance().sendMessage(invitacion.getIdUsuario(), aceptar);
+                idUsuarioActivo = invitacion.getIdUsuario();
             } else {
                 try {
                     Message rechazar = new Rechazar();
@@ -195,8 +199,8 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
             Mediador.getInstance().addClient(aceptar.getIdUsuario(), socketClient);
         }
         if (message instanceof Mensaje) {
-            System.out.println("Llegó el mensaje");
             Mensaje mensaje = (Mensaje) message;
+            System.out.println("Llegó el mensaje: " + mensaje);
 
         }
 

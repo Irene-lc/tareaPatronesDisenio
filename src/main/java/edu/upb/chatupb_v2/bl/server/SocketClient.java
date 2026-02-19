@@ -102,7 +102,7 @@ public class SocketClient extends Thread {
 //        }
 //    }
     public void send(Message message) throws IOException { //enviar mensaje a quien me habló
-        String messageStr = message.generarTrama() + System.lineSeparator();
+        String messageStr = message.generarTrama();
         try {
             dout.write(messageStr.getBytes("UTF-8"));
             dout.flush();
