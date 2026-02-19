@@ -50,7 +50,7 @@ public class SocketClient extends Thread {
         try {
             String message;
             while ((message = br.readLine()) != null) {
-                System.out.println(message);
+                System.out.println("Mensaje recibido: " + message);
 
                 String split[] = message.split(Pattern.quote("|"));
                 if (split.length == 0) {
