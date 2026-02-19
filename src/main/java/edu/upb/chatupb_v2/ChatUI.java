@@ -103,6 +103,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
             client = new SocketClient(jtIp.getText().toString());
             client.addListener(this); // le estoy pasando una instancia de si mismo. se subscribe al socketclient ue se acaba de crear
             client.start();
+            System.out.println("Enviando 001...");
             Message message = new Invitacion("8179864", "Irene");
             client.send(message);
 
@@ -114,6 +115,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
         // TODO add your handling code here:
         if (client != null) {
             try {
+                System.out.println("Enviando 007...");
                 String message = jtMensaje.getText().toString();
                 client.send(Mensaje.parse(message));
             } catch (Exception e) {
@@ -189,10 +191,12 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
             }
         }
         if (message instanceof Aceptar) {
-            Aceptar aceotar = (Aceptar) message;
-            Mediador.getInstance().addClient(aceotar.getIdUsuario(), socketClient );
+            Aceptar aceptar = (Aceptar) message;
+            Mediador.getInstance().addClient(aceptar.getIdUsuario(), socketClient);
         }
-        if (message instanceof Rechazar) {
+        if (message instanceof Mensaje) {
+            System.out.println("Llegó el mensaje");
+            Mensaje mensaje = (Mensaje) message;
 
         }
 

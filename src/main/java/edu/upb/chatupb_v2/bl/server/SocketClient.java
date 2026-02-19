@@ -4,10 +4,7 @@
  */
 package edu.upb.chatupb_v2.bl.server;
 
-import edu.upb.chatupb_v2.bl.message.Aceptar;
-import edu.upb.chatupb_v2.bl.message.Invitacion;
-import edu.upb.chatupb_v2.bl.message.Message;
-import edu.upb.chatupb_v2.bl.message.Rechazar;
+import edu.upb.chatupb_v2.bl.message.*;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -51,7 +48,8 @@ public class SocketClient extends Thread {
         try {
             String message;
             while ((message = br.readLine()) != null) {
-                System.out.println("Comando recibido: " + message);
+//                System.out.println("Comando recibido: " + message);
+                System.out.println(message);
 
                 String split[] = message.split(Pattern.quote("|"));
                 if (split.length == 0) {
@@ -76,6 +74,10 @@ public class SocketClient extends Thread {
                     case "003":
                         Rechazar rechazar = Rechazar.parse(message);
                         notificar(rechazar);
+                        break;
+                    case "007":
+                        Mensaje mensaje = Mensaje.parse(message);
+                        notificar(mensaje);
                         break;
                 }
             }
