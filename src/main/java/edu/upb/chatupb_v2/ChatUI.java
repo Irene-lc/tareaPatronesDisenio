@@ -119,8 +119,12 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
             try {
                 System.out.println("Enviando 007...");
                 String mensajeTxt = jtMensaje.getText().toString();
+                if (idUsuarioActivo == null) {
+                    JOptionPane.showMessageDialog(this, "No hay usuario conectado");
+                    return;
+                }
                 Message message = new Mensaje(idUsuarioActivo,"0", mensajeTxt);
-                client.send(message);
+                Mediador.getInstance().sendMessage(idUsuarioActivo, message);
             } catch (Exception e) {
                 e.printStackTrace();
             }

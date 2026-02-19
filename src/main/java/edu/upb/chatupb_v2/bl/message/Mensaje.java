@@ -1,5 +1,7 @@
 package edu.upb.chatupb_v2.bl.message;
 
+import lombok.Data;
+
 import java.util.regex.Pattern;
 
 public class Mensaje extends Message {
@@ -53,5 +55,10 @@ public class Mensaje extends Message {
 
     public void setMensaje(String mensaje) {
         this.mensaje = mensaje;
+    }
+
+    @Override
+    public String toString() {
+        return mensaje;
     }
 }

@@ -1,5 +1,7 @@
 package edu.upb.chatupb_v2.bl.message;
 
+import lombok.Data;
+
 import java.net.Socket;
 import java.util.regex.Pattern;
 
@@ -47,4 +49,8 @@ public class Invitacion extends Message {
         this.nombre = nombre;
     }
 
+    @Override
+    public String toString() {
+        return nombre ;
+    }
 }
