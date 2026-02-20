@@ -250,7 +250,6 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
                 client = socketClient;
                 chatView = new ChatView(client, idUsuarioActivo);
                 chatView.setVisible(true);
-                this.dispose();
             }
             if (respuesta == JOptionPane.NO_OPTION) {
                 try {
@@ -266,10 +265,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
             Mediador.getInstance().addClient(aceptar.getIdUsuario(), socketClient);
             idUsuarioActivo = aceptar.getIdUsuario();
             chatView = new ChatView(client, idUsuarioActivo);
-        }
-        if (message instanceof Mensaje) {
-            Mensaje mensaje = (Mensaje) message;
-            System.out.println("Llegó el mensaje: " + mensaje);
+            chatView.setVisible(true);
         }
     }
     // End of variables declaration//GEN-END:variables
