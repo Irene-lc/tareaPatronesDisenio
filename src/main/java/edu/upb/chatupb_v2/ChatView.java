@@ -26,15 +26,13 @@ public class ChatView extends JFrame implements SocketListener {
     /**
      * Creates new form ChatUI
      */
-    public ChatView() {
+    public ChatView(SocketClient client, String idUsuarioActivo) {
+        this.client = client;
+        this.idUsuarioActivo = idUsuarioActivo;
+
         initComponents();
-//        try{
-//            chatServer = new ChatServer();
-//            chatServer.addListener(this);
-//            chatServer.start();
-//        }catch(Exception e){
-//            e.printStackTrace();
-//        }
+
+        client.addListener(this);
     }
 
     /**
@@ -115,37 +113,37 @@ public class ChatView extends JFrame implements SocketListener {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ChatView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ChatView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ChatView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ChatView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ChatView().setVisible(true);
-            }
-        });
-    }
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+//         */
+//        try {
+//            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(ChatView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(ChatView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(ChatView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(ChatView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//
+//        /* Create and display the form */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                new ChatView().setVisible(true);
+//            }
+//        });
+//    }
 
 //     Variables declaration - do not modify//GEN-BEGIN:variables
     private JButton jBtnEnviar;
@@ -155,38 +153,6 @@ public class ChatView extends JFrame implements SocketListener {
 
     @Override
     public void onMessage(SocketClient socketClient, Message message) {
-        if (message instanceof Invitacion) {
-            System.out.println("Llego la invitacion");
-
-            Invitacion invitacion = (Invitacion) message;
-            int respuesta = JOptionPane.showConfirmDialog(
-                    this,
-                    "LLego la invitacion: " + invitacion
-                    , "Invitacion",
-                    JOptionPane.YES_NO_OPTION); // esto le llega al CLiente
-
-            if (respuesta == JOptionPane.YES_OPTION) {
-                System.out.println("id invitacion: " + invitacion.getIdUsuario());
-                Mediador.getInstance().addClient(invitacion.getIdUsuario(), socketClient);
-                Message aceptar = new Aceptar(idMio, nombre);
-                Mediador.getInstance().sendMessage(invitacion.getIdUsuario(), aceptar);
-                idUsuarioActivo = invitacion.getIdUsuario();
-                client = socketClient;
-            }
-            if (respuesta == JOptionPane.NO_OPTION) {
-                try {
-                    Message rechazar = new Rechazar();
-                    socketClient.send(rechazar);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        if (message instanceof Aceptar) {
-            Aceptar aceptar = (Aceptar) message;
-            Mediador.getInstance().addClient(aceptar.getIdUsuario(), socketClient);
-            idUsuarioActivo = aceptar.getIdUsuario();
-        }
         if (message instanceof Mensaje) {
             Mensaje mensaje = (Mensaje) message;
             System.out.println("Llegó el mensaje: " + mensaje);
