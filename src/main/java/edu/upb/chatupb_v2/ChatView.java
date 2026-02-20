@@ -10,6 +10,9 @@ import edu.upb.chatupb_v2.bl.server.SocketClient;
 import edu.upb.chatupb_v2.bl.server.SocketListener;
 
 import javax.swing.*;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 /**
  *
@@ -93,7 +96,7 @@ public class ChatView extends JFrame implements SocketListener {
 
     private void jBtnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEnviarActionPerformed
         // TODO add your handling code here:
-        if (client != null) {
+        if (idUsuarioActivo != null) {
             try {
                 System.out.println("Enviando 007...");
                 String mensajeTxt = jtMensaje.getText().toString();
@@ -101,14 +104,36 @@ public class ChatView extends JFrame implements SocketListener {
                     JOptionPane.showMessageDialog(this, "No hay usuario conectado");
                     return;
                 }
-                System.out.println("id usuario: " + idUsuarioActivo);
+                agregarMensaje(mensajeTxt, true);
                 Message message = new Mensaje(idMio, "012", mensajeTxt);
                 Mediador.getInstance().sendMessage(idUsuarioActivo, message);
+                jtMensaje.setText("");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }//GEN-LAST:event_jBtnEnviarActionPerformed
+
+    private void agregarMensaje(String texto, boolean esMio) {
+        StyledDocument doc = jTextPaneChat.getStyledDocument();
+        SimpleAttributeSet attrs = new SimpleAttributeSet();
+
+        if (esMio) {
+            StyleConstants.setAlignment(attrs, StyleConstants.ALIGN_RIGHT);
+            StyleConstants.setForeground(attrs, java.awt.Color.BLUE);
+        } else {
+            StyleConstants.setAlignment(attrs, StyleConstants.ALIGN_LEFT);
+            StyleConstants.setForeground(attrs, java.awt.Color.BLACK);
+        }
+
+        try {
+            int len = doc.getLength();
+            doc.insertString(len, texto + "\n", attrs);
+            doc.setParagraphAttributes(len, texto.length(), attrs, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -155,6 +180,7 @@ public class ChatView extends JFrame implements SocketListener {
     public void onMessage(SocketClient socketClient, Message message) {
         if (message instanceof Mensaje) {
             Mensaje mensaje = (Mensaje) message;
+            agregarMensaje(mensaje.getMensaje(), false);
             System.out.println("Llegó el mensaje: " + mensaje);
         }
     }
