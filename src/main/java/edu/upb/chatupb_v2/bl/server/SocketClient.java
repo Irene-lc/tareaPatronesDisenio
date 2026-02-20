@@ -42,6 +42,9 @@ public class SocketClient extends Thread {
     public void addListener(SocketListener listener) {
         this.socketListener.add(listener);
     }
+    public void removeListener(SocketListener listener) {
+        this.socketListener.remove(listener);
+    }
 
     @Override
     public void run() {

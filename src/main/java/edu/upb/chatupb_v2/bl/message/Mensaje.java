@@ -59,6 +59,6 @@ public class Mensaje extends Message {
 
     @Override
     public String toString() {
-        return mensaje;
+        return generarTrama();
     }
 }

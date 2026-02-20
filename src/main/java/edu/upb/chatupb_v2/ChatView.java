@@ -13,12 +13,15 @@ import javax.swing.*;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import java.util.Random;
+import java.util.UUID;
 
 /**
  *
  * @author rlaredo
  */
 public class ChatView extends JFrame implements SocketListener {
+    private ChatUI chatUI;
     SocketClient client;
     private String idUsuarioActivo;
     private final String idMio = "8179864";
@@ -29,9 +32,10 @@ public class ChatView extends JFrame implements SocketListener {
     /**
      * Creates new form ChatUI
      */
-    public ChatView(SocketClient client, String idUsuarioActivo) {
+    public ChatView(SocketClient client, String idUsuarioActivo, ChatUI chatUI) {
         this.client = client;
         this.idUsuarioActivo = idUsuarioActivo;
+        this.chatUI = chatUI;
 
         initComponents();
 
@@ -55,6 +59,7 @@ public class ChatView extends JFrame implements SocketListener {
         jScrollPaneChat = new JScrollPane();
         jScrollPaneChat.setViewportView(jTextPaneChat);
 
+
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 
@@ -65,6 +70,14 @@ public class ChatView extends JFrame implements SocketListener {
             }
         });
 
+        jBtnNuevaConexion = new JButton("+");
+        jBtnNuevaConexion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnNuevaConexionActionPerformed(evt);
+            }
+        });
+
+
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -72,7 +85,10 @@ public class ChatView extends JFrame implements SocketListener {
                         .addGroup(layout.createSequentialGroup()
                                 .addGap(20, 20, 20)
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                        .addComponent(jScrollPaneChat, GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jScrollPaneChat, GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jBtnNuevaConexion, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE))
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(jtMensaje)
                                                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
@@ -83,7 +99,9 @@ public class ChatView extends JFrame implements SocketListener {
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addGap(20, 20, 20)
-                                .addComponent(jScrollPaneChat, GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(jScrollPaneChat, GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                                        .addComponent(jBtnNuevaConexion, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
                                 .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                         .addComponent(jtMensaje, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -96,24 +114,29 @@ public class ChatView extends JFrame implements SocketListener {
 
     private void jBtnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEnviarActionPerformed
         // TODO add your handling code here:
-        if (idUsuarioActivo != null) {
-            try {
-                System.out.println("Enviando 007...");
-                String mensajeTxt = jtMensaje.getText().toString();
-                if (idUsuarioActivo == null) {
-                    JOptionPane.showMessageDialog(this, "No hay usuario conectado");
-                    return;
+        if (jtMensaje != null) {
+            String mensajeTxt = jtMensaje.getText().toString();
+            if (mensajeTxt.isEmpty())
+                return;
+            if (idUsuarioActivo != null) {
+                try {
+                    System.out.println("Enviando 007...");
+                    agregarMensaje(mensajeTxt, true);
+                    String r = UUID.randomUUID().toString();
+                    Message message = new Mensaje(idMio, r, mensajeTxt);
+                    Mediador.getInstance().sendMessage(idUsuarioActivo, message);
+                    jtMensaje.setText("");
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                agregarMensaje(mensajeTxt, true);
-                Message message = new Mensaje(idMio, "012", mensajeTxt);
-                Mediador.getInstance().sendMessage(idUsuarioActivo, message);
-                jtMensaje.setText("");
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
+
     }//GEN-LAST:event_jBtnEnviarActionPerformed
 
+    private void jBtnNuevaConexionActionPerformed(java.awt.event.ActionEvent evt) {
+        chatUI.setVisible(true);
+    }
     private void agregarMensaje(String texto, boolean esMio) {
         StyledDocument doc = jTextPaneChat.getStyledDocument();
         SimpleAttributeSet attrs = new SimpleAttributeSet();
@@ -175,13 +198,14 @@ public class ChatView extends JFrame implements SocketListener {
     private JTextField jtMensaje;
     private JTextPane jTextPaneChat;
     private JScrollPane jScrollPaneChat;
+    private JButton jBtnNuevaConexion;
 
     @Override
     public void onMessage(SocketClient socketClient, Message message) {
         if (message instanceof Mensaje) {
             Mensaje mensaje = (Mensaje) message;
             agregarMensaje(mensaje.getMensaje(), false);
-            System.out.println("Llegó el mensaje: " + mensaje);
+            System.out.print("Llegó el mensaje: " + mensaje + '\n');
         }
     }
     // End of variables declaration//GEN-END:variables

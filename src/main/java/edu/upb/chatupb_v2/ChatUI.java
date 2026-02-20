@@ -52,7 +52,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
 //        jBtnEnviar = new javax.swing.JButton();
 //        jtMensaje = new javax.swing.JTextField();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+//        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jBtnConectar.setText("Conectar");
         jBtnConectar.addActionListener(new java.awt.event.ActionListener() {
@@ -248,10 +248,13 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
                 Mediador.getInstance().sendMessage(invitacion.getIdUsuario(), aceptar);
                 idUsuarioActivo = invitacion.getIdUsuario();
                 client = socketClient;
-                chatView = new ChatView(client, idUsuarioActivo);
+                chatView = new ChatView(client, idUsuarioActivo, this);
                 chatView.setVisible(true);
+                this.setVisible(false);
+                client.removeListener(this);
             }
             if (respuesta == JOptionPane.NO_OPTION) {
+                System.out.println("Enviando 003...");
                 try {
                     Message rechazar = new Rechazar();
                     socketClient.send(rechazar);
@@ -261,11 +264,17 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
             }
         }
         if (message instanceof Aceptar) {
+            JOptionPane.showMessageDialog(null, "Su invitacion fue aceptada", "Aceptada", JOptionPane.INFORMATION_MESSAGE);
             Aceptar aceptar = (Aceptar) message;
             Mediador.getInstance().addClient(aceptar.getIdUsuario(), socketClient);
             idUsuarioActivo = aceptar.getIdUsuario();
-            chatView = new ChatView(client, idUsuarioActivo);
+            chatView = new ChatView(client, idUsuarioActivo, this);
             chatView.setVisible(true);
+            this.setVisible(false);
+            client.removeListener(this);
+        }
+        if  (message instanceof Rechazar) {
+            JOptionPane.showMessageDialog(null, "Su invitacion fue rechazada", "Rechazo", JOptionPane.INFORMATION_MESSAGE);
         }
     }
     // End of variables declaration//GEN-END:variables
