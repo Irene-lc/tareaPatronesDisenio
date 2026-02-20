@@ -49,8 +49,8 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
 
         jtIp = new javax.swing.JTextField();
         jBtnConectar = new javax.swing.JButton();
-        jBtnEnviar = new javax.swing.JButton();
-        jtMensaje = new javax.swing.JTextField();
+//        jBtnEnviar = new javax.swing.JButton();
+//        jtMensaje = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -61,12 +61,12 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
             }
         });
 
-        jBtnEnviar.setText("Enviar");
-        jBtnEnviar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnEnviarActionPerformed(evt);
-            }
-        });
+//        jBtnEnviar.setText("Enviar");
+//        jBtnEnviar.addActionListener(new java.awt.event.ActionListener() {
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                jBtnEnviarActionPerformed(evt);
+//            }
+//        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -75,10 +75,6 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
                         .addGroup(layout.createSequentialGroup()
                                 .addGap(28, 28, 28)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jtMensaje, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jBtnEnviar))
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(jtIp, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGap(18, 18, 18)
@@ -93,18 +89,74 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
                                         .addComponent(jtIp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(jBtnConectar))
                                 .addGap(143, 143, 143)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jtMensaje, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jBtnEnviar))
                                 .addContainerGap(80, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+//    // @SuppressWarnings("unchecked")
+//    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+//    private void initComponents() {
+//
+//        jtIp = new javax.swing.JTextField();
+//        jBtnConectar = new javax.swing.JButton();
+////        jBtnEnviar = new javax.swing.JButton();
+////        jtMensaje = new javax.swing.JTextField();
+//
+//        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+//
+//        jBtnConectar.setText("Conectar");
+//        jBtnConectar.addActionListener(new java.awt.event.ActionListener() {
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                jBtnConectarActionPerformed(evt);
+//            }
+//        });
+//
+////        jBtnEnviar.setText("Enviar");
+////        jBtnEnviar.addActionListener(new java.awt.event.ActionListener() {
+////            public void actionPerformed(java.awt.event.ActionEvent evt) {
+////                jBtnEnviarActionPerformed(evt);
+////            }
+////        });
+//
+//        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+//        getContentPane().setLayout(layout);
+//        layout.setHorizontalGroup(
+//                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+//                        .addGroup(layout.createSequentialGroup()
+//                                .addGap(28, 28, 28)
+//                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+//                                        .addGroup(layout.createSequentialGroup()
+//                                                .addComponent(jtMensaje, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
+//                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+//                                                .addComponent(jBtnEnviar))
+//                                        .addGroup(layout.createSequentialGroup()
+//                                                .addComponent(jtIp, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
+//                                                .addGap(18, 18, 18)
+//                                                .addComponent(jBtnConectar)))
+//                                .addContainerGap(107, Short.MAX_VALUE))
+//        );
+//        layout.setVerticalGroup(
+//                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+//                        .addGroup(layout.createSequentialGroup()
+//                                .addGap(23, 23, 23)
+//                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+//                                        .addComponent(jtIp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+//                                        .addComponent(jBtnConectar))
+//                                .addGap(143, 143, 143)
+//                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+//                                        .addComponent(jtMensaje, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+//                                        .addComponent(jBtnEnviar))
+//                                .addContainerGap(80, Short.MAX_VALUE))
+//        );
+//
+//        pack();
+//    }// </editor-fold>//GEN-END:initComponents
 
     private void jBtnConectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnConectarActionPerformed
         // TODO add your handling code here:
         try {
+//            iniciarCliente();
             client = new SocketClient(jtIp.getText().toString());
             client.addListener(this); // le estoy pasando una instancia de si mismo. se subscribe al socketclient ue se acaba de crear
             client.start();
@@ -117,65 +169,65 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
         }
     }//GEN-LAST:event_jBtnConectarActionPerformed
 
-    private void jBtnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEnviarActionPerformed
-        // TODO add your handling code here:
-        if (client != null) {
-            try {
-                System.out.println("Enviando 007...");
-                String mensajeTxt = jtMensaje.getText().toString();
-                if (idUsuarioActivo == null) {
-                    JOptionPane.showMessageDialog(this, "No hay usuario conectado");
-                    return;
-                }
-                Random r = new Random();
-                Message message = new Mensaje(idMio, r.toString(), mensajeTxt);
-                Mediador.getInstance().sendMessage(idUsuarioActivo, message);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }//GEN-LAST:event_jBtnEnviarActionPerformed
+//    private void jBtnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEnviarActionPerformed
+//        // TODO add your handling code here:
+//        if (client != null) {
+//            try {
+//                System.out.println("Enviando 007...");
+//                String mensajeTxt = jtMensaje.getText().toString();
+//                if (idUsuarioActivo == null) {
+//                    JOptionPane.showMessageDialog(this, "No hay usuario conectado");
+//                    return;
+//                }
+//                System.out.println("id usuario: " + idUsuarioActivo);
+//                Message message = new Mensaje(idMio, "012", mensajeTxt);
+//                Mediador.getInstance().sendMessage(idUsuarioActivo, message);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }//GEN-LAST:event_jBtnEnviarActionPerformed
 
     /**
      * @param args the command line arguments
      */
-//    public static void main(String args[]) {
-//        /* Set the Nimbus look and feel */
-//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-//         */
-//        try {
-//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-//                if ("Nimbus".equals(info.getName())) {
-//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-//                    break;
-//                }
-//            }
-//        } catch (ClassNotFoundException ex) {
-//            java.util.logging.Logger.getLogger(ChatUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (InstantiationException ex) {
-//            java.util.logging.Logger.getLogger(ChatUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (IllegalAccessException ex) {
-//            java.util.logging.Logger.getLogger(ChatUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-//            java.util.logging.Logger.getLogger(ChatUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        }
-//        //</editor-fold>
-//
-//        /* Create and display the form */
-//        java.awt.EventQueue.invokeLater(new Runnable() {
-//            public void run() {
-//                new ChatUI().setVisible(true);
-//            }
-//        });
-//    }
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(ChatUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(ChatUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(ChatUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(ChatUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new ChatUI().setVisible(true);
+            }
+        });
+    }
+
+//     Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBtnConectar;
-    private javax.swing.JButton jBtnEnviar;
+//    private javax.swing.JButton jBtnEnviar;
     private javax.swing.JTextField jtIp;
-    private javax.swing.JTextField jtMensaje;
+//    private javax.swing.JTextField jtMensaje;
 
     @Override
     public void onMessage(SocketClient socketClient, Message message) {
@@ -190,11 +242,14 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
                     JOptionPane.YES_NO_OPTION); // esto le llega al CLiente
 
             if (respuesta == JOptionPane.YES_OPTION) {
+                System.out.println("id invitacion: " + invitacion.getIdUsuario());
                 Mediador.getInstance().addClient(invitacion.getIdUsuario(), socketClient);
                 Message aceptar = new Aceptar(idMio, nombre);
                 Mediador.getInstance().sendMessage(invitacion.getIdUsuario(), aceptar);
                 idUsuarioActivo = invitacion.getIdUsuario();
-            } else {
+                client = socketClient;
+            }
+            if (respuesta == JOptionPane.NO_OPTION) {
                 try {
                     Message rechazar = new Rechazar();
                     socketClient.send(rechazar);
@@ -211,10 +266,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
         if (message instanceof Mensaje) {
             Mensaje mensaje = (Mensaje) message;
             System.out.println("Llegó el mensaje: " + mensaje);
-
         }
-
-
     }
     // End of variables declaration//GEN-END:variables
 }
