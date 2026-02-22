@@ -16,7 +16,7 @@ import java.util.Random;
  *
  * @author rlaredo
  */
-public class ChatUI extends javax.swing.JFrame implements SocketListener {
+public class ChatUI extends javax.swing.JFrame {
     SocketClient client;
     private String idUsuarioActivo;
     private final String idMio = "8179864";
@@ -158,7 +158,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
         try {
 //            iniciarCliente();
             client = new SocketClient(jtIp.getText().toString());
-            client.addListener(this); // le estoy pasando una instancia de si mismo. se subscribe al socketclient ue se acaba de crear
+//            client.addListener(this); // le estoy pasando una instancia de si mismo. se subscribe al socketclient ue se acaba de crear
             client.start();
             System.out.println("Enviando 001...");
             Message message = new Invitacion(idMio, nombre);
@@ -229,7 +229,6 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
     private javax.swing.JTextField jtIp;
 //    private javax.swing.JTextField jtMensaje;
 
-    @Override
     public void onMessage(SocketClient socketClient, Message message) {
         if (message instanceof Invitacion) {
             System.out.println("Llego la invitacion");
@@ -249,9 +248,10 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
                 idUsuarioActivo = invitacion.getIdUsuario();
                 client = socketClient;
                 chatView = new ChatView(client, idUsuarioActivo, this);
+                Mediador.getInstance().setChatView(chatView);
                 chatView.setVisible(true);
                 this.setVisible(false);
-                client.removeListener(this);
+//                client.removeListener(this);
             }
             if (respuesta == JOptionPane.NO_OPTION) {
                 System.out.println("Enviando 003...");
@@ -269,9 +269,10 @@ public class ChatUI extends javax.swing.JFrame implements SocketListener {
             Mediador.getInstance().addClient(aceptar.getIdUsuario(), socketClient);
             idUsuarioActivo = aceptar.getIdUsuario();
             chatView = new ChatView(client, idUsuarioActivo, this);
+            Mediador.getInstance().setChatView(chatView);
             chatView.setVisible(true);
             this.setVisible(false);
-            client.removeListener(this);
+//            client.removeListener(this);
         }
         if  (message instanceof Rechazar) {
             JOptionPane.showMessageDialog(null, "Su invitacion fue rechazada", "Rechazo", JOptionPane.INFORMATION_MESSAGE);

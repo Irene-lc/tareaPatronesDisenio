@@ -20,7 +20,7 @@ import java.util.UUID;
  *
  * @author rlaredo
  */
-public class ChatView extends JFrame implements SocketListener {
+public class ChatView extends JFrame {
     private ChatUI chatUI;
     SocketClient client;
     private String idUsuarioActivo;
@@ -39,7 +39,7 @@ public class ChatView extends JFrame implements SocketListener {
 
         initComponents();
 
-        client.addListener(this);
+//        client.addListener(this);
     }
 
     /**
@@ -245,7 +245,6 @@ public class ChatView extends JFrame implements SocketListener {
 //    private JButton jBtnNuevaConexion;
     private JButton jBtnOff;
 
-    @Override
     public void onMessage(SocketClient socketClient, Message message) {
         if (message instanceof Mensaje) {
             Mensaje mensaje = (Mensaje) message;

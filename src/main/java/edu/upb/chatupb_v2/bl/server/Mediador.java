@@ -1,11 +1,15 @@
 package edu.upb.chatupb_v2.bl.server;
 
+import edu.upb.chatupb_v2.ChatUI;
+import edu.upb.chatupb_v2.ChatView;
 import edu.upb.chatupb_v2.bl.message.Message;
 
 import java.io.IOException;
 import java.util.HashMap;
 
 public class Mediador {
+    private ChatUI chatUI;
+    private ChatView chatView;
     private static final Mediador mediador = new Mediador();
     public final HashMap<String, SocketClient> listaContactos = new HashMap<>();
 
@@ -51,4 +55,17 @@ public class Mediador {
         }
         listaContactos.clear();
     }
+    public void notificar(SocketClient client, Message message) {
+        chatUI.onMessage(client, message);
+        chatView.onMessage(client, message);
+    }
+
+    public void setChatUI(ChatUI chatUI) {
+        this.chatUI = chatUI;
+    }
+
+    public void setChatView(ChatView chatView) {
+        this.chatView = chatView;
+    }
 }
+

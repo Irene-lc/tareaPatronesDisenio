@@ -23,7 +23,7 @@ public class SocketClient extends Thread {
     private final String ip;
     private final DataOutputStream dout;
     private final BufferedReader br;
-    private List<SocketListener> socketListener = new ArrayList<>();
+//    private List<SocketListener> socketListener = new ArrayList<>();
 
     public SocketClient(Socket socket) throws IOException {
         this.socket = socket;
@@ -39,12 +39,12 @@ public class SocketClient extends Thread {
         br = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
     }
 
-    public void addListener(SocketListener listener) {
-        this.socketListener.add(listener);
-    }
-    public void removeListener(SocketListener listener) {
-        this.socketListener.remove(listener);
-    }
+//    public void addListener(SocketListener listener) {
+//        this.socketListener.add(listener);
+//    }
+//    public void removeListener(SocketListener listener) {
+//        this.socketListener.remove(listener);
+//    }
 
     @Override
     public void run() {
@@ -65,26 +65,30 @@ public class SocketClient extends Thread {
 //                            socketListener.onInvitacion(inv);
 //                        }
 //                        inv.setIp(ip);
-                        notificar(inv);
+                        Mediador.getInstance().notificar(this, inv);
 //                    System.out.println(inv.generarTrama());
                         break;
 
                     case "002":
                         Aceptar acept = Aceptar.parse(message);
 //                        acept.setIp(ip);
-                        notificar(acept);
+                        Mediador.getInstance().notificar(this, acept);
+//                        notificar(acept);
                         break;
                     case "003":
                         Rechazar rechazar = Rechazar.parse(message);
-                        notificar(rechazar);
+                        Mediador.getInstance().notificar(this, rechazar);
+//                        notificar(rechazar);
                         break;
                     case "007":
                         Mensaje mensaje = Mensaje.parse(message);
-                        notificar(mensaje);
+                        Mediador.getInstance().notificar(this, mensaje);
+//                        notificar(mensaje);
                         break;
                     case "0018":
                         FueraLinea fueraLinea = FueraLinea.parse(message);
-                        notificar(fueraLinea);
+                        Mediador.getInstance().notificar(this, fueraLinea);
+//                        notificar(fueraLinea);
                         break;
                 }
             }
@@ -97,11 +101,11 @@ public class SocketClient extends Thread {
         }
     }
 
-    public void notificar(Message message) {
-        for (SocketListener listener : socketListener) {
-            java.awt.EventQueue.invokeLater(() -> listener.onMessage(this, message));
-        }
-    }
+//    public void notificar(Message message) {
+//        for (SocketListener listener : socketListener) {
+//            java.awt.EventQueue.invokeLater(() -> listener.onMessage(this, message));
+//        }
+//    }
 
     //    public void send(String message) throws IOException {
 //        message = message + System.lineSeparator();
