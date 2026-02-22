@@ -146,7 +146,6 @@ public class ChatView extends JFrame implements SocketListener {
             Message message = new FueraLinea(idMio);
             Mediador.getInstance().enviarMensajeATodos(message);
             mostrarMensajeSistema("CONEXION TERMINADA");
-            desactivarChat();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -155,23 +154,32 @@ public class ChatView extends JFrame implements SocketListener {
         chatUI.setVisible(true);
     }
     private void agregarMensaje(String texto, boolean esMio) {
-        StyledDocument doc = jTextPaneChat.getStyledDocument();
-        SimpleAttributeSet attrs = new SimpleAttributeSet();
+        if (client.isAlive()) {
+            StyledDocument doc = jTextPaneChat.getStyledDocument();
+            SimpleAttributeSet attrs = new SimpleAttributeSet();
 
-        if (esMio) {
-            StyleConstants.setAlignment(attrs, StyleConstants.ALIGN_RIGHT);
-            StyleConstants.setForeground(attrs, java.awt.Color.BLUE);
+            if (esMio) {
+                StyleConstants.setAlignment(attrs, StyleConstants.ALIGN_RIGHT);
+                StyleConstants.setForeground(attrs, java.awt.Color.BLUE);
+            } else {
+                StyleConstants.setAlignment(attrs, StyleConstants.ALIGN_LEFT);
+                StyleConstants.setForeground(attrs, java.awt.Color.BLACK);
+            }
+
+            try {
+                int len = doc.getLength();
+                doc.insertString(len, texto + "\n", attrs);
+                doc.setParagraphAttributes(len, texto.length(), attrs, false);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else {
-            StyleConstants.setAlignment(attrs, StyleConstants.ALIGN_LEFT);
-            StyleConstants.setForeground(attrs, java.awt.Color.BLACK);
-        }
-
-        try {
-            int len = doc.getLength();
-            doc.insertString(len, texto + "\n", attrs);
-            doc.setParagraphAttributes(len, texto.length(), attrs, false);
-        } catch (Exception e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No puede enviar mensajes",
+                    "Conexion Terminada",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
         }
     }
 
@@ -247,7 +255,7 @@ public class ChatView extends JFrame implements SocketListener {
         }
         if (message instanceof FueraLinea) {
             System.out.println("Conexión terminada por cliente");
-            desactivarChat();
+            mostrarMensajeSistema("CONEXION TERMINADA");
             JOptionPane.showMessageDialog(null, "Su conexion fue terminada", "Conexión terminada", JOptionPane.INFORMATION_MESSAGE);
             client.close();
             Mediador.getInstance().removeClient(idUsuarioActivo);
