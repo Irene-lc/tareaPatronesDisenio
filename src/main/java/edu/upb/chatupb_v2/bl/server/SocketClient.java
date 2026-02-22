@@ -114,7 +114,8 @@ public class SocketClient extends Thread {
             dout.write(messageStr.getBytes("UTF-8"));
             dout.flush();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Socket cerrado correctamente");
+//            e.printStackTrace();
         }
     }
 
