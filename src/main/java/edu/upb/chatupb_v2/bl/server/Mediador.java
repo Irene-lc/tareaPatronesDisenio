@@ -2,6 +2,7 @@ package edu.upb.chatupb_v2.bl.server;
 
 import edu.upb.chatupb_v2.bl.message.Message;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 public class Mediador {
@@ -37,5 +38,17 @@ public class Mediador {
             e.printStackTrace();
         }
         System.out.println("Enviando comando: " + message.generarTrama());
+    }
+
+    public void enviarMensajeATodos(Message message) {
+        for (SocketClient cliente : listaContactos.values()) {
+            try {
+                cliente.send(message);
+                cliente.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        listaContactos.clear();
     }
 }

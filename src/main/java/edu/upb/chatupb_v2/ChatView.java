@@ -144,8 +144,8 @@ public class ChatView extends JFrame implements SocketListener {
         try {
             System.out.println("Enviando 0018...");
             Message message = new FueraLinea(idMio);
-            client.send(message);
-//            client.close();
+            Mediador.getInstance().enviarMensajeATodos(message);
+            client.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -226,7 +226,9 @@ public class ChatView extends JFrame implements SocketListener {
         }
         if (message instanceof FueraLinea) {
             System.out.println("Conexión terminada por cliente");
+            Mediador.getInstance().enviarMensajeATodos(message);
             JOptionPane.showMessageDialog(null, "Su conexion fue terminada", "Conexión terminada", JOptionPane.INFORMATION_MESSAGE);
+            client.close();
         }
     }
     // End of variables declaration//GEN-END:variables
