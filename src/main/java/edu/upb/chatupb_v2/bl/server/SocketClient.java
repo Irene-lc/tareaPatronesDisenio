@@ -89,7 +89,11 @@ public class SocketClient extends Thread {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            if (!socket.isClosed()) {
+                e.printStackTrace();
+            } else {
+                System.out.println("Socket cerrado correctamente.");
+            }
         }
     }
 
@@ -114,8 +118,7 @@ public class SocketClient extends Thread {
             dout.write(messageStr.getBytes("UTF-8"));
             dout.flush();
         } catch (Exception e) {
-            System.out.println("Socket cerrado correctamente");
-//            e.printStackTrace();
+            e.printStackTrace();
         }
     }
 

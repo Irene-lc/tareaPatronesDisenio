@@ -145,6 +145,8 @@ public class ChatView extends JFrame implements SocketListener {
             System.out.println("Enviando 0018...");
             Message message = new FueraLinea(idMio);
             Mediador.getInstance().enviarMensajeATodos(message);
+            mostrarMensajeSistema("CONEXION TERMINADA");
+            desactivarChat();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -173,6 +175,26 @@ public class ChatView extends JFrame implements SocketListener {
         }
     }
 
+    private void mostrarMensajeSistema(String texto) {
+        StyledDocument doc = jTextPaneChat.getStyledDocument();
+        SimpleAttributeSet attrs = new SimpleAttributeSet();
+
+        StyleConstants.setAlignment(attrs, StyleConstants.ALIGN_CENTER);
+        StyleConstants.setBold(attrs, true);
+        StyleConstants.setForeground(attrs, java.awt.Color.RED);
+
+        try {
+            int len = doc.getLength();
+            doc.insertString(len, texto + "\n", attrs);
+            doc.setParagraphAttributes(len, texto.length(), attrs, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private void desactivarChat() {
+        jtMensaje.setEditable(false);
+        jBtnEnviar.setEnabled(false);
+    }
     /**
      * @param args the command line arguments
      */
@@ -225,6 +247,7 @@ public class ChatView extends JFrame implements SocketListener {
         }
         if (message instanceof FueraLinea) {
             System.out.println("Conexión terminada por cliente");
+            desactivarChat();
             JOptionPane.showMessageDialog(null, "Su conexion fue terminada", "Conexión terminada", JOptionPane.INFORMATION_MESSAGE);
             client.close();
             Mediador.getInstance().removeClient(idUsuarioActivo);
