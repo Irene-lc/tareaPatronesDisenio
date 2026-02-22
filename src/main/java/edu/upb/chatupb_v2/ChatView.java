@@ -70,10 +70,16 @@ public class ChatView extends JFrame implements SocketListener {
             }
         });
 
-        jBtnNuevaConexion = new JButton("+");
-        jBtnNuevaConexion.addActionListener(new java.awt.event.ActionListener() {
+//        jBtnNuevaConexion = new JButton("+");
+//        jBtnNuevaConexion.addActionListener(new java.awt.event.ActionListener() {
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                jBtnNuevaConexionActionPerformed(evt);
+//            }
+//        });
+        jBtnOff = new JButton("off");
+        jBtnOff.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnNuevaConexionActionPerformed(evt);
+                jBtnOffActionPerformed(evt);
             }
         });
 
@@ -88,7 +94,7 @@ public class ChatView extends JFrame implements SocketListener {
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(jScrollPaneChat, GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
                                                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jBtnNuevaConexion, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE))
+                                                .addComponent(jBtnOff, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE))
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(jtMensaje)
                                                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
@@ -101,7 +107,7 @@ public class ChatView extends JFrame implements SocketListener {
                                 .addGap(20, 20, 20)
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                         .addComponent(jScrollPaneChat, GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
-                                        .addComponent(jBtnNuevaConexion, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(jBtnOff, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
                                 .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                         .addComponent(jtMensaje, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -134,6 +140,16 @@ public class ChatView extends JFrame implements SocketListener {
 
     }//GEN-LAST:event_jBtnEnviarActionPerformed
 
+    private void jBtnOffActionPerformed(java.awt.event.ActionEvent evt) {
+        try {
+            System.out.println("Enviando 0018...");
+            Message message = new FueraLinea(idMio);
+            client.send(message);
+//            client.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     private void jBtnNuevaConexionActionPerformed(java.awt.event.ActionEvent evt) {
         chatUI.setVisible(true);
     }
@@ -198,7 +214,8 @@ public class ChatView extends JFrame implements SocketListener {
     private JTextField jtMensaje;
     private JTextPane jTextPaneChat;
     private JScrollPane jScrollPaneChat;
-    private JButton jBtnNuevaConexion;
+//    private JButton jBtnNuevaConexion;
+    private JButton jBtnOff;
 
     @Override
     public void onMessage(SocketClient socketClient, Message message) {
@@ -206,6 +223,10 @@ public class ChatView extends JFrame implements SocketListener {
             Mensaje mensaje = (Mensaje) message;
             agregarMensaje(mensaje.getMensaje(), false);
             System.out.print("Llegó el mensaje: " + mensaje + '\n');
+        }
+        if (message instanceof FueraLinea) {
+            System.out.println("Conexión terminada por cliente");
+            JOptionPane.showMessageDialog(null, "Su conexion fue terminada", "Conexión terminada", JOptionPane.INFORMATION_MESSAGE);
         }
     }
     // End of variables declaration//GEN-END:variables

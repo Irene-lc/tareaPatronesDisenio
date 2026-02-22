@@ -82,6 +82,10 @@ public class SocketClient extends Thread {
                         Mensaje mensaje = Mensaje.parse(message);
                         notificar(mensaje);
                         break;
+                    case "0018":
+                        FueraLinea fueraLinea = FueraLinea.parse(message);
+                        notificar(fueraLinea);
+                        break;
                 }
             }
         } catch (IOException e) {
