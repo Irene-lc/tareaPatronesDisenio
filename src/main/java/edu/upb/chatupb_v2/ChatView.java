@@ -7,13 +7,13 @@ package edu.upb.chatupb_v2;
 import edu.upb.chatupb_v2.bl.message.*;
 import edu.upb.chatupb_v2.bl.server.Mediador;
 import edu.upb.chatupb_v2.bl.server.SocketClient;
-import edu.upb.chatupb_v2.bl.server.SocketListener;
+//import edu.upb.chatupb_v2.bl.server.SocketListener;
 
 import javax.swing.*;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-import java.util.Random;
+import java.awt.*;
 import java.util.UUID;
 
 /**
@@ -26,19 +26,17 @@ public class ChatView extends JFrame {
     private String idUsuarioActivo;
     private final String idMio = "8179864";
     private final String nombre = "Irene";
-
+    JPanel listaContactos = new JPanel();
 //    ChatServer chatServer;
 
     /**
      * Creates new form ChatUI
      */
-    public ChatView(SocketClient client, String idUsuarioActivo, ChatUI chatUI) {
+    public ChatView(SocketClient client, String idCliente, String nombreCliente, ChatUI chatUI) {
         this.client = client;
-        this.idUsuarioActivo = idUsuarioActivo;
+        this.idUsuarioActivo = idCliente;
         this.chatUI = chatUI;
-
         initComponents();
-
 //        client.addListener(this);
     }
 
@@ -52,80 +50,270 @@ public class ChatView extends JFrame {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+//    private void initComponents() {
+//
+//        jBtnEnviar = new JButton();
+//        jtMensaje = new JTextField();
+//        jTextPaneChat = new JTextPane();
+//        jTextPaneChat.setEditable(false);
+//
+//        jScrollPaneChat = new JScrollPane();
+//        jScrollPaneChat.setViewportView(jTextPaneChat);
+//
+//
+//        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//
+//
+//        jBtnEnviar.setText("Enviar");
+//        jBtnEnviar.addActionListener(new java.awt.event.ActionListener() {
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                jBtnEnviarActionPerformed(evt);
+//            }
+//        });
+//
+//        jBtnNuevaConexion = new JButton("+");
+//        jBtnNuevaConexion.addActionListener(new java.awt.event.ActionListener() {
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                jBtnNuevaConexionActionPerformed(evt);
+//            }
+//        });
+//        jBtnOff = new JButton("off");
+//        jBtnOff.addActionListener(new java.awt.event.ActionListener() {
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                jBtnOffActionPerformed(evt);
+//            }
+//        });
+//
+//
+//        GroupLayout layout = new GroupLayout(getContentPane());
+//        getContentPane().setLayout(layout);
+//        layout.setHorizontalGroup(
+//                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+//                        .addGroup(layout.createSequentialGroup()
+//                                .addGap(20, 20, 20)
+//                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+//                                        .addGroup(layout.createSequentialGroup()
+//                                                .addComponent(jScrollPaneChat, GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
+//                                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+//                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+//                                                        .addComponent(jBtnOff, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+//                                                        .addComponent(jBtnNuevaConexion, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)))
+//                                        .addGroup(layout.createSequentialGroup()
+//                                                .addComponent(jtMensaje)
+//                                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+//                                                .addComponent(jBtnEnviar)))
+//                                .addGap(20, 20, 20))
+//        );
+//        layout.setVerticalGroup(
+//                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+//                        .addGroup(layout.createSequentialGroup()
+//                                .addGap(20, 20, 20)
+//                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+//                                        .addComponent(jScrollPaneChat, GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+//                                        .addGroup(layout.createSequentialGroup()
+//                                                .addComponent(jBtnOff, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+//                                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+//                                                .addComponent(jBtnNuevaConexion, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)))
+//                                .addGap(18, 18, 18)
+//                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+//                                        .addComponent(jtMensaje, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+//                                        .addComponent(jBtnEnviar))
+//                                .addGap(20, 20, 20))
+//        );
+//
+//        pack();
+//    }
     private void initComponents() {
 
-        jBtnEnviar = new JButton();
+        // ===== COMPONENTES CHAT =====
+        jBtnEnviar = new JButton("Enviar");
         jtMensaje = new JTextField();
         jTextPaneChat = new JTextPane();
         jTextPaneChat.setEditable(false);
 
-        jScrollPaneChat = new JScrollPane();
-        jScrollPaneChat.setViewportView(jTextPaneChat);
+        jScrollPaneChat = new JScrollPane(jTextPaneChat);
 
+        jBtnNuevaConexion = new JButton("+");
+        jBtnOff = new JButton("off");
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setSize(900, 600);
+        setLocationRelativeTo(null);
 
-
-        jBtnEnviar.setText("Enviar");
         jBtnEnviar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnEnviarActionPerformed(evt);
             }
         });
 
-        jBtnNuevaConexion = new JButton("+");
         jBtnNuevaConexion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnNuevaConexionActionPerformed(evt);
             }
         });
-        jBtnOff = new JButton("off");
+
         jBtnOff.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnOffActionPerformed(evt);
             }
         });
 
+        // ===== PANEL PRINCIPAL =====
+        setLayout(new BorderLayout());
 
-        GroupLayout layout = new GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(20, 20, 20)
-                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jScrollPaneChat, GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
-                                                        .addComponent(jBtnOff, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(jBtnNuevaConexion, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)))
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jtMensaje)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jBtnEnviar)))
-                                .addGap(20, 20, 20))
-        );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(20, 20, 20)
-                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                        .addComponent(jScrollPaneChat, GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jBtnOff, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jBtnNuevaConexion, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jtMensaje, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jBtnEnviar))
-                                .addGap(20, 20, 20))
-        );
+        // PANEL IZQUIERDO (CONTACTOS)
 
-        pack();
-    }// </editor-fold>//GEN-END:initComponents
+        JPanel panelContactos = new JPanel();
+        panelContactos.setLayout(new BorderLayout());
+        panelContactos.setPreferredSize(new Dimension(200, 0));
+        panelContactos.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.LIGHT_GRAY));
 
+        JLabel lblContactos = new JLabel("Contactos", SwingConstants.CENTER);
+        lblContactos.setFont(new Font("Arial", Font.BOLD, 14));
+        lblContactos.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+
+        listaContactos.setLayout(new BoxLayout(listaContactos, BoxLayout.Y_AXIS));
+
+        JScrollPane scrollContactos = new JScrollPane(listaContactos);
+        scrollContactos.setBorder(null);
+
+        panelContactos.add(lblContactos, BorderLayout.NORTH);
+        panelContactos.add(scrollContactos, BorderLayout.CENTER);
+
+        // PANEL DERECHO (CHAT)
+
+        JPanel panelChat = new JPanel(new BorderLayout());
+
+        // Panel superior (botones off y +)
+        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        panelSuperior.add(jBtnOff);
+        panelSuperior.add(jBtnNuevaConexion);
+
+        // Panel inferior (campo mensaje + enviar)
+        JPanel panelInferior = new JPanel(new BorderLayout(10, 0));
+        panelInferior.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panelInferior.add(jtMensaje, BorderLayout.CENTER);
+        panelInferior.add(jBtnEnviar, BorderLayout.EAST);
+
+        panelChat.add(panelSuperior, BorderLayout.NORTH);
+        panelChat.add(jScrollPaneChat, BorderLayout.CENTER);
+        panelChat.add(panelInferior, BorderLayout.SOUTH);
+
+        //AGREGAR AL FRAME
+        add(panelContactos, BorderLayout.WEST);
+        add(panelChat, BorderLayout.CENTER);
+
+    }
+// </editor-fold>//GEN-END:initComponents
+    private void showOffPopup() {
+
+        JDialog dialog = new JDialog(this, true);
+        dialog.setSize(320, 300);
+        dialog.setLocationRelativeTo(this);
+        dialog.setUndecorated(true);
+        dialog.setBackground(new Color(0,0,0,0));
+
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+
+        // ===== CARD =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(40, 90, 250, 110);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("Su conexión fue terminada");
+        title.setFont(new Font("Arial", Font.BOLD, 16));
+        title.setForeground(new Color(37,29,75));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setBounds(15, 20, 220, 30);
+
+        // ===== BOTON OK =====
+        JButton okButton = new JButton("Ok");
+        okButton.setBounds(100, 60, 50, 30);
+        okButton.setBackground(new Color(202,203,233));
+        okButton.setFocusPainted(false);
+
+        okButton.addActionListener(e -> dialog.dispose());
+
+        card.add(title);
+        card.add(okButton);
+
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setBounds(115, 0, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotOff.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Img");
+        }
+
+        root.add(card);
+        root.add(imageLabel);
+
+        dialog.add(root);
+        dialog.setVisible(true);
+    }
+    private void showNoMessagePopup() {
+
+        JDialog dialog = new JDialog(this, true);
+        dialog.setSize(320, 300);
+        dialog.setLocationRelativeTo(this);
+        dialog.setUndecorated(true);
+        dialog.setBackground(new Color(0,0,0,0));
+
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+
+        // ===== CARD =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(40, 90, 250, 110);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("No puede enviar mensajes");
+        title.setFont(new Font("Arial", Font.BOLD, 16));
+        title.setForeground(new Color(37,29,75));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setBounds(15, 20, 220, 30);
+
+        // ===== BOTON OK =====
+        JButton okButton = new JButton("Ok");
+        okButton.setBounds(100, 60, 50, 30);
+        okButton.setBackground(new Color(202,203,233));
+        okButton.setFocusPainted(false);
+
+        okButton.addActionListener(e -> dialog.dispose());
+
+        card.add(title);
+        card.add(okButton);
+
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setBounds(115, 0, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotNoMessage.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Img");
+        }
+
+        root.add(card);
+        root.add(imageLabel);
+
+        dialog.add(root);
+        dialog.setVisible(true);
+    }
     private void jBtnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEnviarActionPerformed
         // TODO add your handling code here:
         if (client.isAlive()) {
@@ -147,12 +335,13 @@ public class ChatView extends JFrame {
                 }
             }
         } else {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "No puede enviar mensajes",
-                    "Conexion Terminada",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
+            showNoMessagePopup();
+//            JOptionPane.showMessageDialog(
+//                    this,
+//                    "No puede enviar mensajes",
+//                    "Conexion Terminada",
+//                    JOptionPane.INFORMATION_MESSAGE
+//            );
         }
     }//GEN-LAST:event_jBtnEnviarActionPerformed
 
@@ -193,6 +382,30 @@ public class ChatView extends JFrame {
         }
     }
 
+    public void agregarContactos(String idUsuario, String nombreContacto) {
+        for (Component contacto : listaContactos.getComponents()) {
+            if (contacto instanceof JButton) {
+                JButton btn = (JButton) contacto;
+                if (btn.getName() != null && btn.getName().equals(idUsuario))
+                    return;
+            }
+        }
+        JButton contacto = new JButton(nombreContacto);
+        contacto.setName(idUsuario);
+        contacto.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        contacto.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        contacto.addActionListener(e -> {
+            idUsuarioActivo = idUsuario;
+            System.out.println("Contacto creado: " + nombreContacto);
+            jTextPaneChat.setText(" ");
+        });
+
+        listaContactos.add(contacto);
+        listaContactos.add(Box.createVerticalStrut(5));
+        listaContactos.revalidate();
+        listaContactos.repaint();
+    }
     private void mostrarMensajeSistema(String texto) {
         StyledDocument doc = jTextPaneChat.getStyledDocument();
         SimpleAttributeSet attrs = new SimpleAttributeSet();
@@ -208,10 +421,6 @@ public class ChatView extends JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-    private void desactivarChat() {
-        jtMensaje.setEditable(false);
-        jBtnEnviar.setEnabled(false);
     }
     /**
      * @param args the command line arguments
@@ -264,7 +473,8 @@ public class ChatView extends JFrame {
         }
         if (message instanceof FueraLinea) {
             System.out.println("Conexión terminada por cliente");
-            JOptionPane.showMessageDialog(null, "Su conexion fue terminada", "Conexión terminada", JOptionPane.INFORMATION_MESSAGE);
+            showOffPopup();
+//            JOptionPane.showMessageDialog(null, "Su conexion fue terminada", "Conexión terminada", JOptionPane.INFORMATION_MESSAGE);
             mostrarMensajeSistema("CONEXION TERMINADA");
             client.close();
             Mediador.getInstance().removeClient(idUsuarioActivo);

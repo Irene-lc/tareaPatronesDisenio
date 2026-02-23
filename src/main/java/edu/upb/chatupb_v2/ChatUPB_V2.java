@@ -32,3 +32,4 @@ public class ChatUPB_V2 {
         }
     }
 }
+// implementar el patron observer con clases abstractas, modificar para que sea apto para clases abstractas

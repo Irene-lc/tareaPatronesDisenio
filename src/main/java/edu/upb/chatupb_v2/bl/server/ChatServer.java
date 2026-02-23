@@ -16,7 +16,7 @@ public class ChatServer extends Thread {
     private static final int port = 1900;
 
     private final ServerSocket server;
-    private SocketListener socketListener;
+//    private SocketListener socketListener;
     public ChatServer() throws IOException {
         this.server = new ServerSocket(port);
     }
@@ -25,9 +25,9 @@ public class ChatServer extends Thread {
 //        this.socketListener = listener;
 //    }
 
-    public void addListener(SocketListener listener) {
-        this.socketListener = listener;
-    }
+//    public void addListener(SocketListener listener) {
+//        this.socketListener = listener;
+//    }
     @Override
     public void run() {
         while (true) {

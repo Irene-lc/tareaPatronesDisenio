@@ -7,7 +7,7 @@ package edu.upb.chatupb_v2;
 import edu.upb.chatupb_v2.bl.message.*;
 import edu.upb.chatupb_v2.bl.server.Mediador;
 import edu.upb.chatupb_v2.bl.server.SocketClient;
-import edu.upb.chatupb_v2.bl.server.SocketListener;
+//import edu.upb.chatupb_v2.bl.server.SocketListener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -141,7 +141,7 @@ public class ChatUI extends javax.swing.JFrame {
         // ===== BOTON =====
         jBtnConectar = new JButton("CONECTAR");
         jBtnConectar.setBounds(75, 235, 200, 35);
-        jBtnConectar.setBackground(new Color(195,190,239));
+        jBtnConectar.setBackground(Color.GRAY);
         jBtnConectar.setForeground(Color.BLACK);
         jBtnConectar.setFocusPainted(false);
 
@@ -269,6 +269,82 @@ public class ChatUI extends javax.swing.JFrame {
         dialog.add(root);
         dialog.setVisible(true);
     }
+    private boolean showInvitationPopup(String nombreInvitador) {
+
+        final boolean[] accepted = {false};
+
+        JDialog dialog = new JDialog(this, true);
+        dialog.setSize(350, 320);
+        dialog.setLocationRelativeTo(this);
+        dialog.setUndecorated(true);
+        dialog.setBackground(new Color(0,0,0,0));
+
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+
+        // ===== CARD =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(40, 100, 270, 150);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("Llegó la invitación: " + nombreInvitador);
+        title.setFont(new Font("Arial", Font.BOLD, 14));
+        title.setForeground(new Color(37,29,75));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setBounds(20, 20, 230, 40);
+
+        // ===== BOTON ACCEPT =====
+        JButton acceptButton = new JButton("Aceptar");
+        acceptButton.setBounds(30, 80, 90, 35);
+        acceptButton.setBackground(Color.lightGray);
+        acceptButton.setForeground(Color.BLACK);
+        acceptButton.setFocusPainted(false);
+
+        acceptButton.addActionListener(e -> {
+            accepted[0] = true;
+            dialog.dispose();
+        });
+
+        // ===== BOTON DECLINE =====
+        JButton declineButton = new JButton("Rechazar");
+        declineButton.setBounds(150, 80, 90, 35);
+        declineButton.setBackground(Color.GRAY);
+        declineButton.setForeground(Color.BLACK);
+        declineButton.setFocusPainted(false);
+
+        declineButton.addActionListener(e -> {
+            accepted[0] = false;
+            dialog.dispose();
+        });
+
+        card.add(title);
+        card.add(acceptButton);
+        card.add(declineButton);
+
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setBounds(120, 0, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotRequest.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Img");
+        }
+
+        root.add(card);
+        root.add(imageLabel);
+
+        dialog.add(root);
+        dialog.setVisible(true);
+
+        return accepted[0];
+    }
+
 
 //    // @SuppressWarnings("unchecked")
 
@@ -352,26 +428,27 @@ public class ChatUI extends javax.swing.JFrame {
             System.out.println("Llego la invitacion");
 
             Invitacion invitacion = (Invitacion) message;
-            int respuesta = JOptionPane.showConfirmDialog(
-                    this,
-                    "LLego la invitacion: " + invitacion
-                    , "Invitacion",
-                    JOptionPane.YES_NO_OPTION); // esto le llega al CLiente
+//            int respuesta = JOptionPane.showConfirmDialog(
+//                    this,
+//                    "LLego la invitacion: " + invitacion
+//                    , "Invitacion",
+//                    JOptionPane.YES_NO_OPTION); // esto le llega al CLiente
 
-            if (respuesta == JOptionPane.YES_OPTION) {
+            boolean accepted = showInvitationPopup(invitacion.getNombre());
+
+            if (accepted) {
                 System.out.println("id invitacion: " + invitacion.getIdUsuario());
-                Mediador.getInstance().addClient(invitacion.getIdUsuario(), socketClient);
+                Mediador.getInstance().addClient(invitacion.getIdUsuario(), invitacion.getNombre(),socketClient);
                 Message aceptar = new Aceptar(idMio, nombre);
                 Mediador.getInstance().sendMessage(invitacion.getIdUsuario(), aceptar);
                 idUsuarioActivo = invitacion.getIdUsuario();
                 client = socketClient;
-                chatView = new ChatView(client, idUsuarioActivo, this);
+                chatView = new ChatView(client, idUsuarioActivo, invitacion.getNombre(),this);
                 Mediador.getInstance().setChatView(chatView);
                 chatView.setVisible(true);
                 this.setVisible(false);
 //                client.removeListener(this);
-            }
-            if (respuesta == JOptionPane.NO_OPTION) {
+            } else  {
                 System.out.println("Enviando 003...");
                 try {
                     Message rechazar = new Rechazar();
@@ -385,9 +462,9 @@ public class ChatUI extends javax.swing.JFrame {
 //            JOptionPane.showMessageDialog(null, "Su invitacion fue aceptada", "Aceptada", JOptionPane.INFORMATION_MESSAGE);
             showAcceptPopup();
             Aceptar aceptar = (Aceptar) message;
-            Mediador.getInstance().addClient(aceptar.getIdUsuario(), socketClient);
+            Mediador.getInstance().addClient(aceptar.getIdUsuario(), aceptar.getNombre(), socketClient);
             idUsuarioActivo = aceptar.getIdUsuario();
-            chatView = new ChatView(client, idUsuarioActivo, this);
+            chatView = new ChatView(client, idUsuarioActivo, aceptar.getNombre(),this);
             Mediador.getInstance().setChatView(chatView);
             chatView.setVisible(true);
             this.setVisible(false);

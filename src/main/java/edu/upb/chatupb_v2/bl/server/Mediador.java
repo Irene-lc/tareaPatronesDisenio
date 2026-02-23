@@ -4,6 +4,7 @@ import edu.upb.chatupb_v2.ChatUI;
 import edu.upb.chatupb_v2.ChatView;
 import edu.upb.chatupb_v2.bl.message.Message;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -21,12 +22,12 @@ public class Mediador {
         return mediador;
     }
 
-    //metodo para agregar cliente
-    public void addClient(String key, SocketClient value) {
+    public void addClient(String key, String nombreClient,SocketClient value) {
         this.listaContactos.put(key, value);
+        if (chatView != null)
+            chatView.agregarContactos(key, nombreClient);
     }
 
-    //metodo para remover cliente
     public void removeClient(String key) {
         this.listaContactos.remove(key);
     }
@@ -56,10 +57,15 @@ public class Mediador {
         listaContactos.clear();
     }
     public void notificar(SocketClient client, Message message) {
-        if (chatUI != null)
-            chatUI.onMessage(client, message);
-        if (chatView != null)
-            chatView.onMessage(client, message);
+        SwingUtilities.invokeLater(() -> {
+            if (chatUI != null) {
+                chatUI.onMessage(client, message);
+            }
+        });
+        SwingUtilities.invokeLater(() -> {
+            if (chatView != null)
+                chatView.onMessage(client, message);
+        });
     }
 
     public void setChatUI(ChatUI chatUI) {

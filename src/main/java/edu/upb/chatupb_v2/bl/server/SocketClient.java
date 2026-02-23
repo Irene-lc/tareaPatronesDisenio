@@ -39,12 +39,6 @@ public class SocketClient extends Thread {
         br = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
     }
 
-//    public void addListener(SocketListener listener) {
-//        this.socketListener.add(listener);
-//    }
-//    public void removeListener(SocketListener listener) {
-//        this.socketListener.remove(listener);
-//    }
 
     @Override
     public void run() {
@@ -101,13 +95,18 @@ public class SocketClient extends Thread {
         }
     }
 
+//    public void addListener(SocketListener listener) {
+//        this.socketListener.add(listener);
+//    }
+//    public void removeListener(SocketListener listener) {
+//        this.socketListener.remove(listener);
+//    }
 //    public void notificar(Message message) {
 //        for (SocketListener listener : socketListener) {
 //            java.awt.EventQueue.invokeLater(() -> listener.onMessage(this, message));
 //        }
 //    }
-
-    //    public void send(String message) throws IOException {
+//    public void send(String message) throws IOException {
 //        message = message + System.lineSeparator();
 //        try {
 //            dout.write(message.getBytes("UTF-8"));
@@ -116,6 +115,7 @@ public class SocketClient extends Thread {
 //            e.printStackTrace();
 //        }
 //    }
+
     public void send(Message message) throws IOException { //enviar mensaje a quien me habló
         String messageStr = message.generarTrama();
         try {
