@@ -10,6 +10,7 @@ import edu.upb.chatupb_v2.bl.server.SocketClient;
 import edu.upb.chatupb_v2.bl.server.SocketListener;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.Random;
 
 /**
@@ -45,57 +46,6 @@ public class ChatUI extends javax.swing.JFrame {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
-
-        jtIp = new javax.swing.JTextField();
-        jBtnConectar = new javax.swing.JButton();
-//        jBtnEnviar = new javax.swing.JButton();
-//        jtMensaje = new javax.swing.JTextField();
-
-//        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        jBtnConectar.setText("Conectar");
-        jBtnConectar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnConectarActionPerformed(evt);
-            }
-        });
-
-//        jBtnEnviar.setText("Enviar");
-//        jBtnEnviar.addActionListener(new java.awt.event.ActionListener() {
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                jBtnEnviarActionPerformed(evt);
-//            }
-//        });
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(28, 28, 28)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jtIp, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(18, 18, 18)
-                                                .addComponent(jBtnConectar)))
-                                .addContainerGap(107, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(23, 23, 23)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jtIp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jBtnConectar))
-                                .addGap(143, 143, 143)
-                                .addContainerGap(80, Short.MAX_VALUE))
-        );
-
-        pack();
-    }// </editor-fold>//GEN-END:initComponents
-//    // @SuppressWarnings("unchecked")
-//    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
 //    private void initComponents() {
 //
 //        jtIp = new javax.swing.JTextField();
@@ -103,7 +53,7 @@ public class ChatUI extends javax.swing.JFrame {
 ////        jBtnEnviar = new javax.swing.JButton();
 ////        jtMensaje = new javax.swing.JTextField();
 //
-//        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+////        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 //
 //        jBtnConectar.setText("Conectar");
 //        jBtnConectar.addActionListener(new java.awt.event.ActionListener() {
@@ -127,10 +77,6 @@ public class ChatUI extends javax.swing.JFrame {
 //                                .addGap(28, 28, 28)
 //                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 //                                        .addGroup(layout.createSequentialGroup()
-//                                                .addComponent(jtMensaje, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
-//                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-//                                                .addComponent(jBtnEnviar))
-//                                        .addGroup(layout.createSequentialGroup()
 //                                                .addComponent(jtIp, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
 //                                                .addGap(18, 18, 18)
 //                                                .addComponent(jBtnConectar)))
@@ -144,14 +90,188 @@ public class ChatUI extends javax.swing.JFrame {
 //                                        .addComponent(jtIp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 //                                        .addComponent(jBtnConectar))
 //                                .addGap(143, 143, 143)
-//                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-//                                        .addComponent(jtMensaje, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-//                                        .addComponent(jBtnEnviar))
 //                                .addContainerGap(80, Short.MAX_VALUE))
 //        );
 //
 //        pack();
 //    }// </editor-fold>//GEN-END:initComponents
+
+    private void initComponents() {
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setSize(420, 450);
+        setLocationRelativeTo(null);
+        setLayout(null);
+        getContentPane().setBackground(new java.awt.Color(240,240,240));
+
+        // ===== CARD PANEL =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(35, 80, 350, 300);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        imageLabel.setBounds(155, 20, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAdd.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Imagen no encontrada");
+        }
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("Add Contact");
+        title.setFont(new Font("Arial", Font.BOLD, 18));
+        title.setBounds(110, 70, 200, 30);
+
+
+        // ===== IP =====
+        JLabel ipLabel = new JLabel("Contact IP:");
+        ipLabel.setFont(new Font("Arial", Font.PLAIN, 13));
+        ipLabel.setBounds(30, 170, 200, 20);
+
+        jtIp = new JTextField();
+        jtIp.setBounds(30, 190, 290, 30);
+
+        // ===== BOTON =====
+        jBtnConectar = new JButton("CONECTAR");
+        jBtnConectar.setBounds(75, 235, 200, 35);
+        jBtnConectar.setBackground(new Color(195,190,239));
+        jBtnConectar.setForeground(Color.BLACK);
+        jBtnConectar.setFocusPainted(false);
+
+        jBtnConectar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnConectarActionPerformed(evt);
+            }
+        });
+
+        // ===== AGREGAMOS AL CARD =====
+        card.add(title);
+        card.add(ipLabel);
+        card.add(jtIp);
+        card.add(jBtnConectar);
+
+        // ===== AGREGAMOS TODO AL FRAME =====
+        add(imageLabel);
+        add(card);
+    }
+    private void showAcceptPopup() {
+
+        JDialog dialog = new JDialog(this, true);
+        dialog.setSize(320, 300);
+        dialog.setLocationRelativeTo(this);
+        dialog.setUndecorated(true);
+        dialog.setBackground(new Color(0,0,0,0));
+
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+
+        // ===== CARD =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(40, 90, 220, 110);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("Conexion aceptada");
+        title.setFont(new Font("Arial", Font.BOLD, 16));
+        title.setForeground(new Color(37,29,75));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setBounds(20, 20, 180, 30);
+
+        // ===== BOTON OK =====
+        JButton okButton = new JButton("Ok");
+        okButton.setBounds(85, 60, 50, 30);
+        okButton.setBackground(new Color(202,203,233));
+        okButton.setFocusPainted(false);
+
+        okButton.addActionListener(e -> dialog.dispose());
+
+        card.add(title);
+        card.add(okButton);
+
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setBounds(85, 0, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAccept.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Img");
+        }
+
+        root.add(card);
+        root.add(imageLabel);
+
+        dialog.add(root);
+        dialog.setVisible(true);
+    }
+    private void showDeclinePopup() {
+
+        JDialog dialog = new JDialog(this, true);
+        dialog.setSize(320, 300);
+        dialog.setLocationRelativeTo(this);
+        dialog.setUndecorated(true);
+        dialog.setBackground(new Color(0,0,0,0));
+
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+
+        // ===== CARD =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(40, 90, 220, 110);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("Conexion rechazada");
+        title.setFont(new Font("Arial", Font.BOLD, 16));
+        title.setForeground(new Color(37,29,75));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setBounds(20, 20, 180, 30);
+
+        // ===== BOTON OK =====
+        JButton okButton = new JButton("Ok");
+        okButton.setBounds(85, 60, 50, 30);
+        okButton.setBackground(new Color(202,203,233));
+        okButton.setFocusPainted(false);
+
+        okButton.addActionListener(e -> dialog.dispose());
+
+        card.add(title);
+        card.add(okButton);
+
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setBounds(85, 0, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotDecline.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Img");
+        }
+
+        root.add(card);
+        root.add(imageLabel);
+
+        dialog.add(root);
+        dialog.setVisible(true);
+    }
+
+//    // @SuppressWarnings("unchecked")
+
 
     private void jBtnConectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnConectarActionPerformed
         // TODO add your handling code here:
@@ -225,9 +345,7 @@ public class ChatUI extends javax.swing.JFrame {
 
 //     Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBtnConectar;
-//    private javax.swing.JButton jBtnEnviar;
     private javax.swing.JTextField jtIp;
-//    private javax.swing.JTextField jtMensaje;
 
     public void onMessage(SocketClient socketClient, Message message) {
         if (message instanceof Invitacion) {
@@ -264,7 +382,8 @@ public class ChatUI extends javax.swing.JFrame {
             }
         }
         if (message instanceof Aceptar) {
-            JOptionPane.showMessageDialog(null, "Su invitacion fue aceptada", "Aceptada", JOptionPane.INFORMATION_MESSAGE);
+//            JOptionPane.showMessageDialog(null, "Su invitacion fue aceptada", "Aceptada", JOptionPane.INFORMATION_MESSAGE);
+            showAcceptPopup();
             Aceptar aceptar = (Aceptar) message;
             Mediador.getInstance().addClient(aceptar.getIdUsuario(), socketClient);
             idUsuarioActivo = aceptar.getIdUsuario();
@@ -275,7 +394,7 @@ public class ChatUI extends javax.swing.JFrame {
 //            client.removeListener(this);
         }
         if  (message instanceof Rechazar) {
-            JOptionPane.showMessageDialog(null, "Su invitacion fue rechazada", "Rechazo", JOptionPane.INFORMATION_MESSAGE);
+            showDeclinePopup();
         }
     }
     // End of variables declaration//GEN-END:variables

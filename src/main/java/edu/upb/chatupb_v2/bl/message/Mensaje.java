@@ -21,7 +21,7 @@ public class Mensaje extends Message {
     }
 
     public static Mensaje parse(String trama) {
-        String[] split = trama.split(Pattern.quote("|"));
+        String[] split = trama.split(Pattern.quote("|"),4);
         if (split.length != 4) {
             throw new IllegalArgumentException("Formato de trama no valido");
         }

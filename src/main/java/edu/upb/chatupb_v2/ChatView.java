@@ -42,6 +42,9 @@ public class ChatView extends JFrame {
 //        client.addListener(this);
     }
 
+    private ChatView() {
+        initComponents();
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -70,12 +73,12 @@ public class ChatView extends JFrame {
             }
         });
 
-//        jBtnNuevaConexion = new JButton("+");
-//        jBtnNuevaConexion.addActionListener(new java.awt.event.ActionListener() {
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                jBtnNuevaConexionActionPerformed(evt);
-//            }
-//        });
+        jBtnNuevaConexion = new JButton("+");
+        jBtnNuevaConexion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnNuevaConexionActionPerformed(evt);
+            }
+        });
         jBtnOff = new JButton("off");
         jBtnOff.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -94,7 +97,9 @@ public class ChatView extends JFrame {
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(jScrollPaneChat, GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
                                                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jBtnOff, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE))
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                                        .addComponent(jBtnOff, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(jBtnNuevaConexion, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)))
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(jtMensaje)
                                                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
@@ -107,7 +112,10 @@ public class ChatView extends JFrame {
                                 .addGap(20, 20, 20)
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                         .addComponent(jScrollPaneChat, GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
-                                        .addComponent(jBtnOff, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jBtnOff, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jBtnNuevaConexion, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)))
                                 .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                         .addComponent(jtMensaje, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -149,13 +157,16 @@ public class ChatView extends JFrame {
     }//GEN-LAST:event_jBtnEnviarActionPerformed
 
     private void jBtnOffActionPerformed(java.awt.event.ActionEvent evt) {
-        try {
-            System.out.println("Enviando 0018...");
-            Message message = new FueraLinea(idMio);
-            Mediador.getInstance().enviarMensajeATodos(message);
-            mostrarMensajeSistema("CONEXION TERMINADA");
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (client.isAlive()) {
+            try {
+                System.out.println("Enviando 0018...");
+                System.out.println("Conexion terminada");
+                Message message = new FueraLinea(idMio);
+                Mediador.getInstance().enviarMensajeATodos(message);
+                mostrarMensajeSistema("CONEXION TERMINADA");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
     private void jBtnNuevaConexionActionPerformed(java.awt.event.ActionEvent evt) {
@@ -242,7 +253,7 @@ public class ChatView extends JFrame {
     private JTextField jtMensaje;
     private JTextPane jTextPaneChat;
     private JScrollPane jScrollPaneChat;
-//    private JButton jBtnNuevaConexion;
+    private JButton jBtnNuevaConexion;
     private JButton jBtnOff;
 
     public void onMessage(SocketClient socketClient, Message message) {

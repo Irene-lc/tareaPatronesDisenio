@@ -56,8 +56,10 @@ public class Mediador {
         listaContactos.clear();
     }
     public void notificar(SocketClient client, Message message) {
-        chatUI.onMessage(client, message);
-        chatView.onMessage(client, message);
+        if (chatUI != null)
+            chatUI.onMessage(client, message);
+        if (chatView != null)
+            chatView.onMessage(client, message);
     }
 
     public void setChatUI(ChatUI chatUI) {
