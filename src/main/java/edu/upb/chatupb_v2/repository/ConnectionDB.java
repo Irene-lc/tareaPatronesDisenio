@@ -24,7 +24,6 @@ public class ConnectionDB {
         return connection;
     }
 
-    
     public Connection getConection(){
         Connection conn = null;
         try {
@@ -32,14 +31,29 @@ public class ConnectionDB {
             conn = DriverManager.getConnection("jdbc:sqlite:chat_upb.sqlite");
             if (conn != null) {
                 System.out.println("Conexión exitosa.");
+                crearTablaSiNoExiste(conn);
             } else {
                 System.out.println("Conexión fallida");
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }catch(ClassNotFoundException e){
-        
+
         }
-        return conn;   
+        return conn;
+    }
+
+    private void crearTablaSiNoExiste(Connection conn) throws SQLException {
+        String sql = """
+        CREATE TABLE IF NOT EXISTS blacklist (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_usuario_duenio TEXT NOT NULL,
+            id_usuario_bloqueado TEXT NOT NULL,
+            fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(id_usuario_duenio, id_usuario_bloqueado)
+        );
+    """;
+
+        conn.createStatement().execute(sql);
     }
 }

@@ -7,6 +7,8 @@ package edu.upb.chatupb_v2;
 import edu.upb.chatupb_v2.bl.message.*;
 import edu.upb.chatupb_v2.bl.server.Mediador;
 import edu.upb.chatupb_v2.bl.server.SocketClient;
+import edu.upb.chatupb_v2.repository.ConnectionDB;
+import edu.upb.chatupb_v2.repository.ListaNegraDao;
 //import edu.upb.chatupb_v2.bl.server.SocketListener;
 
 import javax.swing.*;
@@ -24,6 +26,7 @@ public class ChatUI extends javax.swing.JFrame {
     private final String nombre = "Irene";
     ChatView chatView;
 //    ChatServer chatServer;
+    ListaNegraDao listaNegraDao = new ListaNegraDao(ConnectionDB.getInstance().getConection());;
 
     /**
      * Creates new form ChatUI
@@ -425,14 +428,28 @@ public class ChatUI extends javax.swing.JFrame {
 
     public void onMessage(SocketClient socketClient, Message message) {
         if (message instanceof Invitacion) {
+//            System.out.println("Mediador.getInstance().listaNegra.contains(idUsuarioActivo): " + Mediador.getInstance().listaNegra.contains(idUsuarioActivo));
+
             System.out.println("Llego la invitacion");
 
             Invitacion invitacion = (Invitacion) message;
+            idUsuarioActivo = invitacion.getIdUsuario();
 //            int respuesta = JOptionPane.showConfirmDialog(
 //                    this,
 //                    "LLego la invitacion: " + invitacion
 //                    , "Invitacion",
 //                    JOptionPane.YES_NO_OPTION); // esto le llega al CLiente
+
+            try {
+                if (listaNegraDao.estaBloqueado(idMio, invitacion.getIdUsuario())) {
+                    System.out.println("Usuario bloqueado automáticamente.");
+                    Message rechazar = new Rechazar();
+                    socketClient.send(rechazar);
+                    return;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             boolean accepted = showInvitationPopup(invitacion.getNombre());
 
@@ -449,13 +466,16 @@ public class ChatUI extends javax.swing.JFrame {
                 this.setVisible(false);
 //                client.removeListener(this);
             } else  {
+//                Mediador.getInstance().listaNegra.add(socketClient);
                 System.out.println("Enviando 003...");
                 try {
+                    listaNegraDao.agregarBloqueado(idMio, idUsuarioActivo);
                     Message rechazar = new Rechazar();
                     socketClient.send(rechazar);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                System.out.println("Lista negra: " + Mediador.getInstance().listaNegra);
             }
         }
         if (message instanceof Aceptar) {
@@ -468,7 +488,7 @@ public class ChatUI extends javax.swing.JFrame {
             Mediador.getInstance().setChatView(chatView);
             chatView.setVisible(true);
             this.setVisible(false);
-//            client.removeListener(this);
+//            client.removeListener(Mediador.getInstance());
         }
         if  (message instanceof Rechazar) {
             showDeclinePopup();
@@ -476,3 +496,4 @@ public class ChatUI extends javax.swing.JFrame {
     }
     // End of variables declaration//GEN-END:variables
 }
+

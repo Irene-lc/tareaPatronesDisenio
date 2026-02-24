@@ -7,6 +7,7 @@ package edu.upb.chatupb_v2;
 import edu.upb.chatupb_v2.bl.message.*;
 import edu.upb.chatupb_v2.bl.server.Mediador;
 import edu.upb.chatupb_v2.bl.server.SocketClient;
+import edu.upb.chatupb_v2.repository.Contact;
 //import edu.upb.chatupb_v2.bl.server.SocketListener;
 
 import javax.swing.*;
@@ -27,6 +28,7 @@ public class ChatView extends JFrame {
     private final String idMio = "8179864";
     private final String nombre = "Irene";
     JPanel listaContactos = new JPanel();
+    private DefaultListModel<Contact> contacModel = new DefaultListModel<>();
 //    ChatServer chatServer;
 
     /**
@@ -37,7 +39,12 @@ public class ChatView extends JFrame {
         this.idUsuarioActivo = idCliente;
         this.chatUI = chatUI;
         initComponents();
+//        this.jContactos.setCellRenderer(new ContactRenderer());
+        for (int i = 0; i < 10; i++) {
+            contacModel.add(i, new Contact(i, "Co" + i, "Ricardo" + i, "444", false));
+        }
 //        client.addListener(this);
+        
     }
 
     private ChatView() {
@@ -123,6 +130,7 @@ public class ChatView extends JFrame {
 //
 //        pack();
 //    }
+
     private void initComponents() {
 
         // ===== COMPONENTES CHAT =====
@@ -130,6 +138,8 @@ public class ChatView extends JFrame {
         jtMensaje = new JTextField();
         jTextPaneChat = new JTextPane();
         jTextPaneChat.setEditable(false);
+        
+        jContactos
 
         jScrollPaneChat = new JScrollPane(jTextPaneChat);
 
@@ -464,6 +474,7 @@ public class ChatView extends JFrame {
     private JScrollPane jScrollPaneChat;
     private JButton jBtnNuevaConexion;
     private JButton jBtnOff;
+    private JList<Contact> jContactos;
 
     public void onMessage(SocketClient socketClient, Message message) {
         if (message instanceof Mensaje) {

@@ -32,4 +32,10 @@ public class ChatUPB_V2 {
         }
     }
 }
+
+//4.
 // implementar el patron observer con clases abstractas, modificar para que sea apto para clases abstractas
+
+// 5.
+// lista negra de amigos, si rechazo la solicitud de amistad d eina persona, lo guardo en una lista negra
+// y si vuelvo a recibir una solicitu, el sistema lo rechaza automaticamente

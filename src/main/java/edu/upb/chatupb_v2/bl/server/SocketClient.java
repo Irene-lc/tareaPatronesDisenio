@@ -23,7 +23,6 @@ public class SocketClient extends Thread {
     private final String ip;
     private final DataOutputStream dout;
     private final BufferedReader br;
-//    private List<SocketListener> socketListener = new ArrayList<>();
 
     public SocketClient(Socket socket) throws IOException {
         this.socket = socket;
@@ -60,6 +59,7 @@ public class SocketClient extends Thread {
 //                        }
 //                        inv.setIp(ip);
                         Mediador.getInstance().notificar(this, inv);
+//                        notificar(inv);
 //                    System.out.println(inv.generarTrama());
                         break;
 
@@ -96,12 +96,16 @@ public class SocketClient extends Thread {
     }
 
 //    public void addListener(SocketListener listener) {
-//        this.socketListener.add(listener);
+//        if (!socketListener.contains(listener)) {
+//            socketListener.add(listener);
+//        }
 //    }
+//
 //    public void removeListener(SocketListener listener) {
 //        this.socketListener.remove(listener);
 //    }
 //    public void notificar(Message message) {
+//        addListener(Mediador.getInstance());
 //        for (SocketListener listener : socketListener) {
 //            java.awt.EventQueue.invokeLater(() -> listener.onMessage(this, message));
 //        }
@@ -114,8 +118,7 @@ public class SocketClient extends Thread {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-//    }
-
+//
     public void send(Message message) throws IOException { //enviar mensaje a quien me habló
         String messageStr = message.generarTrama();
         try {

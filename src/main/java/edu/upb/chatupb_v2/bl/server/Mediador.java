@@ -7,12 +7,17 @@ import edu.upb.chatupb_v2.bl.message.Message;
 import javax.swing.*;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+
+// que el mediador se subscriba a los eventos
 
 public class Mediador {
+
     private ChatUI chatUI;
     private ChatView chatView;
     private static final Mediador mediador = new Mediador();
     public final HashMap<String, SocketClient> listaContactos = new HashMap<>();
+    public List<SocketClient> listaNegra;
 
     private Mediador() {
 
@@ -68,10 +73,22 @@ public class Mediador {
         });
     }
 
+//    @Override
+//    void onMessage(SocketClient socketClient, Message message) {
+//        SwingUtilities.invokeLater(() -> {
+//            if (chatUI != null) {
+//                chatUI.onMessage(socketClient, message);
+//            }
+//        });
+//        SwingUtilities.invokeLater(() -> {
+//            if (chatView != null)
+//                chatView.onMessage(socketClient, message);
+//        });
+//    }
+
     public void setChatUI(ChatUI chatUI) {
         this.chatUI = chatUI;
     }
-
     public void setChatView(ChatView chatView) {
         this.chatView = chatView;
     }
