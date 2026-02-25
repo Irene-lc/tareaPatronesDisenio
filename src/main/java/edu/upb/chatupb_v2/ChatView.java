@@ -369,34 +369,6 @@ public class ChatView extends JFrame {
 //            e.printStackTrace();
 //        }
 //    }
-    public void agregarMensaje(String texto, boolean esMio) {
-
-        JPanel panelMensaje = new JPanel(new FlowLayout(
-                esMio ? FlowLayout.RIGHT : FlowLayout.LEFT
-        ));
-        panelMensaje.setOpaque(false);
-
-        JLabel lblMensaje = new JLabel("<html><body style='width: 200px'>" + texto + "</body></html>");
-        lblMensaje.setOpaque(true);
-        lblMensaje.setBorder(BorderFactory.createEmptyBorder(8,12,8,12));
-
-        if (esMio) {
-            lblMensaje.setBackground(new Color(173,216,230)); // celeste
-        } else {
-            lblMensaje.setBackground(new Color(230,230,230)); // gris claro
-        }
-
-        panelMensaje.add(lblMensaje);
-
-        jPanelChat.add(panelMensaje);
-        jPanelChat.revalidate();
-        jPanelChat.repaint();
-
-        SwingUtilities.invokeLater(() -> {
-            JScrollBar vertical = jScrollPaneChat.getVerticalScrollBar();
-            vertical.setValue(vertical.getMaximum());
-        });
-    }
     public void agregarContacto(Contact contact) {
         for (int i = 0; i < contacModel.size(); i++) {
             System.out.println("contacModel.get(i).getId(): " + contacModel.get(i).getId());
@@ -442,6 +414,84 @@ public class ChatView extends JFrame {
     }
     public void actualizarValores(String idUsuarioActual) {
         this.idUsuarioActual = idUsuarioActual;
+    }
+
+    private String obtenerHoraActual() {
+        java.time.LocalTime hora = java.time.LocalTime.now();
+        java.time.format.DateTimeFormatter formatter =
+                java.time.format.DateTimeFormatter.ofPattern("HH:mm");
+        return hora.format(formatter);
+    }
+    private JPanel crearBurbuja(String texto, boolean esMio) {
+
+        JPanel bubble = new JPanel(new BorderLayout());
+        bubble.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        bubble.setOpaque(true);
+
+        if (esMio) {
+            bubble.setBackground(new Color(173,216,230));
+        } else {
+            bubble.setBackground(new Color(230,230,230));
+        }
+
+        JLabel lblTexto = new JLabel(
+                "<html><div style='max-width:250px;'>" + texto + "</div></html>"
+        );
+
+        JLabel lblHora = new JLabel(obtenerHoraActual());
+        lblHora.setFont(new Font("Arial", Font.PLAIN, 9));
+        lblHora.setForeground(Color.DARK_GRAY);
+        lblHora.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        bubble.add(lblTexto, BorderLayout.CENTER);
+        bubble.add(lblHora, BorderLayout.SOUTH);
+
+        return bubble;
+    }
+    private JLabel crearFotoPerfil() {
+
+        JLabel foto = new JLabel();
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/user.png"));
+            Image img = icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+            foto.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            foto.setText("");
+        }
+
+        return foto;
+    }
+    private JPanel crearFilaMensaje(String texto, boolean esMio) {
+
+        JPanel fila = new JPanel(new FlowLayout(
+                esMio ? FlowLayout.RIGHT : FlowLayout.LEFT
+        ));
+        fila.setOpaque(false);
+        fila.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
+        JPanel bubble = crearBurbuja(texto, esMio);
+
+        if (!esMio) {
+            fila.add(crearFotoPerfil());
+        }
+
+        fila.add(bubble);
+
+        return fila;
+    }
+    public void agregarMensaje(String texto, boolean esMio) {
+
+        JPanel mensaje = crearFilaMensaje(texto, esMio);
+
+        jPanelChat.add(mensaje);
+        jPanelChat.revalidate();
+        jPanelChat.repaint();
+
+        SwingUtilities.invokeLater(() -> {
+            JScrollBar vertical = jScrollPaneChat.getVerticalScrollBar();
+            vertical.setValue(vertical.getMaximum());
+        });
     }
     /**
      * @param args the command line arguments

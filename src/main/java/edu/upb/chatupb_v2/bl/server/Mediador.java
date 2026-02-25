@@ -94,16 +94,27 @@ public class Mediador {
     }
 
     public Contact nuevoContacto(String idCliente, String nombreCliente, String ipCliente) {
-        Contact contact = new Contact();
+
+        ContactDao contactDao = new ContactDao();
         try {
-            long idLong = Long.parseLong(idCliente);
-            contact = new Contact(idLong, nombreCliente, ipCliente, false);
-            ContactDao contactDao = new ContactDao();
-            contactDao.save(contact);
+            Contact verificar = contactDao.findByIp(ipCliente);
+            if (verificar != null) {
+                if (verificar.getId() != idCliente) {
+                    System.out.println("Contacto diferente con ip registrada");
+                    verificar.setId(idCliente);
+                    verificar.setIp(ipCliente);
+                    verificar.setName(nombreCliente);
+                    contactDao.update(verificar);
+                }
+                return verificar;
+            }
+            Contact nuevo = new Contact(idCliente, nombreCliente, ipCliente, false);
+            contactDao.save(nuevo);
+            return nuevo;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return contact;
+        return null;
     }
     public void enviarMensajePorChat(String idCliente, String mensaje) {
         if (!listaContactos.containsKey(idCliente)) {

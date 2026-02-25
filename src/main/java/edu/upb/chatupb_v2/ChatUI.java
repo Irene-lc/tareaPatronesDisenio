@@ -373,12 +373,11 @@ public class ChatUI extends javax.swing.JFrame {
             boolean accepted = showInvitationPopup(invitacion.getNombre());
             if (accepted) {
                 System.out.println("id invitacion: " + invitacion.getIdUsuario());
-                Mediador.getInstance().getChatView().actualizarValores(invitacion.getIdUsuario());
                 Mediador.getInstance().addClient(invitacion.getIdUsuario(), invitacion.getNombre(),socketClient);
-
                 Message aceptar = new Aceptar(Mediador.getInstance().getIdMio(), Mediador.getInstance().getNombre());
                 Mediador.getInstance().sendMessage(invitacion.getIdUsuario(), aceptar);
 //                client = socketClient;
+                Mediador.getInstance().getChatView().actualizarValores(invitacion.getIdUsuario());
                 Mediador.getInstance().getChatView().setVisible(true);
                 this.setVisible(false);
 //                client.removeListener(this);

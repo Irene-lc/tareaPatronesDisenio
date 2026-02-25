@@ -21,7 +21,7 @@ public class ContactDao {
     DaoHelper.ResultReader<Contact> resultReader = result -> {
         Contact prefacturaSync = new Contact();
         if (existColumn(result, Contact.Column.ID)) {
-            prefacturaSync.setId(result.getLong(Contact.Column.ID));
+            prefacturaSync.setId(result.getString(Contact.Column.ID));
         }
         if (existColumn(result, Contact.Column.NAME)) {
             prefacturaSync.setName(result.getString(Contact.Column.NAME));
@@ -56,6 +56,10 @@ public class ContactDao {
         String query = "SELECT count(*) FROM contact WHERE ip ='" + ip + "'";
         return helper.executeQueryCount(query, null) == 1;
     }
+    public boolean existById(String id) throws ConnectException, SQLException {
+        String query = "SELECT count(*) FROM contact WHERE id ='" + id + "'";
+        return helper.executeQueryCount(query, null) == 1;
+    }
 
     public Contact findByIp(String ip) throws ConnectException, SQLException {
         String query = "SELECT * FROM contact WHERE ip ='" + ip + "'";
@@ -83,16 +87,16 @@ public class ContactDao {
         helper.insert(query, params, contact);
     }
 
-    public void update(Contact contact) throws Exception {
-        String query = "UPDATE contact SET IP=? WHERE id =?";
-        DaoHelper.QueryParameters params = new DaoHelper.QueryParameters() {
-            @Override
-            public void setParameters(PreparedStatement pst) throws SQLException {
-                pst.setString(1, contact.getIp());
-            }
-        };
-        helper.update(query, params);
-    }
+//    public void update(Contact contact) throws Exception {
+//        String query = "UPDATE contact SET IP=? WHERE id =?";
+//        DaoHelper.QueryParameters params = new DaoHelper.QueryParameters() {
+//            @Override
+//            public void setParameters(PreparedStatement pst) throws SQLException {
+//                pst.setString(1, contact.getIp());
+//            }
+//        };
+//        helper.update(query, params);
+//    }
 
     public void update(String query, String conditionWhere) throws SQLException, ConnectException {
         if (query.trim().endsWith("%s")) {
@@ -101,5 +105,14 @@ public class ContactDao {
             query = String.format("%s %s", query, conditionWhere);
         }
         helper.update(query, null);
+    }
+    public void update(Contact contact) throws Exception {
+        String query = "UPDATE contact SET ip=?, name=? WHERE id=?";
+        DaoHelper.QueryParameters params = pst -> {
+            pst.setString(1, contact.getIp());
+            pst.setString(2, contact.getName());
+            pst.setString(3, contact.getId());
+        };
+        helper.update(query, params);
     }
 }
