@@ -8,6 +8,8 @@ import edu.upb.chatupb_v2.bl.message.*;
 import edu.upb.chatupb_v2.bl.server.Mediador;
 import edu.upb.chatupb_v2.bl.server.SocketClient;
 import edu.upb.chatupb_v2.repository.ConnectionDB;
+import edu.upb.chatupb_v2.repository.Contact;
+import edu.upb.chatupb_v2.repository.ContactDao;
 import edu.upb.chatupb_v2.repository.ListaNegraDao;
 //import edu.upb.chatupb_v2.bl.server.SocketListener;
 
@@ -15,16 +17,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Random;
 
-/**
- *
- * @author rlaredo
- */
 public class ChatUI extends javax.swing.JFrame {
-    SocketClient client;
-    private String idUsuarioActivo;
-    private final String idMio = "8179864";
-    private final String nombre = "Irene";
-    ChatView chatView;
 //    ChatServer chatServer;
 //    ListaNegraDao listaNegraDao = new ListaNegraDao(ConnectionDB.getInstance().getConection());;
 
@@ -49,59 +42,9 @@ public class ChatUI extends javax.swing.JFrame {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-//    private void initComponents() {
-//
-//        jtIp = new javax.swing.JTextField();
-//        jBtnConectar = new javax.swing.JButton();
-////        jBtnEnviar = new javax.swing.JButton();
-////        jtMensaje = new javax.swing.JTextField();
-//
-////        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-//
-//        jBtnConectar.setText("Conectar");
-//        jBtnConectar.addActionListener(new java.awt.event.ActionListener() {
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                jBtnConectarActionPerformed(evt);
-//            }
-//        });
-//
-////        jBtnEnviar.setText("Enviar");
-////        jBtnEnviar.addActionListener(new java.awt.event.ActionListener() {
-////            public void actionPerformed(java.awt.event.ActionEvent evt) {
-////                jBtnEnviarActionPerformed(evt);
-////            }
-////        });
-//
-//        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-//        getContentPane().setLayout(layout);
-//        layout.setHorizontalGroup(
-//                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//                        .addGroup(layout.createSequentialGroup()
-//                                .addGap(28, 28, 28)
-//                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//                                        .addGroup(layout.createSequentialGroup()
-//                                                .addComponent(jtIp, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
-//                                                .addGap(18, 18, 18)
-//                                                .addComponent(jBtnConectar)))
-//                                .addContainerGap(107, Short.MAX_VALUE))
-//        );
-//        layout.setVerticalGroup(
-//                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//                        .addGroup(layout.createSequentialGroup()
-//                                .addGap(23, 23, 23)
-//                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-//                                        .addComponent(jtIp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-//                                        .addComponent(jBtnConectar))
-//                                .addGap(143, 143, 143)
-//                                .addContainerGap(80, Short.MAX_VALUE))
-//        );
-//
-//        pack();
-//    }// </editor-fold>//GEN-END:initComponents
-
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+            setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
         setSize(420, 450);
         setLocationRelativeTo(null);
         setLayout(null);
@@ -160,10 +103,10 @@ public class ChatUI extends javax.swing.JFrame {
         card.add(jtIp);
         card.add(jBtnConectar);
 
-        // ===== AGREGAMOS TODO AL FRAME =====
+        // ===== AGREGAMOS AL FRAME =====
         add(imageLabel);
         add(card);
-    }
+    }// </editor-fold>//GEN-END:initComponents
     private void showAcceptPopup() {
 
         JDialog dialog = new JDialog(this, true);
@@ -348,44 +291,24 @@ public class ChatUI extends javax.swing.JFrame {
         return accepted[0];
     }
 
-
 //    // @SuppressWarnings("unchecked")
 
-
     private void jBtnConectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnConectarActionPerformed
-        // TODO add your handling code here:
-        try {
+        System.out.println("Enviando 001...");
+        Mediador.getInstance().establecerConexion(jtIp.getText().toString(), Mediador.getInstance().getIdMio(), Mediador.getInstance().getNombre());
+//        try {
 //            iniciarCliente();
-            client = new SocketClient(jtIp.getText().toString());
+//            client = new SocketClient(jtIp.getText().toString());
 //            client.addListener(this); // le estoy pasando una instancia de si mismo. se subscribe al socketclient ue se acaba de crear
-            client.start();
-            System.out.println("Enviando 001...");
-            Message message = new Invitacion(idMio, nombre);
-            client.send(message);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }//GEN-LAST:event_jBtnConectarActionPerformed
-
-//    private void jBtnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEnviarActionPerformed
-//        // TODO add your handling code here:
-//        if (client != null) {
-//            try {
-//                System.out.println("Enviando 007...");
-//                String mensajeTxt = jtMensaje.getText().toString();
-//                if (idUsuarioActivo == null) {
-//                    JOptionPane.showMessageDialog(this, "No hay usuario conectado");
-//                    return;
-//                }
-//                System.out.println("id usuario: " + idUsuarioActivo);
-//                Message message = new Mensaje(idMio, "012", mensajeTxt);
-//                Mediador.getInstance().sendMessage(idUsuarioActivo, message);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
+//            client.start();
+//            System.out.println("Enviando 001...");
+//            Message message = new Invitacion(idMio, nombre);
+//            client.send(message);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
 //        }
-//    }//GEN-LAST:event_jBtnEnviarActionPerformed
+    }//GEN-LAST:event_jBtnConectarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -428,12 +351,9 @@ public class ChatUI extends javax.swing.JFrame {
 
     public void onMessage(SocketClient socketClient, Message message) {
         if (message instanceof Invitacion) {
-//            System.out.println("Mediador.getInstance().listaNegra.contains(idUsuarioActivo): " + Mediador.getInstance().listaNegra.contains(idUsuarioActivo));
-
             System.out.println("Llego la invitacion");
 
             Invitacion invitacion = (Invitacion) message;
-            idUsuarioActivo = invitacion.getIdUsuario();
 //            int respuesta = JOptionPane.showConfirmDialog(
 //                    this,
 //                    "LLego la invitacion: " + invitacion
@@ -450,24 +370,29 @@ public class ChatUI extends javax.swing.JFrame {
 //            } catch (Exception e) {
 //                e.printStackTrace();
 //            }
-
             boolean accepted = showInvitationPopup(invitacion.getNombre());
-
             if (accepted) {
                 System.out.println("id invitacion: " + invitacion.getIdUsuario());
+                Mediador.getInstance().getChatView().actualizarValores(invitacion.getIdUsuario());
                 Mediador.getInstance().addClient(invitacion.getIdUsuario(), invitacion.getNombre(),socketClient);
-                Message aceptar = new Aceptar(idMio, nombre);
+
+                Message aceptar = new Aceptar(Mediador.getInstance().getIdMio(), Mediador.getInstance().getNombre());
                 Mediador.getInstance().sendMessage(invitacion.getIdUsuario(), aceptar);
-                idUsuarioActivo = invitacion.getIdUsuario();
-                client = socketClient;
-                chatView = new ChatView(client, idUsuarioActivo, invitacion.getNombre(),this);
-                Mediador.getInstance().setChatView(chatView);
-                chatView.setVisible(true);
+//                client = socketClient;
+                Mediador.getInstance().getChatView().setVisible(true);
                 this.setVisible(false);
 //                client.removeListener(this);
             } else  {
 //                Mediador.getInstance().listaNegra.add(socketClient);
                 System.out.println("Enviando 003...");
+                try {
+                    //PREGUNTAR PROFE
+                    Message rechazar = new Rechazar();
+                    socketClient.send(rechazar);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
 //                try {
 //                    listaNegraDao.agregarBloqueado(idMio, idUsuarioActivo);
 //                    Message rechazar = new Rechazar();
@@ -482,13 +407,10 @@ public class ChatUI extends javax.swing.JFrame {
 //            JOptionPane.showMessageDialog(null, "Su invitacion fue aceptada", "Aceptada", JOptionPane.INFORMATION_MESSAGE);
             showAcceptPopup();
             Aceptar aceptar = (Aceptar) message;
+            Mediador.getInstance().getChatView().actualizarValores(aceptar.getIdUsuario());
             Mediador.getInstance().addClient(aceptar.getIdUsuario(), aceptar.getNombre(), socketClient);
-            idUsuarioActivo = aceptar.getIdUsuario();
-            chatView = new ChatView(client, idUsuarioActivo, aceptar.getNombre(),this);
-            Mediador.getInstance().setChatView(chatView);
-            chatView.setVisible(true);
+            Mediador.getInstance().getChatView().setVisible(true);
             this.setVisible(false);
-//            client.removeListener(Mediador.getInstance());
         }
         if  (message instanceof Rechazar) {
             showDeclinePopup();

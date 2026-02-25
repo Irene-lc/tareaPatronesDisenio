@@ -12,10 +12,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-/**
- *
- * @author rlaredo
- */
 public class ContactRenderer extends JLabel implements ListCellRenderer<Contact> {
 
     protected static final Font SELECTED_FONT = new Font("Comic Sans MS", Font.PLAIN, 12);

@@ -2,15 +2,21 @@ package edu.upb.chatupb_v2.bl.server;
 
 import edu.upb.chatupb_v2.ChatUI;
 import edu.upb.chatupb_v2.ChatView;
+import edu.upb.chatupb_v2.bl.message.Invitacion;
+import edu.upb.chatupb_v2.bl.message.Mensaje;
 import edu.upb.chatupb_v2.bl.message.Message;
+import edu.upb.chatupb_v2.repository.Contact;
+import edu.upb.chatupb_v2.repository.ContactDao;
+import lombok.Data;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 // que el mediador se subscriba a los eventos
-
+@Data
 public class Mediador {
 
     private ChatUI chatUI;
@@ -18,9 +24,10 @@ public class Mediador {
     private static final Mediador mediador = new Mediador();
     public final HashMap<String, SocketClient> listaContactos = new HashMap<>();
     public List<SocketClient> listaNegra;
+    private final String idMio = "8179864";
+    private final String nombre = "Irene";
 
     private Mediador() {
-
     }
 
     public static Mediador getInstance() { // de lo contrario no se puede acceder. Propiedad de singleton
@@ -29,9 +36,10 @@ public class Mediador {
 
     public void addClient(String idUsuario, String nombreClient, SocketClient client) {
         this.listaContactos.put(idUsuario, client);
-        long idUsuariolong = Long.parseLong(idUsuario);
+
+        Contact nuevo = nuevoContacto(idUsuario, nombreClient, client.getIp());
         if (chatView != null)
-            chatView.agregarContacto(idUsuariolong, nombreClient, client.getIp());
+            chatView.agregarContacto(nuevo);
     }
 
     public void removeClient(String key) {
@@ -73,7 +81,66 @@ public class Mediador {
                 chatView.onMessage(client, message);
         });
     }
+    public void establecerConexion(String ip, String idMio, String nombre) {
+        try {
+            SocketClient client = new SocketClient(ip);
+            client.start();
+            Message message = new Invitacion(idMio, nombre);
+            client.send(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
+    }
+
+    public Contact nuevoContacto(String idCliente, String nombreCliente, String ipCliente) {
+        Contact contact = new Contact();
+        try {
+            long idLong = Long.parseLong(idCliente);
+            contact = new Contact(idLong, nombreCliente, ipCliente, false);
+            ContactDao contactDao = new ContactDao();
+            contactDao.save(contact);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return contact;
+    }
+    public void enviarMensajePorChat(String idCliente, String mensaje) {
+        if (!listaContactos.containsKey(idCliente)) {
+            if (chatView != null) {
+                chatView.mostrarMensajeSistema("No hay conexion con cliente");
+                System.out.println("Cliente no en lsitaContactos");
+            }
+            return;
+        }
+        try {
+            String idMensaje = UUID.randomUUID().toString();
+            Message message = new Mensaje(idMio, idMensaje, mensaje);
+
+            sendMessage(idCliente, message);
+            if (chatView != null)
+                chatView.agregarMensaje(mensaje, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+    public void cargarDesdeBD() {
+        try {
+            ContactDao contactDao = new ContactDao();
+            List<Contact> contacts = contactDao.findAll();
+            if (contacts.isEmpty())
+                System.out.println("BD vacia");
+            for (Contact contact : contacts) {
+//                String id = String.valueOf(contact.getId());
+//                listaContactos.put(id, new SocketClient(contact.getIp()));
+                if (chatView != null)
+                    chatView.agregarContacto(contact);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 //    @Override
 //    void onMessage(SocketClient socketClient, Message message) {
 //        SwingUtilities.invokeLater(() -> {
@@ -86,12 +153,5 @@ public class Mediador {
 //                chatView.onMessage(socketClient, message);
 //        });
 //    }
-
-    public void setChatUI(ChatUI chatUI) {
-        this.chatUI = chatUI;
-    }
-    public void setChatView(ChatView chatView) {
-        this.chatView = chatView;
-    }
 }
 

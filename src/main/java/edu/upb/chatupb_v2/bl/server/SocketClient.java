@@ -15,9 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-/**
- * @author rlaredo
- */
 public class SocketClient extends Thread {
     private final Socket socket;
     private final String ip;

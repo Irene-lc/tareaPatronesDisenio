@@ -8,10 +8,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- *
- * @author rlaredo
- */
 public class ConnectionDB {
  
     private static final ConnectionDB connection = new ConnectionDB();
@@ -44,16 +40,27 @@ public class ConnectionDB {
     }
 
     private void crearTablaSiNoExiste(Connection conn) throws SQLException {
-        String sql = """
-        CREATE TABLE IF NOT EXISTS blacklist (
+
+        String sqlContact = """
+        CREATE TABLE IF NOT EXISTS contact (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            id_usuario_duenio TEXT NOT NULL,
-            id_usuario_bloqueado TEXT NOT NULL,
-            fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE(id_usuario_duenio, id_usuario_bloqueado)
+            name TEXT NOT NULL,
+            ip TEXT NOT NULL UNIQUE
         );
     """;
 
-        conn.createStatement().execute(sql);
+        conn.createStatement().execute(sqlContact);
+
+//        String sqlListaNegra = """
+//        CREATE TABLE IF NOT EXISTS listanegra (
+//            id INTEGER PRIMARY KEY AUTOINCREMENT,
+//            id_usuario_duenio TEXT NOT NULL,
+//            id_usuario_bloqueado TEXT NOT NULL,
+//            fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+//            UNIQUE(id_usuario_duenio, id_usuario_bloqueado)
+//        );
+//    """;
+//
+//        conn.createStatement().execute(sqlListaNegra);
     }
 }

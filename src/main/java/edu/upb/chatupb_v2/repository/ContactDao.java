@@ -76,8 +76,8 @@ public class ContactDao {
         DaoHelper.QueryParameters params = new DaoHelper.QueryParameters() {
             @Override
             public void setParameters(PreparedStatement pst) throws SQLException {
-                pst.setString(2, contact.getName());
-                pst.setString(3, contact.getIp());
+                pst.setString(1, contact.getName());
+                pst.setString(2, contact.getIp());
             }
         };
         helper.insert(query, params, contact);

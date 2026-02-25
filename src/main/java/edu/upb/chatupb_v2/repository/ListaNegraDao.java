@@ -14,7 +14,7 @@ public class ListaNegraDao {
     }
 
     public void agregarBloqueado(String mio, String bloqueado) throws SQLException {
-        String sql = "INSERT OR IGNORE INTO blacklist (id_usuario_duenio, id_usuario_bloqueado) VALUES (?, ?)";
+        String sql = "INSERT OR IGNORE INTO listanegra (id_usuario_duenio, id_usuario_bloqueado) VALUES (?, ?)";
 
         try (Connection connection = ConnectionDB.getInstance().getConection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -26,7 +26,7 @@ public class ListaNegraDao {
     }
 
     public boolean estaBloqueado(String duenio, String bloqueado) throws SQLException {
-        String sql = "SELECT 1 FROM blacklist WHERE id_usuario_duenio = ? AND id_usuario_bloqueado = ?";
+        String sql = "SELECT 1 FROM listanegra WHERE id_usuario_duenio = ? AND id_usuario_bloqueado = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, duenio);

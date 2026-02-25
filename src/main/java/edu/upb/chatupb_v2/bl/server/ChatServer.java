@@ -7,10 +7,6 @@ package edu.upb.chatupb_v2.bl.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 
-/**
- *
- * @author rlaredo
- */
 public class ChatServer extends Thread {
 
     private static final int port = 1900;
