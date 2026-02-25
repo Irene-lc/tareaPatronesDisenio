@@ -27,10 +27,11 @@ public class Mediador {
         return mediador;
     }
 
-    public void addClient(String key, String nombreClient,SocketClient value) {
-        this.listaContactos.put(key, value);
+    public void addClient(String idUsuario, String nombreClient, SocketClient client) {
+        this.listaContactos.put(idUsuario, client);
+        long idUsuariolong = Long.parseLong(idUsuario);
         if (chatView != null)
-            chatView.agregarContactos(key, nombreClient);
+            chatView.agregarContacto(idUsuariolong, nombreClient, client.getIp());
     }
 
     public void removeClient(String key) {

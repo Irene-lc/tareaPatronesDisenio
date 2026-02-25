@@ -19,7 +19,6 @@ public class Contact implements Serializable, Model {
 
     public static final class Column{
         public static final String ID= "id";
-        public static final String CODE ="code";
         public static final String NAME ="name";
         public static final String IP ="ip";
 
@@ -29,16 +28,8 @@ public class Contact implements Serializable, Model {
         this.id = id;
     }
     private long id;
-    private String code;
     private String name;
     private String ip;
     private boolean stateConnect = false;
-    
-    public String roomCode(){
-        return ME_CODE + code;
-    }
-    
 
 }
-
-

@@ -27,7 +27,7 @@ public class ChatView extends JFrame {
     private String idUsuarioActivo;
     private final String idMio = "8179864";
     private final String nombre = "Irene";
-    JPanel listaContactos = new JPanel();
+//    JPanel listaContactos = new JPanel();
     private DefaultListModel<Contact> contacModel = new DefaultListModel<>();
 //    ChatServer chatServer;
 
@@ -39,10 +39,10 @@ public class ChatView extends JFrame {
         this.idUsuarioActivo = idCliente;
         this.chatUI = chatUI;
         initComponents();
-//        this.jContactos.setCellRenderer(new ContactRenderer());
-        for (int i = 0; i < 10; i++) {
-            contacModel.add(i, new Contact(i, "Co" + i, "Ricardo" + i, "444", false));
-        }
+        this.jContactos.setCellRenderer(new ContactRenderer());
+//        for (int i = 0; i < 10; i++) {
+//            contacModel.add(i, new Contact(i, "Co" + i, "Ricardo" + i, "444", false));
+//        }
 //        client.addListener(this);
         
     }
@@ -131,37 +131,35 @@ public class ChatView extends JFrame {
 //        pack();
 //    }
 
+// </editor-fold>//GEN-END:initComponents
     private void initComponents() {
 
         // ===== COMPONENTES CHAT =====
-        jBtnEnviar = new JButton("Enviar");
         jtMensaje = new JTextField();
         jTextPaneChat = new JTextPane();
         jTextPaneChat.setEditable(false);
-        
-        jContactos
-
         jScrollPaneChat = new JScrollPane(jTextPaneChat);
-
-        jBtnNuevaConexion = new JButton("+");
-        jBtnOff = new JButton("off");
+        jContactos = new JList<>();
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(900, 600);
         setLocationRelativeTo(null);
 
+        jBtnEnviar = new JButton("Enviar");
         jBtnEnviar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnEnviarActionPerformed(evt);
             }
         });
 
+        jBtnNuevaConexion = new JButton("+");
         jBtnNuevaConexion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnNuevaConexionActionPerformed(evt);
             }
         });
 
+        jBtnOff = new JButton("off");
         jBtnOff.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnOffActionPerformed(evt);
@@ -173,19 +171,30 @@ public class ChatView extends JFrame {
 
         // PANEL IZQUIERDO (CONTACTOS)
 
-        JPanel panelContactos = new JPanel();
-        panelContactos.setLayout(new BorderLayout());
-        panelContactos.setPreferredSize(new Dimension(200, 0));
+        JPanel panelContactos = new JPanel(new BorderLayout());
+        panelContactos.setPreferredSize(new Dimension(220, 0));
         panelContactos.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.LIGHT_GRAY));
 
         JLabel lblContactos = new JLabel("Contactos", SwingConstants.CENTER);
         lblContactos.setFont(new Font("Arial", Font.BOLD, 14));
         lblContactos.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        jContactos = new JList<>(contacModel);
+        jContactos.setCellRenderer(new ContactRenderer());
+        jContactos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        listaContactos.setLayout(new BoxLayout(listaContactos, BoxLayout.Y_AXIS));
+        jContactos.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                Contact seleccionado = jContactos.getSelectedValue();
+                if (seleccionado != null) {
+                    idUsuarioActivo = String.valueOf(seleccionado.getId());
+                    jTextPaneChat.setText("");
+                    System.out.println("Contacto seleccionado: " + seleccionado.getName());
+                }
+            }
+        });
 
-        JScrollPane scrollContactos = new JScrollPane(listaContactos);
+        JScrollPane scrollContactos = new JScrollPane(jContactos);
         scrollContactos.setBorder(null);
 
         panelContactos.add(lblContactos, BorderLayout.NORTH);
@@ -215,7 +224,6 @@ public class ChatView extends JFrame {
         add(panelChat, BorderLayout.CENTER);
 
     }
-// </editor-fold>//GEN-END:initComponents
     private void showOffPopup() {
 
         JDialog dialog = new JDialog(this, true);
@@ -392,30 +400,18 @@ public class ChatView extends JFrame {
         }
     }
 
-    public void agregarContactos(String idUsuario, String nombreContacto) {
-        for (Component contacto : listaContactos.getComponents()) {
-            if (contacto instanceof JButton) {
-                JButton btn = (JButton) contacto;
-                if (btn.getName() != null && btn.getName().equals(idUsuario))
-                    return;
+    public void agregarContacto(long idCliente, String nombreCliente, String ip) {
+
+        for (int i = 0; i < contacModel.size(); i++) {
+            if (contacModel.get(i).getId() == idCliente) {
+                return;
             }
         }
-        JButton contacto = new JButton(nombreContacto);
-        contacto.setName(idUsuario);
-        contacto.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        contacto.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        contacto.addActionListener(e -> {
-            idUsuarioActivo = idUsuario;
-            System.out.println("Contacto creado: " + nombreContacto);
-            jTextPaneChat.setText(" ");
-        });
-
-        listaContactos.add(contacto);
-        listaContactos.add(Box.createVerticalStrut(5));
-        listaContactos.revalidate();
-        listaContactos.repaint();
+        Contact nuevo = new Contact(idCliente, nombreCliente, ip, false);
+        contacModel.addElement(nuevo);
     }
+
     private void mostrarMensajeSistema(String texto) {
         StyledDocument doc = jTextPaneChat.getStyledDocument();
         SimpleAttributeSet attrs = new SimpleAttributeSet();
