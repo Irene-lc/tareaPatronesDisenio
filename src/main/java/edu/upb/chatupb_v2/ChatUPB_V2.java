@@ -3,8 +3,14 @@
  */
 package edu.upb.chatupb_v2;
 
-import edu.upb.chatupb_v2.bl.server.ChatServer;
-import edu.upb.chatupb_v2.bl.server.Mediador;
+import edu.upb.chatupb_v2.controller.ChatsController;
+import edu.upb.chatupb_v2.controller.ContactController;
+import edu.upb.chatupb_v2.model.network.ChatServer;
+import edu.upb.chatupb_v2.controller.Mediador;
+import edu.upb.chatupb_v2.view.ChatUI;
+import edu.upb.chatupb_v2.view.ChatView;
+
+import java.util.List;
 
 public class ChatUPB_V2 {
 
@@ -12,9 +18,17 @@ public class ChatUPB_V2 {
         /* Create and display the form */
         final ChatUI chatUI = new ChatUI();
         ChatView chatView = new ChatView(chatUI);
+
+        ContactController contactController = new ContactController(chatView);
+        ChatsController chatsController = new ChatsController(chatView);
+
+        chatView.setContactController(contactController);
+        chatView.setChatsController(chatsController);
+
         Mediador.getInstance().setChatUI(chatUI);
         Mediador.getInstance().setChatView(chatView);
-        Mediador.getInstance().cargarDesdeBD();
+
+        contactController.onload();
         java.awt.EventQueue.invokeLater(new Runnable() {
             // lo que se hace dentro del hilo es solo del contexto del hilo
             public void run() {
