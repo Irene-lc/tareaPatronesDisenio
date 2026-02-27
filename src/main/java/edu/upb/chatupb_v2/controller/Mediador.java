@@ -51,7 +51,7 @@ public class Mediador implements SocketListener {
         try {
             SocketClient client = new SocketClient(ip);
             client.start();
-            client.addListener(this);
+            client.addListener(this); // El mediador se subscribe a los eventos de SocketClient para escuchar
             Message message = new Invitacion(idMio, nombre);
             client.send(message);
         } catch (Exception e) {

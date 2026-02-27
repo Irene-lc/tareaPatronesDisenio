@@ -26,7 +26,8 @@ public class ChatView extends JFrame implements iChatView {
     private ChatUI chatUI;
     public String idUsuarioActual;
 
-    private final String idMio = "kf3fc20a-766c-4rd4-813d-b1967a01fa9a";
+//    private final String idMio = "kf3fc20a-766c-4rd4-813d-b1967a01fa9a";
+    private final String idMio = Mediador.getInstance().getIdMio();
     private final String nombre = "Irene";
     private DefaultListModel<Contact> contacModel = new DefaultListModel<>();
 
