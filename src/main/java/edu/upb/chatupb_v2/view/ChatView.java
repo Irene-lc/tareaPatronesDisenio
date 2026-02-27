@@ -7,13 +7,12 @@ package edu.upb.chatupb_v2.view;
 import edu.upb.chatupb_v2.controller.ChatsController;
 import edu.upb.chatupb_v2.controller.ContactController;
 import edu.upb.chatupb_v2.model.entities.message.FueraLinea;
+import edu.upb.chatupb_v2.model.entities.message.Hello;
 import edu.upb.chatupb_v2.model.entities.message.Mensaje;
 import edu.upb.chatupb_v2.model.entities.message.Message;
 import edu.upb.chatupb_v2.controller.Mediador;
-import edu.upb.chatupb_v2.model.network.SocketClient;
 import edu.upb.chatupb_v2.model.repository.Chats;
 import edu.upb.chatupb_v2.model.repository.Contact;
-import edu.upb.chatupb_v2.model.repository.ContactDao;
 import lombok.Setter;
 
 import javax.swing.*;
@@ -583,6 +582,9 @@ public class ChatView extends JFrame implements iChatView {
             showOffPopup();
             mostrarMensajeSistema("CONEXION TERMINADA");
             Mediador.getInstance().removeClient(idUsuarioActual);
+        }
+        if (message instanceof Hello) {
+//            Mediador.getInstance().establecerConexion(message.ge);
         }
     }
     private void limpiarChat() {

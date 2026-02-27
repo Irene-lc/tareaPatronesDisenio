@@ -12,6 +12,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class SocketClient extends Thread {
@@ -19,6 +21,15 @@ public class SocketClient extends Thread {
     private final String ip;
     private final DataOutputStream dout;
     private final BufferedReader br;
+
+    @Override
+    public String toString() {
+        return "SocketClient{" +
+                "socketListener=" + socketListener +
+                '}';
+    }
+
+    private List<SocketListener> socketListener = new ArrayList<>();
 
     public SocketClient(Socket socket) throws IOException {
         this.socket = socket;
@@ -40,45 +51,35 @@ public class SocketClient extends Thread {
         try {
             String message;
             while ((message = br.readLine()) != null) {
-//                System.out.println("Comando recibido: " + message);
-                System.out.println(message);
+                System.out.println("Comando recibido: " + message);
 
                 String split[] = message.split(Pattern.quote("|"));
                 if (split.length == 0) {
                     return;
                 }
+                System.out.println("Listeners: " + socketListener);
                 switch (split[0]) {
                     case "001":
                         Invitacion inv = Invitacion.parse(message);
-//                        if (socketListener != null) {
-//                            socketListener.onInvitacion(inv);
-//                        }
-//                        inv.setIp(ip);
-                        Mediador.getInstance().notificar(this, inv);
-//                        notificar(inv);
-//                    System.out.println(inv.generarTrama());
+                        notificar(inv);
                         break;
 
                     case "002":
                         Aceptar acept = Aceptar.parse(message);
 //                        acept.setIp(ip);
-                        Mediador.getInstance().notificar(this, acept);
-//                        notificar(acept);
+                        notificar(acept);
                         break;
                     case "003":
                         Rechazar rechazar = Rechazar.parse(message);
-                        Mediador.getInstance().notificar(this, rechazar);
-//                        notificar(rechazar);
+                        notificar(rechazar);
                         break;
                     case "007":
                         Mensaje mensaje = Mensaje.parse(message);
-                        Mediador.getInstance().notificar(this, mensaje);
-//                        notificar(mensaje);
+                        notificar(mensaje);
                         break;
                     case "0018":
                         FueraLinea fueraLinea = FueraLinea.parse(message);
-                        Mediador.getInstance().notificar(this, fueraLinea);
-//                        notificar(fueraLinea);
+                        notificar(fueraLinea);
                         break;
                 }
             }
@@ -91,30 +92,18 @@ public class SocketClient extends Thread {
         }
     }
 
-//    public void addListener(SocketListener listener) {
-//        if (!socketListener.contains(listener)) {
-//            socketListener.add(listener);
-//        }
-//    }
-//
-//    public void removeListener(SocketListener listener) {
-//        this.socketListener.remove(listener);
-//    }
-//    public void notificar(Message message) {
-//        addListener(Mediador.getInstance());
-//        for (SocketListener listener : socketListener) {
-//            java.awt.EventQueue.invokeLater(() -> listener.onMessage(this, message));
-//        }
-//    }
-//    public void send(String message) throws IOException {
-//        message = message + System.lineSeparator();
-//        try {
-//            dout.write(message.getBytes("UTF-8"));
-//            dout.flush();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
+    public void addListener(SocketListener listener) {
+        this.socketListener.add(listener);
+    }
+
+    public void removeListener(SocketListener listener) {
+        this.socketListener.remove(listener);
+    }
+    public void notificar(Message message) {
+        for (SocketListener listener : socketListener) {
+            java.awt.EventQueue.invokeLater(() -> listener.onMessage(this, message));
+        }
+    }
     public void send(Message message) throws IOException { //enviar mensaje a quien me habló
         String messageStr = message.generarTrama();
         try {
@@ -127,6 +116,7 @@ public class SocketClient extends Thread {
 
     public void close() {
         try {
+            removeListener(Mediador.getInstance());
             this.socket.close();
             this.br.close();
             this.dout.close();

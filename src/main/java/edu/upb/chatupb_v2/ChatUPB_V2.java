@@ -40,7 +40,7 @@ public class ChatUPB_V2 {
         try {
             ChatServer chatServer = new ChatServer();
             chatServer.start();
-//            chatServer.addListener(chatUI);
+//            chatServer.addListener(Mediador.getInstance());
         } catch (Exception e) {
             e.printStackTrace();
         }

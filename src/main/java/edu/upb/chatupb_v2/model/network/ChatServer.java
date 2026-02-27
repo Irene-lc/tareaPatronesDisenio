@@ -4,6 +4,8 @@
  */
 package edu.upb.chatupb_v2.model.network;
 
+import edu.upb.chatupb_v2.controller.Mediador;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 
@@ -12,24 +14,20 @@ public class ChatServer extends Thread {
     private static final int port = 1900;
 
     private final ServerSocket server;
-//    private SocketListener socketListener;
     public ChatServer() throws IOException {
         this.server = new ServerSocket(port);
     }
-//    public ChatServer(SocketListener listener) throws IOException {
-//        this.server = new ServerSocket(port);
+    public ChatServer(SocketListener listener) throws IOException {
+        this.server = new ServerSocket(port);
 //        this.socketListener = listener;
-//    }
+    }
 
-//    public void addListener(SocketListener listener) {
-//        this.socketListener = listener;
-//    }
     @Override
     public void run() {
         while (true) {
             try {
                 SocketClient socketClient = new SocketClient(this.server.accept()); // hasta que reciba una solicitud de coonexion
-//                socketClient.addListener(this.socketListener);
+                socketClient.addListener(Mediador.getInstance());
                 socketClient.start();
             } catch (Exception e) {
                 e.printStackTrace();
