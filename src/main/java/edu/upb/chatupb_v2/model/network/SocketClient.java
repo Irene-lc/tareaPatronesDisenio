@@ -22,12 +22,6 @@ public class SocketClient extends Thread {
     private final DataOutputStream dout;
     private final BufferedReader br;
 
-    @Override
-    public String toString() {
-        return "SocketClient{" +
-                "socketListener=" + socketListener +
-                '}';
-    }
 
     private List<SocketListener> socketListener = new ArrayList<>();
 

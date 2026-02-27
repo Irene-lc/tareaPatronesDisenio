@@ -35,9 +35,10 @@ public class Mediador implements SocketListener {
         this.clientes.put(idUsuario, client);
 
         System.out.println("Creando contacto:");
-        System.out.println("ID: " + idUsuario);
-        System.out.println("Nombre: " + nombreClient);
-        System.out.println("IP: " + client.getIp());
+        System.out.println("ID contacto: " + idUsuario);
+        System.out.println("Nombre contacto: " + nombreClient);
+        System.out.println("IP contacto: " + client.getIp());
+        System.out.println("------");
 
         Contact nuevo = chatView.contactController.agregarContactoBd(idUsuario, nombreClient, client.getIp());
         if (chatView != null)
@@ -112,8 +113,8 @@ public class Mediador implements SocketListener {
     }
     @Override
     public synchronized void onMessage(SocketClient socketClient, Message message) {
-        chatView.onMessage(message);
         chatUI.onMessage(socketClient, message);
+        chatView.onMessage(message);
         //llamar Dao?
     }
 }

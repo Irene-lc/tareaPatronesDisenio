@@ -405,15 +405,15 @@ public class ChatView extends JFrame implements iChatView {
 
         for (int i = 0; i < contacModel.size(); i++) {
             System.out.println("contacModel.get(i).getId(): " + contacModel.get(i).getId());
-            System.out.println("idCliente: " + contact.getId());
+            System.out.println("idCliente: (ChatView) " + contact.getId());
             if (contacModel.get(i).getId().equals(contact.getId())) {
                 return;
             }
         }
-        System.out.println("nombreCliente: " + contact.getName());
-        System.out.println("ip: " + contact.getIp());
+        System.out.println("nombreCliente: (ChatView) " + contact.getName());
+        System.out.println("ip: (ChatView)" + contact.getIp());
         contacModel.addElement(contact);
-        System.out.println("Agregando contacto con id: " + contact.getId());
+        System.out.println("Agregando contacto con id al conctacModel: (ChatView)" + contact.getId());
     }
 //    public void mostrarMensajeSistema(String texto) {
 //        StyledDocument doc = jTextPaneChat.getStyledDocument();

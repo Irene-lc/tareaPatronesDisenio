@@ -26,6 +26,7 @@ public class ChatServer extends Thread {
     public void run() {
         while (true) {
             try {
+                System.out.println("Se agrego el Mediador");
                 SocketClient socketClient = new SocketClient(this.server.accept()); // hasta que reciba una solicitud de coonexion
                 socketClient.addListener(Mediador.getInstance());
                 socketClient.start();

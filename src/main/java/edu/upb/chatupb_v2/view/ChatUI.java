@@ -349,7 +349,7 @@ public class ChatUI extends javax.swing.JFrame {
 
     public void onMessage(SocketClient socketClient, Message message) {
         if (message instanceof Invitacion) {
-            System.out.println("Llego la invitacion");
+            System.out.println("Paso 1: Llego la invitacion");
 
             Invitacion invitacion = (Invitacion) message;
 //            int respuesta = JOptionPane.showConfirmDialog(
@@ -370,15 +370,18 @@ public class ChatUI extends javax.swing.JFrame {
 //            }
             boolean accepted = showInvitationPopup(invitacion.getNombre());
             if (accepted) {
+                System.out.println("Paso 2: Aceptar Invitacion");
                 System.out.println("id invitacion: " + invitacion.getIdUsuario());
                 Mediador.getInstance().addClient(invitacion.getIdUsuario(), invitacion.getNombre(), socketClient);
                 Message aceptar = new Aceptar(Mediador.getInstance().getIdMio(), Mediador.getInstance().getNombre());
                 Mediador.getInstance().sendMessage(invitacion.getIdUsuario(), aceptar);
+                System.out.println("Enviando 002...");
                 Mediador.getInstance().getChatView().actualizarValores(invitacion.getIdUsuario());
                 Mediador.getInstance().getChatView().setVisible(true);
                 this.setVisible(false);
 //                client.removeListener(this);
             } else  {
+                System.out.println("Paso 2: Rechazar Invitacion");
 //                Mediador.getInstance().listaNegra.add(socketClient);
                 System.out.println("Enviando 003...");
                 try {
@@ -410,6 +413,7 @@ public class ChatUI extends javax.swing.JFrame {
             this.setVisible(false);
         }
         if  (message instanceof Rechazar) {
+            System.out.println("Entra en 003 Solicitud Rechazada");
             showDeclinePopup();
         }
     }
