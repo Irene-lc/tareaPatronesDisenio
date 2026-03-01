@@ -1,15 +1,16 @@
 package edu.upb.chatupb_v2.controller;
 
+import edu.upb.chatupb_v2.controller.exception.OperationException;
+import edu.upb.chatupb_v2.model.entities.message.*;
 import edu.upb.chatupb_v2.model.network.SocketClient;
 import edu.upb.chatupb_v2.model.network.SocketListener;
+import edu.upb.chatupb_v2.model.repository.ContactDao;
 import edu.upb.chatupb_v2.view.ChatUI;
 import edu.upb.chatupb_v2.view.ChatView;
-import edu.upb.chatupb_v2.model.entities.message.Invitacion;
-import edu.upb.chatupb_v2.model.entities.message.Mensaje;
-import edu.upb.chatupb_v2.model.entities.message.Message;
 import edu.upb.chatupb_v2.model.repository.Contact;
 import lombok.Data;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -19,6 +20,7 @@ public class Mediador implements SocketListener {
 
     private ChatUI chatUI;
     private ChatView chatView;
+    private ContactDao contactDao = new ContactDao();
     private static final Mediador mediador = new Mediador();
     private final HashMap<String, SocketClient> clientes = new HashMap<>();
 //    public List<SocketClient> listaNegra;
@@ -40,24 +42,19 @@ public class Mediador implements SocketListener {
         System.out.println("IP contacto: " + client.getIp());
         System.out.println("------");
 
-        Contact nuevo = chatView.contactController.agregarContactoBd(idUsuario, nombreClient, client.getIp());
+        Contact nuevo = new Contact(idUsuario, nombreClient, client.getIp(), false);
+        try {
+            this.contactDao.save(nuevo);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new OperationException("No se pudo guardar el contacto en la base de datos");
+        }
         if (chatView != null)
             chatView.agregarContacto(nuevo);
+
     }
     public void removeClient(String key) {
         this.clientes.remove(key);
-    }
-    public void establecerConexion(String ip, String idMio, String nombre) {
-        try {
-            SocketClient client = new SocketClient(ip);
-            client.start();
-            client.addListener(this); // El mediador se subscribe a los eventos de SocketClient para escuchar
-            Message message = new Invitacion(idMio, nombre);
-            client.send(message);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
     }
     public void sendMessage(String key, Message message) { //enviar mensajes tipo chat privado
         SocketClient cliente = this.clientes.get(key);
@@ -84,7 +81,7 @@ public class Mediador implements SocketListener {
             sendMessage(idCliente, message);
             chatView.chatsController.guardarEnBd(idMensaje, mensaje, idMio, idCliente, chatView.obtenerHoraActual());
             if (chatView != null)
-                chatView.agregarMensaje(mensaje, true, chatView.obtenerHoraActual());
+                chatView.agregarMensajeUI(mensaje, true, chatView.obtenerHoraActual());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -112,9 +109,73 @@ public class Mediador implements SocketListener {
         }
         clientes.clear();
     }
+
+    public void establecerConexion(String ip) {
+        SocketClient client;
+        try {
+            System.out.println("entroooo");
+            client = new SocketClient(ip);
+            client.addListener(this); // El mediador se subscribe a los eventos de SocketClient para escuchar
+            client.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new OperationException("No se logró establecer la conexión");
+        }
+        Message message = new Invitacion(idMio, nombre);
+        try {
+            client.send(message);
+            System.out.println("Enviando 001...");
+        } catch (IOException e) {
+            throw new OperationException("No se logró enviar la invitación");
+        }
+    }
+    public void aceptarInvitacion(SocketClient socketClient, Invitacion invitacion) {
+        addClient(invitacion.getIdUsuario(), invitacion.getNombre(), socketClient);
+
+        Message aceptar = new Aceptar(idMio, nombre);
+        sendMessage(invitacion.getIdUsuario(), aceptar);
+        if (chatView != null) {
+            chatView.actualizarValores(invitacion.getIdUsuario());
+            chatView.setVisible(true);
+        }
+        chatUI.setVisible(false);
+    }
+    public void rechazarInvitacion(SocketClient socketClient) {
+        try {
+            SocketClient client = new SocketClient(socketClient.getIp());
+            Message rechazar = new Rechazar();
+            client.send(rechazar);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new OperationException("No se pudo rechazar la invitación");
+        }
+    }
+    public void invitacionAceptada(SocketClient socketClient, Message message) {
+        Aceptar aceptar = (Aceptar) message;
+        addClient(aceptar.getIdUsuario(), aceptar.getNombre(), socketClient);
+        if (chatView != null) {
+            chatView.actualizarValores(aceptar.getIdUsuario());
+            chatView.setVisible(true);
+        }
+    }
     @Override
     public synchronized void onMessage(SocketClient socketClient, Message message) {
-        chatUI.onMessage(socketClient, message);
+        if (message instanceof Invitacion) {
+            Invitacion invitacion = (Invitacion) message;
+            boolean accepted = chatUI.showInvitationPopup(invitacion.getNombre());
+            if (accepted) {
+                System.out.println("Enviando 002...");
+                aceptarInvitacion(socketClient, invitacion);
+            } else  {
+                System.out.println("Enviando 003...");
+                rechazarInvitacion(socketClient);
+            }
+        }
+        if (message instanceof Aceptar) {
+            invitacionAceptada(socketClient, message);
+            chatView.setVisible(true);
+        }
+        chatUI.onMessage(message);
         chatView.onMessage(message);
         //llamar Dao?
     }

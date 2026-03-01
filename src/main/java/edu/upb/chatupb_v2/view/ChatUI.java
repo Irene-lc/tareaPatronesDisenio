@@ -9,7 +9,6 @@ import edu.upb.chatupb_v2.model.entities.message.Invitacion;
 import edu.upb.chatupb_v2.model.entities.message.Message;
 import edu.upb.chatupb_v2.model.entities.message.Rechazar;
 import edu.upb.chatupb_v2.controller.Mediador;
-import edu.upb.chatupb_v2.model.network.SocketClient;
 //import edu.upb.chatupb_v2.bl.server.SocketListener;
 
 import javax.swing.*;
@@ -213,7 +212,7 @@ public class ChatUI extends javax.swing.JFrame {
         dialog.add(root);
         dialog.setVisible(true);
     }
-    private boolean showInvitationPopup(String nombreInvitador) {
+    public boolean showInvitationPopup(String nombreContacto) {
 
         final boolean[] accepted = {false};
 
@@ -234,7 +233,7 @@ public class ChatUI extends javax.swing.JFrame {
         card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
 
         // ===== TITULO =====
-        JLabel title = new JLabel("Llegó la invitación: " + nombreInvitador);
+        JLabel title = new JLabel("Llegó la invitación: " + nombreContacto);
         title.setFont(new Font("Arial", Font.BOLD, 14));
         title.setForeground(new Color(37,29,75));
         title.setHorizontalAlignment(SwingConstants.CENTER);
@@ -292,8 +291,7 @@ public class ChatUI extends javax.swing.JFrame {
 //    // @SuppressWarnings("unchecked")
 
     private void jBtnConectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnConectarActionPerformed
-        System.out.println("Enviando 001...");
-        Mediador.getInstance().establecerConexion(jtIp.getText().toString(), Mediador.getInstance().getIdMio(), Mediador.getInstance().getNombre());
+        Mediador.getInstance().establecerConexion(jtIp.getText().toString());
 //        try {
 //            iniciarCliente();
 //            client = new SocketClient(jtIp.getText().toString());
@@ -347,69 +345,10 @@ public class ChatUI extends javax.swing.JFrame {
     private javax.swing.JButton jBtnConectar;
     private javax.swing.JTextField jtIp;
 
-    public void onMessage(SocketClient socketClient, Message message) {
-        if (message instanceof Invitacion) {
-            System.out.println("Paso 1: Llego la invitacion");
-
-            Invitacion invitacion = (Invitacion) message;
-//            int respuesta = JOptionPane.showConfirmDialog(
-//                    this,
-//                    "LLego la invitacion: " + invitacion
-//                    , "Invitacion",
-//                    JOptionPane.YES_NO_OPTION); // esto le llega al CLiente
-
-//            try {
-//                if (listaNegraDao.estaBloqueado(idMio, invitacion.getIdUsuario())) {
-//                    System.out.println("Usuario bloqueado automáticamente.");
-//                    Message rechazar = new Rechazar();
-//                    socketClient.send(rechazar);
-//                    return;
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-            boolean accepted = showInvitationPopup(invitacion.getNombre());
-            if (accepted) {
-                System.out.println("Paso 2: Aceptar Invitacion");
-                System.out.println("id invitacion: " + invitacion.getIdUsuario());
-                Mediador.getInstance().addClient(invitacion.getIdUsuario(), invitacion.getNombre(), socketClient);
-                Message aceptar = new Aceptar(Mediador.getInstance().getIdMio(), Mediador.getInstance().getNombre());
-                Mediador.getInstance().sendMessage(invitacion.getIdUsuario(), aceptar);
-                System.out.println("Enviando 002...");
-                Mediador.getInstance().getChatView().actualizarValores(invitacion.getIdUsuario());
-                Mediador.getInstance().getChatView().setVisible(true);
-                this.setVisible(false);
-//                client.removeListener(this);
-            } else  {
-                System.out.println("Paso 2: Rechazar Invitacion");
-//                Mediador.getInstance().listaNegra.add(socketClient);
-                System.out.println("Enviando 003...");
-                try {
-                    //PREGUNTAR PROFE
-                    Message rechazar = new Rechazar();
-                    socketClient.send(rechazar);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-//                try {
-//                    listaNegraDao.agregarBloqueado(idMio, idUsuarioActivo);
-//                    Message rechazar = new Rechazar();
-//                    socketClient.send(rechazar);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                System.out.println("Lista negra: " + Mediador.getInstance().listaNegra);
-            }
-        }
+    public void onMessage(Message message) {
         if (message instanceof Aceptar) {
-//            JOptionPane.showMessageDialog(null, "Su invitacion fue aceptada", "Aceptada", JOptionPane.INFORMATION_MESSAGE);
             System.out.println("Entra en 002 Aceptar");
             showAcceptPopup();
-            Aceptar aceptar = (Aceptar) message;
-            Mediador.getInstance().getChatView().actualizarValores(aceptar.getIdUsuario());
-            Mediador.getInstance().addClient(aceptar.getIdUsuario(), aceptar.getNombre(), socketClient);
-            Mediador.getInstance().getChatView().setVisible(true);
             this.setVisible(false);
         }
         if  (message instanceof Rechazar) {

@@ -90,7 +90,7 @@ public class ChatsDao {
         }
         helper.update(query, null);
     }
-    public List<Chats> findByContact(String idMio, String idCliente) throws Exception {
+    public List<Chats> findByContact(String idEmisor, String idReceptor) throws Exception {
         String query = """
         SELECT idMensaje, mensajeTxt, hora, idEmisor, idReceptor
         FROM chats 
@@ -100,10 +100,10 @@ public class ChatsDao {
     """;
 
         DaoHelper.QueryParameters params = pst -> {
-            pst.setString(1, idMio);
-            pst.setString(2, idCliente);
-            pst.setString(3, idCliente);
-            pst.setString(4, idMio);
+            pst.setString(1, idEmisor);
+            pst.setString(2, idReceptor);
+            pst.setString(3, idReceptor);
+            pst.setString(4, idEmisor);
         };
 
         return helper.executeQuery(query, params, resultReader);

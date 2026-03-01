@@ -7,10 +7,7 @@ package edu.upb.chatupb_v2.view;
 import edu.upb.chatupb_v2.model.repository.Contact;
 
 import java.awt.*;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.ListCellRenderer;
+import javax.swing.*;
 
 public class ContactRenderer extends JLabel implements ListCellRenderer<Contact> {
 
@@ -32,13 +29,13 @@ public class ContactRenderer extends JLabel implements ListCellRenderer<Contact>
 
         setText( "<html><p>"+ contac.getName()+"</p></html>");
 
-//        if (isSelected) {
-//            setBackground(Color.BLUE);
-//            setFont(SELECTED_FONT);
-//        } else {
-//            setFont(UIManager.getFont("Label.font"));
-//            setBackground(Color.WHITE);
-//        }
+        if (isSelected) {
+            setBackground(Color.BLUE);
+            setFont(SELECTED_FONT);
+        } else {
+            setFont(UIManager.getFont("Label.font"));
+            setBackground(Color.WHITE);
+        }
         return this;
     }
 }

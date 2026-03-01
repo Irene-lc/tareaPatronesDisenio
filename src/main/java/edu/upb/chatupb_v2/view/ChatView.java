@@ -6,10 +6,7 @@ package edu.upb.chatupb_v2.view;
 
 import edu.upb.chatupb_v2.controller.ChatsController;
 import edu.upb.chatupb_v2.controller.ContactController;
-import edu.upb.chatupb_v2.model.entities.message.FueraLinea;
-import edu.upb.chatupb_v2.model.entities.message.Hello;
-import edu.upb.chatupb_v2.model.entities.message.Mensaje;
-import edu.upb.chatupb_v2.model.entities.message.Message;
+import edu.upb.chatupb_v2.model.entities.message.*;
 import edu.upb.chatupb_v2.controller.Mediador;
 import edu.upb.chatupb_v2.model.repository.Chats;
 import edu.upb.chatupb_v2.model.repository.Contact;
@@ -293,6 +290,190 @@ public class ChatView extends JFrame implements iChatView {
         dialog.add(root);
         dialog.setVisible(true);
     }
+
+    private void showAcceptPopup() {
+
+        JDialog dialog = new JDialog(this, true);
+        dialog.setSize(320, 300);
+        dialog.setLocationRelativeTo(this);
+        dialog.setUndecorated(true);
+        dialog.setBackground(new Color(0,0,0,0));
+
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+
+        // ===== CARD =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(40, 90, 220, 110);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("Conexion aceptada");
+        title.setFont(new Font("Arial", Font.BOLD, 16));
+        title.setForeground(new Color(37,29,75));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setBounds(20, 20, 180, 30);
+
+        // ===== BOTON OK =====
+        JButton okButton = new JButton("Ok");
+        okButton.setBounds(85, 60, 50, 30);
+        okButton.setBackground(new Color(202,203,233));
+        okButton.setFocusPainted(false);
+
+        okButton.addActionListener(e -> dialog.dispose());
+
+        card.add(title);
+        card.add(okButton);
+
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setBounds(85, 0, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAccept.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Img");
+        }
+
+        root.add(card);
+        root.add(imageLabel);
+
+        dialog.add(root);
+        dialog.setVisible(true);
+    }
+    private void showDeclinePopup() {
+
+        JDialog dialog = new JDialog(this, true);
+        dialog.setSize(320, 300);
+        dialog.setLocationRelativeTo(this);
+        dialog.setUndecorated(true);
+        dialog.setBackground(new Color(0,0,0,0));
+
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+
+        // ===== CARD =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(40, 90, 220, 110);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("Conexion rechazada");
+        title.setFont(new Font("Arial", Font.BOLD, 16));
+        title.setForeground(new Color(37,29,75));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setBounds(20, 20, 180, 30);
+
+        // ===== BOTON OK =====
+        JButton okButton = new JButton("Ok");
+        okButton.setBounds(85, 60, 50, 30);
+        okButton.setBackground(new Color(202,203,233));
+        okButton.setFocusPainted(false);
+
+        okButton.addActionListener(e -> dialog.dispose());
+
+        card.add(title);
+        card.add(okButton);
+
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setBounds(85, 0, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotDecline.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Img");
+        }
+
+        root.add(card);
+        root.add(imageLabel);
+
+        dialog.add(root);
+        dialog.setVisible(true);
+    }
+    public boolean showInvitationPopup(String nombreContacto) {
+
+        final boolean[] accepted = {false};
+
+        JDialog dialog = new JDialog(this, true);
+        dialog.setSize(350, 320);
+        dialog.setLocationRelativeTo(this);
+        dialog.setUndecorated(true);
+        dialog.setBackground(new Color(0,0,0,0));
+
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+
+        // ===== CARD =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(40, 100, 270, 150);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("Llegó la invitación: " + nombreContacto);
+        title.setFont(new Font("Arial", Font.BOLD, 14));
+        title.setForeground(new Color(37,29,75));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setBounds(20, 20, 230, 40);
+
+        // ===== BOTON ACCEPT =====
+        JButton acceptButton = new JButton("Aceptar");
+        acceptButton.setBounds(30, 80, 90, 35);
+        acceptButton.setBackground(Color.lightGray);
+        acceptButton.setForeground(Color.BLACK);
+        acceptButton.setFocusPainted(false);
+
+        acceptButton.addActionListener(e -> {
+            accepted[0] = true;
+            dialog.dispose();
+        });
+
+        // ===== BOTON DECLINE =====
+        JButton declineButton = new JButton("Rechazar");
+        declineButton.setBounds(150, 80, 90, 35);
+        declineButton.setBackground(Color.GRAY);
+        declineButton.setForeground(Color.BLACK);
+        declineButton.setFocusPainted(false);
+
+        declineButton.addActionListener(e -> {
+            accepted[0] = false;
+            dialog.dispose();
+        });
+
+        card.add(title);
+        card.add(acceptButton);
+        card.add(declineButton);
+
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setBounds(120, 0, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotRequest.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Img");
+        }
+
+        root.add(card);
+        root.add(imageLabel);
+
+        dialog.add(root);
+        dialog.setVisible(true);
+
+        return accepted[0];
+    }
     private void showNoMessagePopup() {
 
         JDialog dialog = new JDialog(this, true);
@@ -457,6 +638,20 @@ public class ChatView extends JFrame implements iChatView {
                 java.time.format.DateTimeFormatter.ofPattern("HH:mm");
         return hora.format(formatter);
     }
+    private JLabel crearFotoPerfil() {
+
+        JLabel foto = new JLabel();
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/user.png"));
+            Image img = icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+            foto.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            foto.setText("");
+        }
+
+        return foto;
+    }
     private JPanel crearBurbuja(String texto, boolean esMio, String hora) {
 
         JPanel bubble = new JPanel(new BorderLayout());
@@ -482,20 +677,6 @@ public class ChatView extends JFrame implements iChatView {
 
         return bubble;
     }
-    private JLabel crearFotoPerfil() {
-
-        JLabel foto = new JLabel();
-
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/user.png"));
-            Image img = icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-            foto.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            foto.setText("");
-        }
-
-        return foto;
-    }
     private JPanel crearFilaMensaje(String texto, boolean esMio) {
 
         JPanel fila = new JPanel(new FlowLayout(
@@ -514,7 +695,7 @@ public class ChatView extends JFrame implements iChatView {
 
         return fila;
     }
-    public void agregarMensaje(String texto, boolean esMio, String hora) {
+    public void agregarMensajeUI(String texto, boolean esMio, String hora) {
 
         JPanel mensaje = crearFilaMensaje(texto, esMio);
 
@@ -572,9 +753,18 @@ public class ChatView extends JFrame implements iChatView {
     private JList<Contact> jContactos;
 
     public void onMessage(Message message) {
+        if (message instanceof Aceptar) {
+            System.out.println("Entra en 002 Aceptar");
+            showAcceptPopup();
+            this.setVisible(false);
+        }
+        if  (message instanceof Rechazar) {
+            System.out.println("Entra en 003 Solicitud Rechazada");
+            showDeclinePopup();
+        }
         if (message instanceof Mensaje) {
             Mensaje mensaje = (Mensaje) message;
-            agregarMensaje(mensaje.getMensaje(), false, obtenerHoraActual());
+            agregarMensajeUI(mensaje.getMensaje(), false, obtenerHoraActual());
             chatsController.guardarEnBd(mensaje.getIdMensaje(), mensaje.getMensaje(), mensaje.getIdUsuario(), idMio, obtenerHoraActual());
             System.out.print("Llegó el mensaje: " + mensaje + '\n');
         }
@@ -610,7 +800,7 @@ public class ChatView extends JFrame implements iChatView {
         limpiarChat();
         for (Chats c : chats) {
             boolean emisor = c.getIdEmisor().equals(idMio);
-            agregarMensaje(c.getMensajeTxt(), emisor, c.getHora());
+            agregarMensajeUI(c.getMensajeTxt(), emisor, c.getHora());
         }
     }
     // End of variables declaration//GEN-END:variables

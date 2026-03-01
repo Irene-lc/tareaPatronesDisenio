@@ -5,6 +5,7 @@
 package edu.upb.chatupb_v2.model.network;
 
 import edu.upb.chatupb_v2.controller.Mediador;
+import edu.upb.chatupb_v2.controller.exception.OperationException;
 import edu.upb.chatupb_v2.model.entities.message.*;
 
 import java.io.BufferedReader;
@@ -51,7 +52,6 @@ public class SocketClient extends Thread {
                 if (split.length == 0) {
                     return;
                 }
-                System.out.println("Listeners: " + socketListener);
                 switch (split[0]) {
                     case "001":
                         Invitacion inv = Invitacion.parse(message);
@@ -83,6 +83,9 @@ public class SocketClient extends Thread {
             } else {
                 System.out.println("Socket cerrado correctamente.");
             }
+            throw new OperationException("Socket cerrado por cliente");
+        } finally {
+            close();
         }
     }
 
