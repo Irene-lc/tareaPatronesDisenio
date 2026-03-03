@@ -1025,6 +1025,12 @@ public class ChatUI extends JFrame implements iChatView {
             Mensaje mensaje = (Mensaje) message;
             agregarMensajeUI(mensaje.getMensaje(), false, Mediador.getInstance().obtenerHoraActual(), false, mensaje.getIdMensaje());
             chatsController.guardarEnBd(mensaje.getIdMensaje(), mensaje.getMensaje(), mensaje.getIdUsuario(), idMio, Mediador.getInstance().obtenerHoraActual());
+            if (mensaje.getIdUsuario().equals(idUsuarioActual)) {
+                ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(mensaje.getIdMensaje());
+                System.out.println("Enviando 008...");
+                Mediador.getInstance().sendMessage(idUsuarioActual, confirmarRecibido);
+                Mediador.getInstance().actualizarLeido(mensaje.getIdMensaje());
+            }
         }
         if (message instanceof Hello) {
             Hello hello = (Hello) message;

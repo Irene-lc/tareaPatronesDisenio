@@ -86,6 +86,7 @@ public class SocketClient extends Thread {
                     case "008":
                         ConfirmarRecibido confirmarRecibido = ConfirmarRecibido.parse(message);
                         notificar(confirmarRecibido);
+                        break;
                     case "0018":
                         FueraLinea fueraLinea = FueraLinea.parse(message);
                         notificar(fueraLinea);

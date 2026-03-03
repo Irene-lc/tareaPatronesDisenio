@@ -10,6 +10,7 @@ import edu.upb.chatupb_v2.view.ChatUI;
 import edu.upb.chatupb_v2.model.repository.Contact;
 import lombok.Data;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
@@ -257,7 +258,10 @@ public class Mediador implements SocketListener {
             actualizarLeido(confirmarRecibido.getIdMensaje());
 
         }
-        chatUI.onMessage(message);
+        //Preguntar Profe
+        SwingUtilities.invokeLater(() -> {
+            chatUI.onMessage(message);
+        });
         //llamar Dao?
     }
 }
