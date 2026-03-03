@@ -6,7 +6,6 @@ import edu.upb.chatupb_v2.model.network.SocketClient;
 import edu.upb.chatupb_v2.model.network.SocketListener;
 import edu.upb.chatupb_v2.model.repository.ContactDao;
 import edu.upb.chatupb_v2.view.ChatUI;
-import edu.upb.chatupb_v2.view.ChatView;
 import edu.upb.chatupb_v2.model.repository.Contact;
 import lombok.Data;
 
@@ -19,7 +18,6 @@ import java.util.UUID;
 public class Mediador implements SocketListener {
 
     private ChatUI chatUI;
-    private ChatView chatView;
     private ContactDao contactDao = new ContactDao();
     private static final Mediador mediador = new Mediador();
     private final HashMap<String, SocketClient> clientes = new HashMap<>();
@@ -44,13 +42,26 @@ public class Mediador implements SocketListener {
 
         Contact nuevo = new Contact(idUsuario, nombreClient, client.getIp(), false);
         try {
+            if (this.contactDao.existById(idUsuario)) {
+                Contact contact = this.contactDao.findById(idUsuario);
+                System.out.println("El contacto ya se encuentra registrado");
+                if (!contact.getIp().equals(client.getIp())) {
+                    this.contactDao.updateIp(idUsuario, client.getIp());
+                    System.out.println();
+                    System.out.println("Contacto Antiguo: " + contact.getName() + " con ip: " + contact.getIp());
+                    System.out.println("Se actualizó la Ip del contacto correctamente");
+                    contact = this.contactDao.findById(idUsuario);
+                    System.out.println("Contacto Nuevo: " + contact.getName() + " con ip: " + contact.getIp());
+                }
+                return;
+            }
             this.contactDao.save(nuevo);
         } catch (Exception e) {
             e.printStackTrace();
             throw new OperationException("No se pudo guardar el contacto en la base de datos");
         }
-        if (chatView != null)
-            chatView.agregarContacto(nuevo);
+        if (chatUI != null)
+            chatUI.agregarContacto(nuevo);
 
     }
     public void removeClient(String key) {
@@ -69,8 +80,8 @@ public class Mediador implements SocketListener {
     }
     public void enviarMensajePorChat(String idCliente, String mensaje) {
         if (!clientes.containsKey(idCliente)) {
-            if (chatView != null) {
-                chatView.mostrarMensajeSistema("No hay conexion con cliente");
+            if (chatUI != null) {
+                chatUI.mostrarMensajeSistema("No hay conexion con cliente");
                 System.out.println("Cliente no en lsitaContactos");
             }
             return;
@@ -79,9 +90,9 @@ public class Mediador implements SocketListener {
             String idMensaje = UUID.randomUUID().toString();
             Message message = new Mensaje(idMio, idMensaje, mensaje);
             sendMessage(idCliente, message);
-            chatView.chatsController.guardarEnBd(idMensaje, mensaje, idMio, idCliente, chatView.obtenerHoraActual());
-            if (chatView != null)
-                chatView.agregarMensajeUI(mensaje, true, chatView.obtenerHoraActual());
+            chatUI.chatsController.guardarEnBd(idMensaje, mensaje, idMio, idCliente, obtenerHoraActual());
+            if (chatUI != null)
+                chatUI.agregarMensajeUI(mensaje, true, obtenerHoraActual());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -113,7 +124,6 @@ public class Mediador implements SocketListener {
     public void establecerConexion(String ip) {
         SocketClient client;
         try {
-            System.out.println("entroooo");
             client = new SocketClient(ip);
             client.addListener(this); // El mediador se subscribe a los eventos de SocketClient para escuchar
             client.start();
@@ -134,11 +144,10 @@ public class Mediador implements SocketListener {
 
         Message aceptar = new Aceptar(idMio, nombre);
         sendMessage(invitacion.getIdUsuario(), aceptar);
-        if (chatView != null) {
-            chatView.actualizarValores(invitacion.getIdUsuario());
-            chatView.setVisible(true);
+        if (chatUI != null) {
+            chatUI.actualizarValores(invitacion.getIdUsuario());
+            chatUI.setVisible(true);
         }
-        chatUI.setVisible(false);
     }
     public void rechazarInvitacion(SocketClient socketClient) {
         try {
@@ -153,11 +162,59 @@ public class Mediador implements SocketListener {
     public void invitacionAceptada(SocketClient socketClient, Message message) {
         Aceptar aceptar = (Aceptar) message;
         addClient(aceptar.getIdUsuario(), aceptar.getNombre(), socketClient);
-        if (chatView != null) {
-            chatView.actualizarValores(aceptar.getIdUsuario());
-            chatView.setVisible(true);
+        if (chatUI != null) {
+            chatUI.actualizarValores(aceptar.getIdUsuario());
+            chatUI.setVisible(true);
         }
     }
+    public String obtenerHoraActual() {
+        java.time.LocalDateTime ahora = java.time.LocalDateTime.now();
+        java.time.format.DateTimeFormatter formatter =
+                java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return ahora.format(formatter);
+    }
+    public void enviarHello(String id) {
+        SocketClient client;
+        Contact contact;
+        try {
+            contact = this.contactDao.findById(id);
+            System.out.println("ip contacto: "+ contact.getIp());
+            client = new SocketClient(contact.getIp());
+            client.addListener(this);
+            client.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new OperationException("No se logró establecer la conexión");
+        }
+        Message message = new Hello(idMio);
+        try {
+            client.send(message);
+            System.out.println("Enviando 004...");
+        } catch (IOException e) {
+            throw new OperationException("No se logró enviar la invitación");
+        }
+    }
+    public void enviarRespuestaHello(SocketClient client, String id) {
+        Contact contact;
+        try {
+            contact = this.contactDao.findById(id);
+            if (contact == null) {
+                System.out.println("El contacto no esta en la base de datos");
+                Message message = new RechazarHello();
+                client.send(message);
+            } else {
+                System.out.println("Se encontro el contacto con ip: " + contact.getIp() + " con Nombre: " + contact.getName());
+                clientes.put(id, client);
+                chatUI.actualizarValores(id);
+                Message message = new AceptarHello(idMio);
+                client.send(message);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new OperationException("No se logró establecer la conexión");
+        }
+    }
+
     @Override
     public synchronized void onMessage(SocketClient socketClient, Message message) {
         if (message instanceof Invitacion) {
@@ -173,10 +230,18 @@ public class Mediador implements SocketListener {
         }
         if (message instanceof Aceptar) {
             invitacionAceptada(socketClient, message);
-            chatView.setVisible(true);
+            chatUI.setVisible(true);
+        }
+        if (message instanceof Hello) {
+            Hello hello = (Hello) message;
+            System.out.println("Llegó 004");
+            enviarRespuestaHello(socketClient, hello.getIdUsuario());
+        }
+        if (message instanceof AceptarHello) {
+            System.out.println("Hello aceptado por: " + ((AceptarHello) message).getIdUsuario());
+//            clientes.put(((AceptarHello) message).getIdUsuario(), socketClient);
         }
         chatUI.onMessage(message);
-        chatView.onMessage(message);
         //llamar Dao?
     }
 }

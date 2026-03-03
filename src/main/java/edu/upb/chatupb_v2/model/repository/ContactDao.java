@@ -70,6 +70,16 @@ public class ContactDao {
         }
         return list.get(0);
     }
+    public Contact findById(String id) throws ConnectException, SQLException {
+        String query = "SELECT * FROM contact WHERE id ='" + id + "'";
+
+        List<Contact> list = helper.executeQuery(query, resultReader);
+
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
+    }
 
     public void update(String query) throws Exception {
         helper.update(query, null);
@@ -113,6 +123,15 @@ public class ContactDao {
             pst.setString(1, contact.getIp());
             pst.setString(2, contact.getName());
             pst.setString(3, contact.getId());
+        };
+        helper.update(query, params);
+    }
+
+    public void updateIp(String id, String ip) throws Exception {
+        String query = "UPDATE contact SET ip=? WHERE id=?";
+        DaoHelper.QueryParameters params = pst -> {
+            pst.setString(1, ip);
+            pst.setString(2, id);
         };
         helper.update(query, params);
     }

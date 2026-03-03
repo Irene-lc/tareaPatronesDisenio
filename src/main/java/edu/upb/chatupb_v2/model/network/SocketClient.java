@@ -67,6 +67,14 @@ public class SocketClient extends Thread {
                         Rechazar rechazar = Rechazar.parse(message);
                         notificar(rechazar);
                         break;
+                    case "004":
+                        Hello hello = Hello.parse(message);
+                        notificar(hello);
+                        break;
+                    case "005":
+                        AceptarHello aceptarHello = AceptarHello.parse(message);
+                        notificar(aceptarHello);
+                        break;
                     case "007":
                         Mensaje mensaje = Mensaje.parse(message);
                         notificar(mensaje);

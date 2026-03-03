@@ -4,32 +4,40 @@
  */
 package edu.upb.chatupb_v2.view;
 
-import edu.upb.chatupb_v2.model.entities.message.Aceptar;
-import edu.upb.chatupb_v2.model.entities.message.Invitacion;
-import edu.upb.chatupb_v2.model.entities.message.Message;
-import edu.upb.chatupb_v2.model.entities.message.Rechazar;
+import edu.upb.chatupb_v2.controller.ChatsController;
+import edu.upb.chatupb_v2.controller.ContactController;
+import edu.upb.chatupb_v2.model.entities.message.*;
 import edu.upb.chatupb_v2.controller.Mediador;
-//import edu.upb.chatupb_v2.bl.server.SocketListener;
+import edu.upb.chatupb_v2.model.repository.Chats;
+import edu.upb.chatupb_v2.model.repository.Contact;
+import lombok.Setter;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.List;
 
-public class ChatUI extends javax.swing.JFrame {
-//    ChatServer chatServer;
-//    ListaNegraDao listaNegraDao = new ListaNegraDao(ConnectionDB.getInstance().getConection());;
 
-    /**
-     * Creates new form ChatUI
-     */
+public class ChatUI extends JFrame implements iChatView {
+    public String idUsuarioActual;
+
+//    private final String idMio = "kf3fc20a-766c-4rd4-813d-b1967a01fa9a";
+    private final String idMio = Mediador.getInstance().getIdMio();
+    private final String nombre = "Irene";
+    private DefaultListModel<Contact> contacModel = new DefaultListModel<>();
+
+    @Setter
+    public ContactController contactController;
+    @Setter
+    public ChatsController chatsController;
+
     public ChatUI() {
+
         initComponents();
-//        try{
-//            chatServer = new ChatServer();
-//            chatServer.addListener(this);
-//            chatServer.start();
-//        }catch(Exception e){
-//            e.printStackTrace();
-//        }
+        this.jContactos.setCellRenderer(new ContactRenderer());
     }
 
     /**
@@ -39,71 +47,193 @@ public class ChatUI extends javax.swing.JFrame {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+
+// </editor-fold>//GEN-END:initComponents
     private void initComponents() {
 
-            setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-        setSize(420, 450);
+        // ===== COMPONENTES CHAT =====
+        jtMensaje = new JTextField();
+        jPanelChat = new JPanel();
+        jPanelChat.setLayout(new BoxLayout(jPanelChat, BoxLayout.Y_AXIS));
+        jPanelChat.setBackground(Color.WHITE);
+
+        jScrollPaneChat = new JScrollPane(jPanelChat);
+        jScrollPaneChat.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+//        jScrollPaneChat = new JScrollPane();
+//        jScrollPaneChat.setViewportView(jPanelChat);
+
+        jContactos = new JList<>();
+
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setSize(900, 600);
         setLocationRelativeTo(null);
-        setLayout(null);
-        getContentPane().setBackground(new java.awt.Color(240,240,240));
 
-        // ===== CARD PANEL =====
-        JPanel card = new JPanel();
-        card.setLayout(null);
-        card.setBackground(Color.WHITE);
-        card.setBounds(35, 80, 350, 300);
-        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
-
-        // ===== IMAGEN =====
-        JLabel imageLabel = new JLabel();
-        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        imageLabel.setBounds(155, 20, 110, 110);
-
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAdd.png"));
-            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
-            imageLabel.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            imageLabel.setText("Imagen no encontrada");
-        }
-
-        // ===== TITULO =====
-        JLabel title = new JLabel("Add Contact");
-        title.setFont(new Font("Arial", Font.BOLD, 18));
-        title.setBounds(110, 70, 200, 30);
-
-
-        // ===== IP =====
-        JLabel ipLabel = new JLabel("Contact IP:");
-        ipLabel.setFont(new Font("Arial", Font.PLAIN, 13));
-        ipLabel.setBounds(30, 170, 200, 20);
-
-        jtIp = new JTextField();
-        jtIp.setBounds(30, 190, 290, 30);
-
-        // ===== BOTON =====
-        jBtnConectar = new JButton("CONECTAR");
-        jBtnConectar.setBounds(75, 235, 200, 35);
-        jBtnConectar.setBackground(Color.GRAY);
-        jBtnConectar.setForeground(Color.BLACK);
-        jBtnConectar.setFocusPainted(false);
-
-        jBtnConectar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnConectarActionPerformed(evt);
+        jBtnEnviar = new JButton("Enviar");
+        jBtnEnviar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                jBtnEnviarActionPerformed(evt);
             }
         });
 
-        // ===== AGREGAMOS AL CARD =====
-        card.add(title);
-        card.add(ipLabel);
-        card.add(jtIp);
-        card.add(jBtnConectar);
+        jBtnNuevaConexion = new JButton("+");
+        jBtnNuevaConexion.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                jBtnNuevaConexionActionPerformed(evt);
+            }
+        });
 
-        // ===== AGREGAMOS AL FRAME =====
-        add(imageLabel);
-        add(card);
-    }// </editor-fold>//GEN-END:initComponents
+        jBtnOff = new JButton("off");
+        jBtnOff.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                jBtnOffActionPerformed(evt);
+            }
+        });
+
+        // ===== PANEL PRINCIPAL =====
+        setLayout(new BorderLayout());
+
+        // PANEL IZQUIERDO (CONTACTOS)
+
+        JPanel panelContactos = new JPanel(new BorderLayout());
+        panelContactos.setPreferredSize(new Dimension(220, 0));
+        panelContactos.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.LIGHT_GRAY));
+
+        JLabel lblContactos = new JLabel("Contactos", SwingConstants.CENTER);
+        lblContactos.setFont(new Font("Arial", Font.BOLD, 14));
+        lblContactos.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        jContactos = new JList<>(contacModel);
+        jContactos.setCellRenderer(new ContactRenderer());
+        jContactos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+//        jContactos.addListSelectionListener(e -> {
+//            if (!e.getValueIsAdjusting()) {
+//                Contact seleccionado = jContactos.getSelectedValue();
+//                if (seleccionado != null) {
+//                    idUsuarioActual = String.valueOf(seleccionado.getId());
+//                    limpiarChat();
+//                    chatsController.onloadMessages(idMio, idUsuarioActual);
+//                    System.out.println("Contacto seleccionado: " + seleccionado.getName());
+//                    jPanelChat.revalidate();
+//                    jPanelChat.repaint();
+//                }
+//            }
+//        });
+        jContactos.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+
+                Contact seleccionado = jContactos.getSelectedValue();
+
+                if (seleccionado != null && chatsController != null) {
+                    idUsuarioActual = seleccionado.getId();
+                    limpiarChat();
+                    chatsController.onloadMessages(idMio, idUsuarioActual);
+                    System.out.println("Cargando mensajes con: " + seleccionado.getName() + ", con id:" + seleccionado.getId()) ;
+                }
+            }
+        });
+
+        jContactos.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    System.out.println();
+                    System.out.println("Dos clicks");
+                    Contact seleccionado = jContactos.getSelectedValue();
+                    if (seleccionado != null && chatsController != null) {
+                        System.out.println("idSeleccionado: " + idUsuarioActual);
+                        idUsuarioActual = seleccionado.getId();
+                        Mediador.getInstance().enviarHello(idUsuarioActual);
+                    }
+                }
+            }
+        });
+
+
+        JScrollPane scrollContactos = new JScrollPane(jContactos);
+        scrollContactos.setBorder(null);
+
+        panelContactos.add(lblContactos, BorderLayout.NORTH);
+        panelContactos.add(scrollContactos, BorderLayout.CENTER);
+
+        // PANEL DERECHO (CHAT)
+
+        JPanel panelChat = new JPanel(new BorderLayout());
+
+        // Panel superior (botones off y +)
+        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        panelSuperior.add(jBtnOff);
+        panelSuperior.add(jBtnNuevaConexion);
+
+        // Panel inferior (campo mensaje + enviar)
+        JPanel panelInferior = new JPanel(new BorderLayout(10, 0));
+        panelInferior.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panelInferior.add(jtMensaje, BorderLayout.CENTER);
+        panelInferior.add(jBtnEnviar, BorderLayout.EAST);
+
+        panelChat.add(panelSuperior, BorderLayout.NORTH);
+        panelChat.add(jScrollPaneChat, BorderLayout.CENTER);
+        panelChat.add(panelInferior, BorderLayout.SOUTH);
+
+        //AGREGAR AL FRAME
+        add(panelContactos, BorderLayout.WEST);
+        add(panelChat, BorderLayout.CENTER);
+
+    }
+    private void showOffPopup() {
+
+        JDialog dialog = new JDialog(this, true);
+        dialog.setSize(320, 300);
+        dialog.setLocationRelativeTo(this);
+        dialog.setUndecorated(true);
+        dialog.setBackground(new Color(0,0,0,0));
+
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+
+        // ===== CARD =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(40, 90, 250, 110);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("Su conexión fue terminada");
+        title.setFont(new Font("Arial", Font.BOLD, 16));
+        title.setForeground(new Color(37,29,75));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setBounds(15, 20, 220, 30);
+
+        // ===== BOTON OK =====
+        JButton okButton = new JButton("Ok");
+        okButton.setBounds(100, 60, 50, 30);
+        okButton.setBackground(new Color(202,203,233));
+        okButton.setFocusPainted(false);
+
+        okButton.addActionListener(e -> dialog.dispose());
+
+        card.add(title);
+        card.add(okButton);
+
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setBounds(115, 0, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotOff.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Img");
+        }
+
+        root.add(card);
+        root.add(imageLabel);
+
+        dialog.add(root);
+        dialog.setVisible(true);
+    }
     private void showAcceptPopup() {
 
         JDialog dialog = new JDialog(this, true);
@@ -287,25 +417,354 @@ public class ChatUI extends javax.swing.JFrame {
 
         return accepted[0];
     }
+    private void showNoMessagePopup() {
 
-//    // @SuppressWarnings("unchecked")
+        JDialog dialog = new JDialog(this, true);
+        dialog.setSize(320, 300);
+        dialog.setLocationRelativeTo(this);
+        dialog.setUndecorated(true);
+        dialog.setBackground(new Color(0,0,0,0));
 
-    private void jBtnConectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnConectarActionPerformed
-        Mediador.getInstance().establecerConexion(jtIp.getText().toString());
-//        try {
-//            iniciarCliente();
-//            client = new SocketClient(jtIp.getText().toString());
-//            client.addListener(this); // le estoy pasando una instancia de si mismo. se subscribe al socketclient ue se acaba de crear
-//            client.start();
-//            System.out.println("Enviando 001...");
-//            Message message = new Invitacion(idMio, nombre);
-//            client.send(message);
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+
+        // ===== CARD =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(40, 90, 250, 110);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("No puede enviar mensajes");
+        title.setFont(new Font("Arial", Font.BOLD, 16));
+        title.setForeground(new Color(37,29,75));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setBounds(15, 20, 220, 30);
+
+        // ===== BOTON OK =====
+        JButton okButton = new JButton("Ok");
+        okButton.setBounds(100, 60, 50, 30);
+        okButton.setBackground(new Color(202,203,233));
+        okButton.setFocusPainted(false);
+
+        okButton.addActionListener(e -> dialog.dispose());
+
+        card.add(title);
+        card.add(okButton);
+
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setBounds(115, 0, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotNoMessage.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Img");
+        }
+
+        root.add(card);
+        root.add(imageLabel);
+
+        dialog.add(root);
+        dialog.setVisible(true);
+    }
+    private void showNuevaConexionPopup() {
+
+        JDialog dialog = new JDialog(this, true);
+        dialog.setSize(420, 450);
+        dialog.setLocationRelativeTo(this);
+        dialog.setUndecorated(true);
+        dialog.setBackground(new Color(0,0,0,0));
+
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+
+        // ===== CARD PANEL =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(35, 80, 350, 300);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+
+        // ===== BOTON CERRAR =====
+        JButton btnCerrar = new JButton();
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/x1.png"));
+            Image img = icon.getImage().getScaledInstance(40, 30, Image.SCALE_SMOOTH);
+            btnCerrar.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            btnCerrar.setText("X");
+        }
+
+        btnCerrar.setBounds(10, 10, 25, 25);
+
+        btnCerrar.setBorderPainted(false);
+        btnCerrar.setContentAreaFilled(false);
+        btnCerrar.setFocusPainted(false);
+        btnCerrar.setOpaque(false);
+        btnCerrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        btnCerrar.addActionListener(e -> dialog.dispose());
+
+
+//        btnCerrar.setBounds(310, 10, 30, 25);
+//        btnCerrar.setBackground(Color.WHITE);
+//        btnCerrar.setForeground(Color.RED);
+//        btnCerrar.setFocusPainted(false);
+//        btnCerrar.setBorder(null);
 //
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-    }//GEN-LAST:event_jBtnConectarActionPerformed
+//        btnCerrar.addActionListener(e -> dialog.dispose());
 
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        imageLabel.setBounds(155, 20, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAdd.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Imagen no encontrada");
+        }
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("Add Contact");
+        title.setFont(new Font("Arial", Font.BOLD, 18));
+        title.setBounds(110, 70, 200, 30);
+
+        // ===== IP =====
+        JLabel ipLabel = new JLabel("Contact IP:");
+        ipLabel.setFont(new Font("Arial", Font.PLAIN, 13));
+        ipLabel.setBounds(30, 170, 200, 20);
+
+        jtIp = new JTextField();
+        jtIp.setBounds(30, 190, 290, 30);
+
+        // ===== BOTON =====
+        jBtnConectar = new JButton("CONECTAR");
+        jBtnConectar.setBounds(75, 235, 200, 35);
+        jBtnConectar.setBackground(Color.GRAY);
+        jBtnConectar.setForeground(Color.BLACK);
+        jBtnConectar.setFocusPainted(false);
+
+        jBtnConectar.addActionListener(evt -> {
+            Mediador.getInstance().establecerConexion(jtIp.getText());
+            dialog.dispose();
+        });
+
+        // ===== AGREGAMOS AL CARD =====
+        card.add(title);
+        card.add(ipLabel);
+        card.add(jtIp);
+        card.add(jBtnConectar);
+        card.add(btnCerrar);
+
+        // ===== AGREGAMOS AL ROOT =====
+        root.add(imageLabel);
+        root.add(card);
+
+        dialog.add(root);
+        dialog.setVisible(true);
+    }
+    private void jBtnEnviarActionPerformed(ActionEvent evt) {//GEN-FIRST:event_jBtnEnviarActionPerformed
+        String mensajeTxt = jtMensaje.getText().toString();
+        if (mensajeTxt.isEmpty() || idUsuarioActual == null) {
+            System.out.println("Entra aca");
+            return;
+        }
+
+        System.out.println("Enviando 007...");
+        Mediador.getInstance().enviarMensajePorChat(idUsuarioActual, mensajeTxt);
+        jtMensaje.setText("");
+
+//    }else {
+//            showNoMessagePopup();
+//        }
+    }//GEN-LAST:event_jBtnEnviarActionPerformed
+    private void jBtnOffActionPerformed(ActionEvent evt) {
+        try {
+            System.out.println("Enviando 0018...");
+            System.out.println("Conexion terminada");
+            Message message = new FueraLinea(idMio);
+            Mediador.getInstance().enviarMensajeATodos(message);
+            mostrarMensajeSistema("CONEXION TERMINADA");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private void jBtnNuevaConexionActionPerformed(ActionEvent evt) {
+        showNuevaConexionPopup();
+    }
+
+    public void agregarContacto(Contact contact) {
+        if (contact == null || contact.getId() == null) {
+            System.out.println("Contacto inválido");
+            return;
+        }
+
+        for (int i = 0; i < contacModel.size(); i++) {
+            System.out.println("contacModel.get(i).getId(): " + contacModel.get(i).getId());
+            System.out.println("idCliente: (ChatView) " + contact.getId());
+            if (contacModel.get(i).getId().equals(contact.getId())) {
+                return;
+            }
+        }
+        System.out.println("nombreCliente: (ChatView) " + contact.getName());
+        System.out.println("ip: (ChatView)" + contact.getIp());
+        contacModel.addElement(contact);
+        System.out.println("Agregando contacto con id al conctacModel: (ChatView)" + contact.getId());
+    }
+    public void mostrarMensajeSistema(String texto) {
+
+        JPanel panelSistema = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        panelSistema.setOpaque(false);
+
+        JLabel lblSistema = new JLabel(texto);
+        lblSistema.setForeground(Color.RED);
+        lblSistema.setFont(new Font("Arial", Font.BOLD, 12));
+
+        panelSistema.add(lblSistema);
+
+        jPanelChat.add(panelSistema);
+        jPanelChat.revalidate();
+        jPanelChat.repaint();
+    }
+    public void actualizarValores(String idUsuarioActual) {
+        this.idUsuarioActual = idUsuarioActual;
+    }
+    private JLabel crearFotoPerfil() {
+
+        JLabel foto = new JLabel();
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/user.png"));
+            Image img = icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+            foto.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            foto.setText("");
+        }
+
+        return foto;
+    }
+    private JPanel crearBurbuja(String texto, boolean esMio, String hora) {
+
+        JPanel bubble = new JPanel(new BorderLayout());
+        bubble.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        bubble.setOpaque(true);
+
+        if (esMio) {
+            bubble.setBackground(new Color(173,216,230));
+        } else {
+            bubble.setBackground(new Color(230,230,230));
+        }
+
+        JLabel lblTexto = new JLabel(
+                "<html><div style='max-width:250px;'>" + texto + "</div></html>"
+        );
+        JLabel lblHora = new JLabel(hora);
+        lblHora.setFont(new Font("Arial", Font.PLAIN, 9));
+        lblHora.setForeground(Color.DARK_GRAY);
+        lblHora.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        bubble.add(lblTexto, BorderLayout.CENTER);
+        bubble.add(lblHora, BorderLayout.SOUTH);
+
+        return bubble;
+    }
+    private JPanel crearFilaMensaje(String texto, boolean esMio, String fechaHora) {
+
+        JPanel fila = new JPanel(new BorderLayout());
+        fila.setOpaque(false);
+        fila.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+
+        String soloHora = formatearSoloHora(fechaHora);
+        JPanel bubble = crearBurbuja(texto, esMio, soloHora);
+
+        if (esMio) {
+            fila.add(bubble, BorderLayout.EAST);
+        } else {
+            JPanel contenedor = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+            contenedor.setOpaque(false);
+            contenedor.add(crearFotoPerfil());
+            contenedor.add(bubble);
+            fila.add(contenedor, BorderLayout.WEST);
+        }
+
+        return fila;
+    }
+    private String formatearSoloHora(String fechaHora) {
+        try {
+            java.time.LocalDateTime dateTime =
+                    java.time.LocalDateTime.parse(
+                            fechaHora,
+                            java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                    );
+
+            return dateTime.format(
+                    java.time.format.DateTimeFormatter.ofPattern("HH:mm")
+            );
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return fechaHora;
+        }
+    }
+    public void agregarMensajeUI(String texto, boolean esMio, String fechaHora) {
+
+        JPanel mensaje = crearFilaMensaje(texto, esMio, fechaHora);
+
+        jPanelChat.add(mensaje);
+
+        jPanelChat.revalidate();
+        jPanelChat.repaint();
+
+        SwingUtilities.invokeLater(() -> {
+            JScrollBar vertical = jScrollPaneChat.getVerticalScrollBar();
+            vertical.setValue(vertical.getMaximum());
+        });
+    }
+    private void limpiarChat() {
+        jPanelChat.removeAll();
+        jPanelChat.revalidate();
+        jPanelChat.repaint();
+    }
+
+    private String mensajePorFecha(String fechaHora) {
+        try {
+            java.time.LocalDateTime dateTime =
+                    java.time.LocalDateTime.parse(
+                            fechaHora,
+                            java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                    );
+
+            return dateTime.format(
+                    java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            );
+
+        } catch (Exception e) {
+            return "";
+        }
+    }
+    private void agregarSeparadorFecha(String fecha) {
+
+        JPanel panelFecha = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        panelFecha.setOpaque(false);
+
+        JLabel lblFecha = new JLabel("---- " + fecha + " ----");
+        lblFecha.setForeground(Color.GRAY);
+        lblFecha.setFont(new Font("Arial", Font.BOLD, 12));
+
+        panelFecha.add(lblFecha);
+
+        jPanelChat.add(panelFecha);
+    }
     /**
      * @param args the command line arguments
      */
@@ -316,46 +775,100 @@ public class ChatUI extends javax.swing.JFrame {
 //         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
 //         */
 //        try {
-//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 //                if ("Nimbus".equals(info.getName())) {
-//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    UIManager.setLookAndFeel(info.getClassName());
 //                    break;
 //                }
 //            }
 //        } catch (ClassNotFoundException ex) {
-//            java.util.logging.Logger.getLogger(ChatUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//            java.util.logging.Logger.getLogger(ChatView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 //        } catch (InstantiationException ex) {
-//            java.util.logging.Logger.getLogger(ChatUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//            java.util.logging.Logger.getLogger(ChatView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 //        } catch (IllegalAccessException ex) {
-//            java.util.logging.Logger.getLogger(ChatUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-//            java.util.logging.Logger.getLogger(ChatUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//            java.util.logging.Logger.getLogger(ChatView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(ChatView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 //        }
 //        //</editor-fold>
 //
 //        /* Create and display the form */
 //        java.awt.EventQueue.invokeLater(new Runnable() {
 //            public void run() {
-//                new ChatUI().setVisible(true);
+//                new ChatView().setVisible(true);
 //            }
 //        });
 //    }
 
 //     Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jBtnConectar;
-    private javax.swing.JTextField jtIp;
+    private JButton jBtnEnviar;
+    private JTextField jtMensaje;
+    private JPanel jPanelChat;
+    private JScrollPane jScrollPaneChat;
+    private JButton jBtnNuevaConexion;
+    private JButton jBtnOff;
+    private JList<Contact> jContactos;
+    private JButton jBtnConectar;
+    private JTextField jtIp;
 
     public void onMessage(Message message) {
         if (message instanceof Aceptar) {
             System.out.println("Entra en 002 Aceptar");
             showAcceptPopup();
-            this.setVisible(false);
         }
         if  (message instanceof Rechazar) {
             System.out.println("Entra en 003 Solicitud Rechazada");
             showDeclinePopup();
         }
+        if (message instanceof Mensaje) {
+            Mensaje mensaje = (Mensaje) message;
+            agregarMensajeUI(mensaje.getMensaje(), false, Mediador.getInstance().obtenerHoraActual());
+            chatsController.guardarEnBd(mensaje.getIdMensaje(), mensaje.getMensaje(), mensaje.getIdUsuario(), idMio, Mediador.getInstance().obtenerHoraActual());
+            System.out.print("Llegó el mensaje: " + mensaje + '\n');
+        }
+        if (message instanceof Hello) {
+            Hello hello = (Hello) message;
+            System.out.println("Se recibio el Hello de: " + hello.getIdUsuario());
+        }
+        if (message instanceof FueraLinea) {
+            System.out.println("Conexión terminada por cliente");
+            showOffPopup();
+            mostrarMensajeSistema("CONEXION TERMINADA");
+            Mediador.getInstance().removeClient(idUsuarioActual);
+        }
+    }
+
+    @Override
+    public void onloadContacts(List<Contact> contacts) {
+        try {
+            if (contacts.isEmpty())
+                System.out.println("BD vacia");
+            contacModel.addAll(contacts);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onloadMessages(List<Chats> chats) {
+        limpiarChat();
+        String ultimaFecha = "";
+
+        for (Chats c : chats) {
+            String fechaActual = mensajePorFecha(c.getHora());
+
+//            if (!fechaActual.equals(ultimaFecha)) {
+//                agregarSeparadorFecha(fechaActual);
+//                ultimaFecha = fechaActual;
+//            }
+
+            boolean esMio = c.getIdEmisor().equals(idMio);
+            agregarMensajeUI(
+                    c.getMensajeTxt(),
+                    esMio,
+                    c.getHora()
+            );
+        }
     }
     // End of variables declaration//GEN-END:variables
 }
-

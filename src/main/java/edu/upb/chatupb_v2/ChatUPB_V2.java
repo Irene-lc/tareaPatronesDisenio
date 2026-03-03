@@ -8,25 +8,20 @@ import edu.upb.chatupb_v2.controller.ContactController;
 import edu.upb.chatupb_v2.model.network.ChatServer;
 import edu.upb.chatupb_v2.controller.Mediador;
 import edu.upb.chatupb_v2.view.ChatUI;
-import edu.upb.chatupb_v2.view.ChatView;
-
-import java.util.List;
 
 public class ChatUPB_V2 {
 
     public static void main(String[] args) {
         /* Create and display the form */
         final ChatUI chatUI = new ChatUI();
-        ChatView chatView = new ChatView(chatUI);
 
-        ContactController contactController = new ContactController(chatView);
-        ChatsController chatsController = new ChatsController(chatView);
+        ContactController contactController = new ContactController(chatUI);
+        ChatsController chatsController = new ChatsController(chatUI);
 
-        chatView.setContactController(contactController);
-        chatView.setChatsController(chatsController);
+        chatUI.setContactController(contactController);
+        chatUI.setChatsController(chatsController);
 
         Mediador.getInstance().setChatUI(chatUI);
-        Mediador.getInstance().setChatView(chatView);
 
         contactController.onload();
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -34,7 +29,7 @@ public class ChatUPB_V2 {
             public void run() {
                 // dentro del contexto del hilo
                 //no puede tocar nada del contexto externo, no puede comunicarse fuera del hilo
-                chatView.setVisible(true);
+                chatUI.setVisible(true);
             }
         });
         try {
