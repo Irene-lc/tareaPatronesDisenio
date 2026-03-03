@@ -142,6 +142,7 @@ public class ChatUI extends JFrame implements iChatView {
                     Contact seleccionado = jContactos.getSelectedValue();
                     if (seleccionado != null && chatsController != null) {
                         System.out.println("idSeleccionado: " + idUsuarioActual);
+                        //prueba
                         idUsuarioActual = seleccionado.getId();
                         Mediador.getInstance().enviarHello(idUsuarioActual);
                     }
