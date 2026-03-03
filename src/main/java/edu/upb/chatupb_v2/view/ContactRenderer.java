@@ -16,7 +16,7 @@ public class ContactRenderer extends JLabel implements ListCellRenderer<Contact>
     @Override
     public Component getListCellRendererComponent(JList<? extends Contact> list, Contact contac, int index, boolean isSelected, boolean cellHasFocus) {
         ImageIcon imageIcon;
-        if (contac.isStateConnect()) {
+        if (contac.getStateConnect().equals("1")) {
             imageIcon = new ImageIcon(getClass().getResource("/images/on-line.png"));
         } else {
             imageIcon = new ImageIcon(getClass().getResource("/images/off-line.png"));

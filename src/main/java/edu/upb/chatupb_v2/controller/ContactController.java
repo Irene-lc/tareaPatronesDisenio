@@ -20,6 +20,10 @@ public class ContactController {
     public void onload() {
         try {
             List<Contact> contacts = contactDao.findAll();
+            for (Contact c : contacts) {
+                contactDao.updateState(c.getId(), "0");
+                c.setStateConnect("0");
+            }
             view.onloadContacts(contacts);
         } catch (Exception e) {
             e.printStackTrace();

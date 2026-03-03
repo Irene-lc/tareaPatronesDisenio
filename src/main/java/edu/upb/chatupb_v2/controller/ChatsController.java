@@ -33,7 +33,7 @@ public class ChatsController {
             System.out.println("idCliente: " + idReceptor);
 
             List<Chats> chats = chatsDao.findByContact(idEmisor, idReceptor);
-            System.out.println("Mensajes encontrados: " + chats.size());
+            System.out.println("Mensajes encontrados: " + chats.size() + '\n');
             iChatView.onloadMessages(chats);
         } catch (Exception e) {
             e.printStackTrace();

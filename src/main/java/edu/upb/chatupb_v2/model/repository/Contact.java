@@ -21,6 +21,8 @@ public class Contact implements Serializable, Model {
         public static final String ID= "id";
         public static final String NAME ="name";
         public static final String IP ="ip";
+        public static final String STATE ="state";
+
 
     }
     @Override
@@ -30,6 +32,6 @@ public class Contact implements Serializable, Model {
     private String id;
     private String name;
     private String ip;
-    private boolean stateConnect = false;
+    private String stateConnect = "0";
 
 }

@@ -95,6 +95,12 @@ public class SocketClient extends Thread {
             }
         } catch (IOException e) {
             if (!socket.isClosed()) {
+                if (socketListener != null){
+                    for (SocketListener listener : socketListener) {
+                        java.awt.EventQueue.invokeLater(() -> listener.onDisconnect(this));
+                    }
+                }
+                e.printStackTrace();
                 System.out.println("Socket cerrado por cliente");
             } else {
                 System.out.println("Socket cerrado correctamente.");
