@@ -206,6 +206,7 @@ public class Mediador implements SocketListener {
                 System.out.println("Se encontro el contacto con ip: " + contact.getIp() + " con Nombre: " + contact.getName());
                 clientes.put(id, client);
                 chatUI.actualizarValores(id);
+                chatUI.showHelloPopup(contact.getName());
                 Message message = new AceptarHello(idMio);
                 client.send(message);
             }
@@ -221,25 +222,25 @@ public class Mediador implements SocketListener {
             Invitacion invitacion = (Invitacion) message;
             boolean accepted = chatUI.showInvitationPopup(invitacion.getNombre());
             if (accepted) {
-                System.out.println("Enviando 002...");
+                System.out.println("Enviando 002..." + '\n');
                 aceptarInvitacion(socketClient, invitacion);
             } else  {
-                System.out.println("Enviando 003...");
+                System.out.println("Enviando 003..." + '\n');
                 rechazarInvitacion(socketClient);
             }
         }
         if (message instanceof Aceptar) {
             invitacionAceptada(socketClient, message);
-            chatUI.setVisible(true);
         }
         if (message instanceof Hello) {
             Hello hello = (Hello) message;
-            System.out.println("Llegó 004");
+            System.out.println("Llegó 004" + '\n');
             enviarRespuestaHello(socketClient, hello.getIdUsuario());
         }
         if (message instanceof AceptarHello) {
-            System.out.println("Hello aceptado por: " + ((AceptarHello) message).getIdUsuario());
-//            clientes.put(((AceptarHello) message).getIdUsuario(), socketClient);
+            AceptarHello aceptarHello = (AceptarHello) message;
+            System.out.println("Hello aceptado por: " + aceptarHello.getIdUsuario() + '\n');
+            clientes.put(aceptarHello.getIdUsuario(), socketClient);
         }
         chatUI.onMessage(message);
         //llamar Dao?
