@@ -20,7 +20,7 @@ public class ChatsController {
 
     public void guardarEnBd(String idMensaje, String mensajeTxt, String idEmisor, String idReceptor, String hora) {
         try {
-            Chats chats = new Chats(idMensaje, mensajeTxt, hora, idEmisor, idReceptor);
+            Chats chats = new Chats(idMensaje, mensajeTxt, hora, idEmisor, idReceptor, "0");
             chatsDao.save(chats);
         } catch (Exception e) {
             e.printStackTrace();

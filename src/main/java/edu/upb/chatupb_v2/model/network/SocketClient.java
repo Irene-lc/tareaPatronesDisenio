@@ -83,6 +83,9 @@ public class SocketClient extends Thread {
                         Mensaje mensaje = Mensaje.parse(message);
                         notificar(mensaje);
                         break;
+                    case "008":
+                        ConfirmarRecibido confirmarRecibido = ConfirmarRecibido.parse(message);
+                        notificar(confirmarRecibido);
                     case "0018":
                         FueraLinea fueraLinea = FueraLinea.parse(message);
                         notificar(fueraLinea);
@@ -91,11 +94,10 @@ public class SocketClient extends Thread {
             }
         } catch (IOException e) {
             if (!socket.isClosed()) {
-                e.printStackTrace();
+                System.out.println("Socket cerrado por cliente");
             } else {
                 System.out.println("Socket cerrado correctamente.");
             }
-            throw new OperationException("Socket cerrado por cliente");
         } finally {
             close();
         }

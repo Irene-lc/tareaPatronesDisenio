@@ -4,6 +4,7 @@ import edu.upb.chatupb_v2.controller.exception.OperationException;
 import edu.upb.chatupb_v2.model.entities.message.*;
 import edu.upb.chatupb_v2.model.network.SocketClient;
 import edu.upb.chatupb_v2.model.network.SocketListener;
+import edu.upb.chatupb_v2.model.repository.ChatsDao;
 import edu.upb.chatupb_v2.model.repository.ContactDao;
 import edu.upb.chatupb_v2.view.ChatUI;
 import edu.upb.chatupb_v2.model.repository.Contact;
@@ -19,6 +20,7 @@ public class Mediador implements SocketListener {
 
     private ChatUI chatUI;
     private ContactDao contactDao = new ContactDao();
+    private ChatsDao chatsDao = new ChatsDao();
     private static final Mediador mediador = new Mediador();
     private final HashMap<String, SocketClient> clientes = new HashMap<>();
 //    public List<SocketClient> listaNegra;
@@ -92,7 +94,7 @@ public class Mediador implements SocketListener {
             sendMessage(idCliente, message);
             chatUI.chatsController.guardarEnBd(idMensaje, mensaje, idMio, idCliente, obtenerHoraActual());
             if (chatUI != null)
-                chatUI.agregarMensajeUI(mensaje, true, obtenerHoraActual());
+                chatUI.agregarMensajeUI(mensaje, true, obtenerHoraActual(), false, idMensaje);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -215,6 +217,14 @@ public class Mediador implements SocketListener {
             throw new OperationException("No se logró establecer la conexión");
         }
     }
+    public void actualizarLeido(String idMensaje) {
+        try {
+            this.chatsDao.updateLeido(idMensaje);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new OperationException("No se pudo actualizar a 'Mensaje Leido'");
+        }
+    }
 
     @Override
     public synchronized void onMessage(SocketClient socketClient, Message message) {
@@ -241,6 +251,11 @@ public class Mediador implements SocketListener {
             AceptarHello aceptarHello = (AceptarHello) message;
             System.out.println("Hello aceptado por: " + aceptarHello.getIdUsuario() + '\n');
             clientes.put(aceptarHello.getIdUsuario(), socketClient);
+        }
+        if (message instanceof ConfirmarRecibido) {
+            ConfirmarRecibido confirmarRecibido = (ConfirmarRecibido) message;
+            actualizarLeido(confirmarRecibido.getIdMensaje());
+
         }
         chatUI.onMessage(message);
         //llamar Dao?

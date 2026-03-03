@@ -815,7 +815,7 @@ public class ChatUI extends JFrame implements iChatView {
 
         return foto;
     }
-    private JPanel crearBurbuja(String texto, boolean esMio, String hora) {
+    private JPanel crearBurbuja(String texto, boolean esMio, String hora, boolean leido, String idMensaje) {
 
         JPanel bubble = new JPanel(new BorderLayout());
         bubble.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
@@ -830,17 +830,30 @@ public class ChatUI extends JFrame implements iChatView {
         JLabel lblTexto = new JLabel(
                 "<html><div style='max-width:250px;'>" + texto + "</div></html>"
         );
+//        lblHora.setHorizontalAlignment(SwingConstants.RIGHT);
+
         JLabel lblHora = new JLabel(hora);
         lblHora.setFont(new Font("Arial", Font.PLAIN, 9));
         lblHora.setForeground(Color.DARK_GRAY);
-        lblHora.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 0));
+        panelInferior.setOpaque(false);
+
+        panelInferior.add(lblHora);
+
+        if (esMio) {
+            JLabel lblCheck = new JLabel(leido ? "✔✔" : "✔");
+            lblCheck.setName(idMensaje);
+            lblCheck.setForeground(leido ? Color.BLUE : Color.GRAY);
+            panelInferior.add(lblCheck);
+        }
 
         bubble.add(lblTexto, BorderLayout.CENTER);
-        bubble.add(lblHora, BorderLayout.SOUTH);
+        bubble.add(panelInferior, BorderLayout.SOUTH);
 
         return bubble;
     }
-    private JPanel crearFilaMensaje(String texto, boolean esMio, String fechaHora) {
+    private JPanel crearFilaMensaje(String texto, boolean esMio, String fechaHora, boolean leido, String idMensaje) {
 
         JPanel fila = new JPanel(new BorderLayout());
         fila.setOpaque(false);
@@ -848,7 +861,7 @@ public class ChatUI extends JFrame implements iChatView {
         fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
 
         String soloHora = formatearSoloHora(fechaHora);
-        JPanel bubble = crearBurbuja(texto, esMio, soloHora);
+        JPanel bubble = crearBurbuja(texto, esMio, soloHora, leido, idMensaje);
 
         if (esMio) {
             fila.add(bubble, BorderLayout.EAST);
@@ -879,9 +892,9 @@ public class ChatUI extends JFrame implements iChatView {
             return fechaHora;
         }
     }
-    public void agregarMensajeUI(String texto, boolean esMio, String fechaHora) {
+    public void agregarMensajeUI(String texto, boolean esMio, String fechaHora, boolean leido, String idMensaje) {
 
-        JPanel mensaje = crearFilaMensaje(texto, esMio, fechaHora);
+        JPanel mensaje = crearFilaMensaje(texto, esMio, fechaHora, leido, idMensaje);
 
         jPanelChat.add(mensaje);
 
@@ -927,6 +940,31 @@ public class ChatUI extends JFrame implements iChatView {
         panelFecha.add(lblFecha);
 
         jPanelChat.add(panelFecha);
+    }
+    public void actualizarChecksAzules(String idMensaje) {
+        for (Component comp : jPanelChat.getComponents()) {
+            if (comp instanceof JPanel panelFila) {
+                for (Component subComp : panelFila.getComponents()) {
+                    if (subComp instanceof JPanel bubble) {
+                        for (Component inner : bubble.getComponents()) {
+                            if (inner instanceof JPanel panelInferior) {
+                                for (Component checkComp : panelInferior.getComponents()) {
+                                    if (checkComp instanceof JLabel lbl) {
+                                        if (idMensaje.equals(lbl.getName())) {
+                                            lbl.setText("✔✔");
+                                            lbl.setForeground(Color.BLUE);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        jPanelChat.revalidate();
+        jPanelChat.repaint();
     }
     /**
      * @param args the command line arguments
@@ -985,7 +1023,7 @@ public class ChatUI extends JFrame implements iChatView {
         }
         if (message instanceof Mensaje) {
             Mensaje mensaje = (Mensaje) message;
-            agregarMensajeUI(mensaje.getMensaje(), false, Mediador.getInstance().obtenerHoraActual());
+            agregarMensajeUI(mensaje.getMensaje(), false, Mediador.getInstance().obtenerHoraActual(), false, mensaje.getIdMensaje());
             chatsController.guardarEnBd(mensaje.getIdMensaje(), mensaje.getMensaje(), mensaje.getIdUsuario(), idMio, Mediador.getInstance().obtenerHoraActual());
         }
         if (message instanceof Hello) {
@@ -999,6 +1037,9 @@ public class ChatUI extends JFrame implements iChatView {
         if (message instanceof RechazarHello) {
             System.out.println("Hello Rechazado");
             showDeclineHelloPopup();
+        }
+        if (message instanceof ConfirmarRecibido) {
+            actualizarChecksAzules(((ConfirmarRecibido) message).getIdMensaje());
         }
         if (message instanceof FueraLinea) {
             System.out.println("Conexión terminada por cliente");
@@ -1033,11 +1074,20 @@ public class ChatUI extends JFrame implements iChatView {
 //            }
 
             boolean esMio = c.getIdEmisor().equals(idMio);
+            boolean leido = c.getLeido().equals("1");
             agregarMensajeUI(
                     c.getMensajeTxt(),
                     esMio,
-                    c.getHora()
+                    c.getHora(),
+                    leido,
+                    c.getIdMensaje()
             );
+            if (!esMio && !leido) {
+                System.out.println("Enviando 008...");
+                ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(c.getIdMensaje());
+                Mediador.getInstance().sendMessage(c.getIdEmisor(), confirmarRecibido);
+                Mediador.getInstance().actualizarLeido(c.getIdMensaje());
+            }
         }
     }
     // End of variables declaration//GEN-END:variables

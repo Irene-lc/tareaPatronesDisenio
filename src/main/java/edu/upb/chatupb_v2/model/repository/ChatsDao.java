@@ -35,6 +35,9 @@ public class ChatsDao {
         if (existColumn(result, Chats.Column.ID_RECEPTOR)) {
             prefacturaSync.setIdReceptor(result.getString(Chats.Column.ID_RECEPTOR));
         }
+        if (existColumn(result, Chats.Column.LEIDO)) {
+            prefacturaSync.setLeido(result.getString(Chats.Column.LEIDO));
+        }
         return prefacturaSync;
     };
 
@@ -68,7 +71,7 @@ public class ChatsDao {
     }
 
     public void save(Chats chats) throws Exception {
-        String query = "INSERT INTO chats(idMensaje, mensajeTxt, hora, idEmisor, idReceptor) values (?,?,?,?,?)";
+        String query = "INSERT INTO chats(idMensaje, mensajeTxt, hora, idEmisor, idReceptor, leido) values (?,?,?,?,?,?)";
         DaoHelper.QueryParameters params = new DaoHelper.QueryParameters() {
             @Override
             public void setParameters(PreparedStatement pst) throws SQLException {
@@ -77,6 +80,7 @@ public class ChatsDao {
                 pst.setString(3, chats.getHora());
                 pst.setString(4, chats.getIdEmisor());
                 pst.setString(5, chats.getIdReceptor());
+                pst.setString(6, chats.getLeido());
             }
         };
         helper.insert(query, params, chats);
@@ -92,7 +96,7 @@ public class ChatsDao {
     }
     public List<Chats> findByContact(String idEmisor, String idReceptor) throws Exception {
         String query = """
-        SELECT idMensaje, mensajeTxt, hora, idEmisor, idReceptor
+        SELECT idMensaje, mensajeTxt, hora, idEmisor, idReceptor, leido
         FROM chats 
         WHERE (idEmisor = ? AND idReceptor = ?)
            OR (idEmisor = ? AND idReceptor = ?)
@@ -107,5 +111,13 @@ public class ChatsDao {
         };
 
         return helper.executeQuery(query, params, resultReader);
+    }
+
+    public void updateLeido(String id) throws Exception {
+        String query = "UPDATE chats SET leido = 1 WHERE idMensaje = ? AND leido = 0;";
+        DaoHelper.QueryParameters params = pst -> {
+            pst.setString(1, id);
+        };
+        helper.update(query, params);
     }
 }

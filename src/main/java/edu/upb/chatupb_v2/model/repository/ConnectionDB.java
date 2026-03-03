@@ -57,7 +57,8 @@ public class ConnectionDB {
             mensajeTxt TEXT NOT NULL,
             hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             idEmisor TEXT NOT NULL,
-            idReceptor TEXT NOT NULL
+            idReceptor TEXT NOT NULL,
+            leido TEXT NOT NULL
         );
     """;
 

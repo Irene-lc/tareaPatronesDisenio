@@ -23,6 +23,7 @@ public class Chats implements Serializable, Model {
         public static final String HORA ="hora";
         public static final String ID_EMISOR ="idEmisor";
         public static final String ID_RECEPTOR ="idReceptor";
+        public static final String LEIDO = "leido";
 
     }
     @Override
@@ -40,5 +41,5 @@ public class Chats implements Serializable, Model {
     private String hora;
     private String idEmisor;
     private String idReceptor;
-
+    private String leido;
 }

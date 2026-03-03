@@ -3,15 +3,15 @@ package edu.upb.chatupb_v2.model.entities.message;
 import java.util.regex.Pattern;
 
 public class ConfirmarRecibido extends Message {
-    private String idUsuario;
+    private String idMensaje;
 
     public ConfirmarRecibido() {
         super("008");
     }
 
-    public ConfirmarRecibido(String idUsuario) {
+    public ConfirmarRecibido(String idMensaje) {
         super("008");
-        this.idUsuario = idUsuario;
+        this.idMensaje = idMensaje;
     }
 
     public static ConfirmarRecibido parse(String trama) {
@@ -24,14 +24,14 @@ public class ConfirmarRecibido extends Message {
 
     @Override
     public String generarTrama() {
-        return getCodigo() + "|" + idUsuario + System.lineSeparator();
+        return getCodigo() + "|" + idMensaje + System.lineSeparator();
     }
 
-    public String getIdUsuario() {
-        return idUsuario;
+    public String getIdMensaje() {
+        return idMensaje;
     }
 
-    public void setIdUsuario(String idUsuario) {
-        this.idUsuario = idUsuario;
+    public void setIdMensaje(String idMensaje) {
+        this.idMensaje = idMensaje;
     }
 }
