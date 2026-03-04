@@ -106,19 +106,6 @@ public class ChatUI extends JFrame implements iChatView {
         jContactos.setCellRenderer(new ContactRenderer());
         jContactos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-//        jContactos.addListSelectionListener(e -> {
-//            if (!e.getValueIsAdjusting()) {
-//                Contact seleccionado = jContactos.getSelectedValue();
-//                if (seleccionado != null) {
-//                    idUsuarioActual = String.valueOf(seleccionado.getId());
-//                    limpiarChat();
-//                    chatsController.onloadMessages(idMio, idUsuarioActual);
-//                    System.out.println("Contacto seleccionado: " + seleccionado.getName());
-//                    jPanelChat.revalidate();
-//                    jPanelChat.repaint();
-//                }
-//            }
-//        });
         jContactos.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
 
@@ -145,12 +132,31 @@ public class ChatUI extends JFrame implements iChatView {
                         System.out.println("idSeleccionado: " + idUsuarioActual);
                         //prueba
                         idUsuarioActual = seleccionado.getId();
-                        showHelloEnviarPopup(seleccionado.getName());
+//                        showHelloEnviarPopup(seleccionado.getName());
                         Mediador.getInstance().enviarHello(idUsuarioActual);
                     }
                 }
             }
         });
+
+
+        jContactos.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    System.out.println();
+                    System.out.println("click derecho");
+                    Contact seleccionado = jContactos.getSelectedValue();
+                    if (seleccionado != null) {
+                        System.out.println("idSeleccionado: " + idUsuarioActual);
+                        idUsuarioActual = seleccionado.getId();
+                        Zumbido zumbido = new Zumbido(idMio);
+                        Mediador.getInstance().sendMessage(idUsuarioActual, zumbido);
+                    }
+                }
+            }
+        });
+
 
 
         JScrollPane scrollContactos = new JScrollPane(jContactos);
@@ -291,60 +297,6 @@ public class ChatUI extends JFrame implements iChatView {
         dialog.add(root);
         dialog.setVisible(true);
     }
-    private void showAcceptHelloPopup() {
-
-        JDialog dialog = new JDialog(this, true);
-        dialog.setSize(320, 300);
-        dialog.setLocationRelativeTo(this);
-        dialog.setUndecorated(true);
-        dialog.setBackground(new Color(0,0,0,0));
-
-        JPanel root = new JPanel(null);
-        root.setOpaque(false);
-
-        // ===== CARD =====
-        JPanel card = new JPanel();
-        card.setLayout(null);
-        card.setBackground(Color.WHITE);
-        card.setBounds(40, 90, 220, 110);
-        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
-
-        // ===== TITULO =====
-        JLabel title = new JLabel("Hello aceptado");
-        title.setFont(new Font("Arial", Font.BOLD, 16));
-        title.setForeground(new Color(37,29,75));
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setBounds(20, 20, 180, 30);
-
-        // ===== BOTON OK =====
-        JButton okButton = new JButton("Ok");
-        okButton.setBounds(85, 60, 50, 30);
-        okButton.setBackground(new Color(202,203,233));
-        okButton.setFocusPainted(false);
-
-        okButton.addActionListener(e -> dialog.dispose());
-
-        card.add(title);
-        card.add(okButton);
-
-        // ===== IMAGEN =====
-        JLabel imageLabel = new JLabel();
-        imageLabel.setBounds(85, 0, 110, 110);
-
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAccept.png"));
-            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
-            imageLabel.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            imageLabel.setText("Img");
-        }
-
-        root.add(card);
-        root.add(imageLabel);
-
-        dialog.add(root);
-        dialog.setVisible(true);
-    }
     private void showDeclinePopup() {
 
         JDialog dialog = new JDialog(this, true);
@@ -399,7 +351,8 @@ public class ChatUI extends JFrame implements iChatView {
         dialog.add(root);
         dialog.setVisible(true);
     }
-    private void showDeclineHelloPopup() {
+
+    public void showZumbidoPopup(String nombre) {
 
         JDialog dialog = new JDialog(this, true);
         dialog.setSize(320, 300);
@@ -418,7 +371,7 @@ public class ChatUI extends JFrame implements iChatView {
         card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
 
         // ===== TITULO =====
-        JLabel title = new JLabel("Hello rechazado");
+        JLabel title = new JLabel(nombre + " te esta zumbando");
         title.setFont(new Font("Arial", Font.BOLD, 16));
         title.setForeground(new Color(37,29,75));
         title.setHorizontalAlignment(SwingConstants.CENTER);
@@ -440,115 +393,7 @@ public class ChatUI extends JFrame implements iChatView {
         imageLabel.setBounds(85, 0, 110, 110);
 
         try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotDecline.png"));
-            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
-            imageLabel.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            imageLabel.setText("Img");
-        }
-
-        root.add(card);
-        root.add(imageLabel);
-
-        dialog.add(root);
-        dialog.setVisible(true);
-    }
-    public void showHelloPopup(String nombre) {
-
-        JDialog dialog = new JDialog(this, true);
-        dialog.setSize(320, 300);
-        dialog.setLocationRelativeTo(this);
-        dialog.setUndecorated(true);
-        dialog.setBackground(new Color(0,0,0,0));
-
-        JPanel root = new JPanel(null);
-        root.setOpaque(false);
-
-        // ===== CARD =====
-        JPanel card = new JPanel();
-        card.setLayout(null);
-        card.setBackground(Color.WHITE);
-        card.setBounds(40, 90, 220, 110);
-        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
-
-        // ===== TITULO =====
-        JLabel title = new JLabel(nombre + " te envío un Hello");
-        title.setFont(new Font("Arial", Font.BOLD, 16));
-        title.setForeground(new Color(37,29,75));
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setBounds(20, 20, 180, 30);
-
-        // ===== BOTON OK =====
-        JButton okButton = new JButton("Ok");
-        okButton.setBounds(85, 60, 50, 30);
-        okButton.setBackground(new Color(202,203,233));
-        okButton.setFocusPainted(false);
-
-        okButton.addActionListener(e -> dialog.dispose());
-
-        card.add(title);
-        card.add(okButton);
-
-        // ===== IMAGEN =====
-        JLabel imageLabel = new JLabel();
-        imageLabel.setBounds(85, 0, 110, 110);
-
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotHello.png"));
-            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
-            imageLabel.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            imageLabel.setText("Img");
-        }
-
-        root.add(card);
-        root.add(imageLabel);
-
-        dialog.add(root);
-        dialog.setVisible(true);
-    }
-    public void showHelloEnviarPopup(String nombre) {
-
-        JDialog dialog = new JDialog(this, true);
-        dialog.setSize(320, 300);
-        dialog.setLocationRelativeTo(this);
-        dialog.setUndecorated(true);
-        dialog.setBackground(new Color(0,0,0,0));
-
-        JPanel root = new JPanel(null);
-        root.setOpaque(false);
-
-        // ===== CARD =====
-        JPanel card = new JPanel();
-        card.setLayout(null);
-        card.setBackground(Color.WHITE);
-        card.setBounds(40, 90, 220, 110);
-        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
-
-        // ===== TITULO =====
-        JLabel title = new JLabel("Hello enviado a " + nombre);
-        title.setFont(new Font("Arial", Font.BOLD, 16));
-        title.setForeground(new Color(37,29,75));
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setBounds(20, 20, 180, 30);
-
-        // ===== BOTON OK =====
-        JButton okButton = new JButton("Ok");
-        okButton.setBounds(85, 60, 50, 30);
-        okButton.setBackground(new Color(202,203,233));
-        okButton.setFocusPainted(false);
-
-        okButton.addActionListener(e -> dialog.dispose());
-
-        card.add(title);
-        card.add(okButton);
-
-        // ===== IMAGEN =====
-        JLabel imageLabel = new JLabel();
-        imageLabel.setBounds(85, 0, 110, 110);
-
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotHello.png"));
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAccept.png"));
             Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
             imageLabel.setIcon(new ImageIcon(img));
         } catch (Exception e) {
@@ -791,6 +636,7 @@ public class ChatUI extends JFrame implements iChatView {
         dialog.add(root);
         dialog.setVisible(true);
     }
+
     private void jBtnEnviarActionPerformed(ActionEvent evt) {//GEN-FIRST:event_jBtnEnviarActionPerformed
         String mensajeTxt = jtMensaje.getText().toString();
         if (mensajeTxt.isEmpty() || idUsuarioActual == null) {
@@ -1023,16 +869,14 @@ public class ChatUI extends JFrame implements iChatView {
         jPanelChat.repaint();
     }
     public void actualizarEstadoContacto(String id, boolean estado) {
-        String estadoStr = (estado ? "1" : "0");
         for (int i = 0; i < contacModel.size(); i++) {
             Contact c = contacModel.get(i);
             if (c.getId().equals(id)) {
-                c.setStateConnect(estadoStr);
+                c.setStateConnect(estado);
                 contacModel.set(i, c);
                 break;
             }
         }
-
         jContactos.repaint();
     }
     /**
@@ -1092,13 +936,23 @@ public class ChatUI extends JFrame implements iChatView {
         }
         if (message instanceof Mensaje) {
             Mensaje mensaje = (Mensaje) message;
-            agregarMensajeUI(mensaje.getMensaje(), false, Mediador.getInstance().obtenerHoraActual(), false, mensaje.getIdMensaje());
+            if (mensaje.getIdUsuario().equals(idUsuarioActual))
+                agregarMensajeUI(mensaje.getMensaje(), false, Mediador.getInstance().obtenerHoraActual(), false, mensaje.getIdMensaje());
             chatsController.guardarEnBd(mensaje.getIdMensaje(), mensaje.getMensaje(), mensaje.getIdUsuario(), idMio, Mediador.getInstance().obtenerHoraActual());
+
             if (mensaje.getIdUsuario().equals(idUsuarioActual)) {
                 ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(mensaje.getIdMensaje());
                 System.out.println("Enviando 008...");
                 Mediador.getInstance().sendMessage(idUsuarioActual, confirmarRecibido);
                 Mediador.getInstance().actualizarLeido(mensaje.getIdMensaje());
+            }
+            if (mensaje.getMensaje().toLowerCase().equals("chau")){
+                System.out.println("Enviando 0018...");
+                System.out.println("Conexion terminada");
+                Message message1 = new FueraLinea(idMio);
+                Mediador.getInstance().enviarChau(message1, mensaje.getIdUsuario());
+                mostrarMensajeSistema("CONEXION TERMINADA");
+                actualizarEstadoContacto(mensaje.getIdUsuario(), false);
             }
         }
         if (message instanceof Hello) {
@@ -1107,11 +961,9 @@ public class ChatUI extends JFrame implements iChatView {
         }
         if (message instanceof AceptarHello) {
             System.out.println("Hello Aceptado");
-            showAcceptHelloPopup();
         }
         if (message instanceof RechazarHello) {
             System.out.println("Hello Rechazado");
-            showDeclineHelloPopup();
         }
         if (message instanceof ConfirmarRecibido) {
             actualizarChecksAzules(((ConfirmarRecibido) message).getIdMensaje());
@@ -1150,6 +1002,7 @@ public class ChatUI extends JFrame implements iChatView {
 
             boolean esMio = c.getIdEmisor().equals(idMio);
             boolean leido = c.getLeido().equals("1");
+
             agregarMensajeUI(
                     c.getMensajeTxt(),
                     esMio,

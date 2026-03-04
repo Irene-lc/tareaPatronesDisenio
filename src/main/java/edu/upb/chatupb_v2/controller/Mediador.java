@@ -45,7 +45,7 @@ public class Mediador implements SocketListener {
         System.out.println("IP contacto: " + client.getIp());
         System.out.println("------");
 
-        Contact nuevo = new Contact(idUsuario, nombreClient, client.getIp(), "0");
+        Contact nuevo = new Contact(idUsuario, nombreClient, client.getIp(), false);
         try {
             if (this.contactDao.existById(idUsuario)) {
                 Contact contact = this.contactDao.findById(idUsuario);
@@ -61,7 +61,7 @@ public class Mediador implements SocketListener {
                 return;
             }
             this.contactDao.save(nuevo);
-            actualizarEstadoContacto(idUsuario, true);
+            chatUI.actualizarEstadoContacto(idUsuario, true);
         } catch (Exception e) {
             e.printStackTrace();
             throw new OperationException("No se pudo guardar el contacto en la base de datos");
@@ -125,6 +125,15 @@ public class Mediador implements SocketListener {
             }
         }
         clientes.clear();
+    }
+    public void enviarChau(Message message, String idUsuario) {
+        try {
+            SocketClient client = clientes.get(idUsuario);
+            client.send(message);
+            client.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void establecerConexion(String ip) {
@@ -204,13 +213,14 @@ public class Mediador implements SocketListener {
             contact = this.contactDao.findById(id);
             if (contact == null) {
                 System.out.println("El contacto no esta en la base de datos");
+                System.out.println("Enviando 006...");
                 Message message = new RechazarHello();
                 client.send(message);
             } else {
                 System.out.println("Se encontro el contacto con ip: " + contact.getIp() + " con Nombre: " + contact.getName());
                 clientes.put(id, client);
                 chatUI.actualizarValores(id);
-                chatUI.showHelloPopup(contact.getName());
+//                chatUI.showHelloPopup(contact.getName());
                 Message message = new AceptarHello(idMio);
                 client.send(message);
             }
@@ -227,15 +237,7 @@ public class Mediador implements SocketListener {
             throw new OperationException("No se pudo actualizar a 'Mensaje Leido'");
         }
     }
-    public void actualizarEstadoContacto(String id, boolean estado) {
-        String estadoStr = estado ? "1" : "0";
-        try {
-            this.contactDao.updateState(id, estadoStr);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        chatUI.actualizarEstadoContacto(id, estado);
-    }
+
     @Override
     public synchronized void onMessage(SocketClient socketClient, Message message) {
         if (message instanceof Invitacion) {
@@ -244,36 +246,49 @@ public class Mediador implements SocketListener {
             if (accepted) {
                 System.out.println("Enviando 002..." + '\n');
                 aceptarInvitacion(socketClient, invitacion);
-                actualizarEstadoContacto(invitacion.getIdUsuario(), true);
+                chatUI.actualizarEstadoContacto(invitacion.getIdUsuario(), true);
             } else  {
                 System.out.println("Enviando 003..." + '\n');
                 rechazarInvitacion(socketClient);
             }
         }
         if (message instanceof Aceptar) {
+            Aceptar aceptar = (Aceptar) message;
             invitacionAceptada(socketClient, message);
+            chatUI.actualizarEstadoContacto(aceptar.getIdUsuario(), true);
+
         }
         if (message instanceof Hello) {
             Hello hello = (Hello) message;
             System.out.println("Llegó 004" + '\n');
             enviarRespuestaHello(socketClient, hello.getIdUsuario());
-            actualizarEstadoContacto(hello.getIdUsuario(), true);
+            chatUI.actualizarEstadoContacto(hello.getIdUsuario(), true);
         }
         if (message instanceof AceptarHello) {
             AceptarHello aceptarHello = (AceptarHello) message;
             System.out.println("Hello aceptado por: " + aceptarHello.getIdUsuario() + '\n');
             clientes.put(aceptarHello.getIdUsuario(), socketClient);
-            actualizarEstadoContacto(aceptarHello.getIdUsuario(), true);
+            chatUI.actualizarEstadoContacto(aceptarHello.getIdUsuario(), true);
         }
         if (message instanceof ConfirmarRecibido) {
             ConfirmarRecibido confirmarRecibido = (ConfirmarRecibido) message;
             actualizarLeido(confirmarRecibido.getIdMensaje());
         }
-        //Preguntar Profe
+        if (message instanceof Zumbido) {
+            Zumbido zumbido = (Zumbido) message;
+            try {
+                Contact contact = this.contactDao.findById(zumbido.getIdUsuario());
+                if (contact != null) {
+                    chatUI.showZumbidoPopup(contact.getName());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         SwingUtilities.invokeLater(() -> {
             chatUI.onMessage(message);
         });
-        //llamar Dao?
     }
 
     @Override
@@ -281,7 +296,7 @@ public class Mediador implements SocketListener {
         try {
             Contact contact = this.contactDao.findByIp(socketClient.getIp());
             if (contact != null) {
-                actualizarEstadoContacto(contact.getId(), false);
+                chatUI.actualizarEstadoContacto(contact.getId(), false);
                 removeClient(contact.getId());
                 clientes.remove(contact.getId());
             }

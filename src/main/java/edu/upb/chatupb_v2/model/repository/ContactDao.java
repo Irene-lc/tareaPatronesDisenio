@@ -29,9 +29,6 @@ public class ContactDao {
         if (existColumn(result, Contact.Column.IP)) {
             prefacturaSync.setIp(result.getString(Contact.Column.IP));
         }
-        if (existColumn(result, Contact.Column.STATE)) {
-            prefacturaSync.setStateConnect(result.getString(Contact.Column.STATE));
-        }
         return prefacturaSync;
     };
 
@@ -89,14 +86,13 @@ public class ContactDao {
     }
 
     public void save(Contact contact) throws Exception {
-        String query = "INSERT INTO contact(id, name, ip, state) values (?,?,?,?)";
+        String query = "INSERT INTO contact(id, name, ip) values (?,?,?)";
         DaoHelper.QueryParameters params = new DaoHelper.QueryParameters() {
             @Override
             public void setParameters(PreparedStatement pst) throws SQLException {
                 pst.setString(1, contact.getId());
                 pst.setString(2, contact.getName());
                 pst.setString(3, contact.getIp());
-                pst.setString(4, contact.getStateConnect());
             }
         };
         helper.insert(query, params, contact);
@@ -135,14 +131,6 @@ public class ContactDao {
         String query = "UPDATE contact SET ip=? WHERE id=?";
         DaoHelper.QueryParameters params = pst -> {
             pst.setString(1, ip);
-            pst.setString(2, id);
-        };
-        helper.update(query, params);
-    }
-    public void updateState(String id, String state) throws Exception {
-        String query = "UPDATE contact SET state= ? WHERE id=?";
-        DaoHelper.QueryParameters params = pst -> {
-            pst.setString(1, state);
             pst.setString(2, id);
         };
         helper.update(query, params);
