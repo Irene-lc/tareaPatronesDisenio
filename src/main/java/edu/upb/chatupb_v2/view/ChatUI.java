@@ -186,9 +186,8 @@ public class ChatUI extends JFrame implements iChatView {
 
         if (Mediador.getInstance().dbVacia()) {
             showNombrePopup();
-        } else {
-            Mediador.getInstance().cargarMisDatos();
         }
+        Mediador.getInstance().cargarMisDatos();
     }
     private void showOffPopup() {
 
@@ -778,6 +777,22 @@ public class ChatUI extends JFrame implements iChatView {
         contacModel.addElement(contact);
         System.out.println("Agregando contacto con id al conctacModel: (ChatView)" + contact.getId());
     }
+    public void actualizarContacto(Contact contact) {
+        for (int i = 0; i < contacModel.size(); i++) {
+            Contact c = contacModel.get(i);
+
+            if (c.getId().equals(contact.getId())) {
+
+                c.setName(contact.getName());
+                c.setIp(contact.getIp());
+
+                contacModel.set(i, c);
+                break;
+            }
+        }
+
+        jContactos.repaint();
+    }
     public void mostrarMensajeSistema(String texto) {
 
         JPanel panelSistema = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -1031,10 +1046,12 @@ public class ChatUI extends JFrame implements iChatView {
         }
         if (message instanceof Mensaje) {
             Mensaje mensaje = (Mensaje) message;
-            if (mensaje.getIdUsuario().equals(idUsuarioActual))
+            if (mensaje.getIdUsuario().equals(idUsuarioActual) && !idUsuarioActual.equals(Mediador.getInstance().getIdMio())) {
                 agregarMensajeUI(mensaje.getMensaje(), false, Mediador.getInstance().obtenerHoraActual(), false, mensaje.getIdMensaje());
-            chatsController.guardarEnBd(mensaje.getIdMensaje(), mensaje.getMensaje(), mensaje.getIdUsuario(), Mediador.getInstance().getIdMio(), Mediador.getInstance().obtenerHoraActual());
-
+            }
+            if (!idUsuarioActual.equals(Mediador.getInstance().getIdMio())) {
+                chatsController.guardarEnBd(mensaje.getIdMensaje(), mensaje.getMensaje(), mensaje.getIdUsuario(), Mediador.getInstance().getIdMio(), Mediador.getInstance().obtenerHoraActual());
+            }
             if (mensaje.getIdUsuario().equals(idUsuarioActual)) {
                 ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(mensaje.getIdMensaje());
                 System.out.println("Enviando 008...");

@@ -46,6 +46,10 @@ public class ContactDao {
         String query = "SELECT * FROM contact";
         return helper.executeQuery(query, resultReader);
     }
+    public List<Contact> findAllMenosYo() throws ConnectException, SQLException {
+        String query = "SELECT * FROM contact LIMIT -1 OFFSET 1";
+        return helper.executeQuery(query, resultReader);
+    }
 
     public boolean exist(String argument) throws ConnectException, SQLException {
         String query = "SELECT count(*) FROM contact WHERE " + argument;

@@ -52,11 +52,13 @@ public class Mediador implements SocketListener {
                 System.out.println("El contacto ya se encuentra registrado");
                 if (!contact.getIp().equals(client.getIp()) || !contact.getName().equals(nombreClient)) {
                     this.contactDao.update(nuevo);
-                    System.out.println();
-                    System.out.println("Contacto Antiguo: " + contact.getName() + " con ip: " + contact.getIp() + " con nombre: " + contact.getName());
-                    System.out.println("Se actualizó la Ip del contacto correctamente");
-                    contact = this.contactDao.findById(idUsuario);
-                    System.out.println("Contacto Nuevo: " + contact.getName() + " con ip: " + contact.getIp() + " con nombre: " + contact.getName());
+                    if (chatUI != null)
+                        chatUI.actualizarContacto(nuevo);
+//                    System.out.println();
+//                    System.out.println("Contacto Antiguo: " + contact.getName() + " con ip: " + contact.getIp() + " con nombre: " + contact.getName());
+//                    System.out.println("Se actualizó la Ip del contacto correctamente");
+//                    contact = this.contactDao.findById(idUsuario);
+//                    System.out.println("Contacto Nuevo: " + contact.getName() + " con ip: " + contact.getIp() + " con nombre: " + contact.getName());
                 }
                 return;
             }
@@ -104,28 +106,6 @@ public class Mediador implements SocketListener {
         }
     }
 
-    //    public void notificar(SocketClient client, Message message) {
-//        SwingUtilities.invokeLater(() -> {
-//            if (chatUI != null) {
-//                chatUI.onMessage(client, message);
-//            }
-//        });
-//        SwingUtilities.invokeLater(() -> {
-//            if (chatView != null)
-//                chatView.onMessage(message);
-//        });
-//    }
-    public void cargarMisDatos() {
-        try {
-            Contact contact = this.contactDao.findUsuarioPrincipal();
-            if (contact != null) {
-                idMio = contact.getId();
-                nombre = contact.getName();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
     public void enviarMensajeATodos(Message message) {
         for (SocketClient cliente : clientes.values()) {
             try {
@@ -259,10 +239,22 @@ public class Mediador implements SocketListener {
         return false;
     }
     public void primerRegistro(String nombre) {
-        String idMio = UUID.randomUUID().toString();
-        Contact contact = new Contact(idMio, nombre, "localhost", true);
+        String idMio = "aed70cc4-7f4f-4e6d-974b-2dd32160a490";
+        this.nombre = nombre;
+        Contact contact = new Contact(idMio, nombre, "localhost", false);
         try {
             this.contactDao.save(contact);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void cargarMisDatos() {
+        try {
+            Contact contact = this.contactDao.findUsuarioPrincipal();
+            if (contact != null) {
+                idMio = contact.getId();
+                nombre = contact.getName();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
