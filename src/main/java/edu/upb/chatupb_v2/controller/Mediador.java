@@ -27,8 +27,8 @@ public class Mediador implements SocketListener {
     private static final Mediador mediador = new Mediador();
     private final HashMap<String, SocketClient> clientes = new HashMap<>();
 //    public List<SocketClient> listaNegra;
-    private final String idMio = "kf3fc20a-766c-4rd4-813d-b1967a01fa9a";
-    private final String nombre = "Irene";
+    private String idMio;
+    private String nombre;
 
     private Mediador() {
     }
@@ -115,6 +115,17 @@ public class Mediador implements SocketListener {
 //                chatView.onMessage(message);
 //        });
 //    }
+    public void cargarMisDatos() {
+        try {
+            Contact contact = this.contactDao.findUsuarioPrincipal();
+            if (contact != null) {
+                idMio = contact.getId();
+                nombre = contact.getName();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public void enviarMensajeATodos(Message message) {
         for (SocketClient cliente : clientes.values()) {
             try {
@@ -131,6 +142,7 @@ public class Mediador implements SocketListener {
             SocketClient client = clientes.get(idUsuario);
             client.send(message);
             client.close();
+            clientes.remove(idUsuario);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -235,6 +247,24 @@ public class Mediador implements SocketListener {
         } catch (Exception e) {
             e.printStackTrace();
             throw new OperationException("No se pudo actualizar a 'Mensaje Leido'");
+        }
+    }
+    public boolean dbVacia() {
+        try {
+            if (this.contactDao.findAll().isEmpty())
+                return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public void primerRegistro(String nombre) {
+        String idMio = UUID.randomUUID().toString();
+        Contact contact = new Contact(idMio, nombre, "localhost", true);
+        try {
+            this.contactDao.save(contact);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

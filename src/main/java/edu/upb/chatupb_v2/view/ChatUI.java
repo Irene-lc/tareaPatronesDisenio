@@ -24,9 +24,7 @@ import java.util.List;
 public class ChatUI extends JFrame implements iChatView {
     public String idUsuarioActual;
 
-//    private final String idMio = "kf3fc20a-766c-4rd4-813d-b1967a01fa9a";
     private final String idMio = Mediador.getInstance().getIdMio();
-    private final String nombre = "Irene";
     private DefaultListModel<Contact> contacModel = new DefaultListModel<>();
 
     @Setter
@@ -188,6 +186,11 @@ public class ChatUI extends JFrame implements iChatView {
         add(panelContactos, BorderLayout.WEST);
         add(panelChat, BorderLayout.CENTER);
 
+        if (Mediador.getInstance().dbVacia()) {
+            showNombrePopup();
+        } else {
+            Mediador.getInstance().cargarMisDatos();
+        }
     }
     private void showOffPopup() {
 
@@ -636,6 +639,98 @@ public class ChatUI extends JFrame implements iChatView {
         dialog.add(root);
         dialog.setVisible(true);
     }
+    public void showNombrePopup() {
+
+        JDialog dialog = new JDialog(this, true);
+        dialog.setSize(420, 450);
+        dialog.setLocationRelativeTo(this);
+        dialog.setUndecorated(true);
+        dialog.setBackground(new Color(0,0,0,0));
+
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+
+        // ===== CARD PANEL =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(35, 80, 350, 300);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+
+        // ===== BOTON CERRAR =====
+        JButton btnCerrar = new JButton();
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/x1.png"));
+            Image img = icon.getImage().getScaledInstance(40, 30, Image.SCALE_SMOOTH);
+            btnCerrar.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            btnCerrar.setText("X");
+        }
+
+        btnCerrar.setBounds(10, 10, 25, 25);
+
+        btnCerrar.setBorderPainted(false);
+        btnCerrar.setContentAreaFilled(false);
+        btnCerrar.setFocusPainted(false);
+        btnCerrar.setOpaque(false);
+        btnCerrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        btnCerrar.addActionListener(e -> dialog.dispose());
+
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        imageLabel.setBounds(155, 20, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAdd.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Imagen no encontrada");
+        }
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("Ingrese su nombre");
+        title.setFont(new Font("Arial", Font.BOLD, 18));
+        title.setBounds(110, 70, 200, 30);
+
+        // ===== IP =====
+        JLabel ipLabel = new JLabel("Nombre:");
+        ipLabel.setFont(new Font("Arial", Font.PLAIN, 13));
+        ipLabel.setBounds(30, 170, 200, 20);
+
+        jtName = new JTextField();
+        jtName.setBounds(30, 190, 290, 30);
+
+        // ===== BOTON =====
+        jBtnAceptar = new JButton("ACPETAR");
+        jBtnAceptar.setBounds(75, 235, 200, 35);
+        jBtnAceptar.setBackground(Color.GRAY);
+        jBtnAceptar.setForeground(Color.BLACK);
+        jBtnAceptar.setFocusPainted(false);
+
+        jBtnAceptar.addActionListener(evt -> {
+            Mediador.getInstance().primerRegistro(jtName.getText());
+            dialog.dispose();
+        });
+
+        // ===== AGREGAMOS AL CARD =====
+        card.add(title);
+        card.add(ipLabel);
+        card.add(jtName);
+        card.add(jBtnAceptar);
+        card.add(btnCerrar);
+
+        // ===== AGREGAMOS AL ROOT =====
+        root.add(imageLabel);
+        root.add(card);
+
+        dialog.add(root);
+        dialog.setVisible(true);
+    }
 
     private void jBtnEnviarActionPerformed(ActionEvent evt) {//GEN-FIRST:event_jBtnEnviarActionPerformed
         String mensajeTxt = jtMensaje.getText().toString();
@@ -923,7 +1018,9 @@ public class ChatUI extends JFrame implements iChatView {
     private JButton jBtnOff;
     private JList<Contact> jContactos;
     private JButton jBtnConectar;
+    private JButton jBtnAceptar;
     private JTextField jtIp;
+    private JTextField jtName;
 
     public void onMessage(Message message) {
         if (message instanceof Aceptar) {
@@ -972,7 +1069,7 @@ public class ChatUI extends JFrame implements iChatView {
             System.out.println("Conexión terminada por cliente");
             showOffPopup();
             mostrarMensajeSistema("CONEXION TERMINADA");
-//            Mediador.getInstance().removeClient(idUsuarioActual);
+            actualizarEstadoContacto(idUsuarioActual, false);
         }
     }
 

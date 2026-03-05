@@ -98,17 +98,6 @@ public class ContactDao {
         helper.insert(query, params, contact);
     }
 
-//    public void update(Contact contact) throws Exception {
-//        String query = "UPDATE contact SET IP=? WHERE id =?";
-//        DaoHelper.QueryParameters params = new DaoHelper.QueryParameters() {
-//            @Override
-//            public void setParameters(PreparedStatement pst) throws SQLException {
-//                pst.setString(1, contact.getIp());
-//            }
-//        };
-//        helper.update(query, params);
-//    }
-
     public void update(String query, String conditionWhere) throws SQLException, ConnectException {
         if (query.trim().endsWith("%s")) {
             query = String.format(query, conditionWhere);
@@ -134,5 +123,16 @@ public class ContactDao {
             pst.setString(2, id);
         };
         helper.update(query, params);
+    }
+    public Contact findUsuarioPrincipal() throws ConnectException, SQLException {
+        String query = "SELECT * FROM contact LIMIT 1";
+
+        List<Contact> list = helper.executeQuery(query, resultReader);
+
+        if (list.isEmpty()) {
+            return null;
+        }
+
+        return list.get(0);
     }
 }
