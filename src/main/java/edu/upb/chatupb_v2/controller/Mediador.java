@@ -50,13 +50,13 @@ public class Mediador implements SocketListener {
             if (this.contactDao.existById(idUsuario)) {
                 Contact contact = this.contactDao.findById(idUsuario);
                 System.out.println("El contacto ya se encuentra registrado");
-                if (!contact.getIp().equals(client.getIp())) {
-                    this.contactDao.updateIp(idUsuario, client.getIp());
+                if (!contact.getIp().equals(client.getIp()) || !contact.getName().equals(nombreClient)) {
+                    this.contactDao.update(nuevo);
                     System.out.println();
-                    System.out.println("Contacto Antiguo: " + contact.getName() + " con ip: " + contact.getIp());
+                    System.out.println("Contacto Antiguo: " + contact.getName() + " con ip: " + contact.getIp() + " con nombre: " + contact.getName());
                     System.out.println("Se actualizó la Ip del contacto correctamente");
                     contact = this.contactDao.findById(idUsuario);
-                    System.out.println("Contacto Nuevo: " + contact.getName() + " con ip: " + contact.getIp());
+                    System.out.println("Contacto Nuevo: " + contact.getName() + " con ip: " + contact.getIp() + " con nombre: " + contact.getName());
                 }
                 return;
             }

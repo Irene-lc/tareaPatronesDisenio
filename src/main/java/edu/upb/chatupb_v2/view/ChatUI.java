@@ -23,8 +23,6 @@ import java.util.List;
 
 public class ChatUI extends JFrame implements iChatView {
     public String idUsuarioActual;
-
-    private final String idMio = Mediador.getInstance().getIdMio();
     private DefaultListModel<Contact> contacModel = new DefaultListModel<>();
 
     @Setter
@@ -113,7 +111,7 @@ public class ChatUI extends JFrame implements iChatView {
                     idUsuarioActual = seleccionado.getId();
                     limpiarChat();
                     System.out.println("idusuarioactuak: " + idUsuarioActual);
-                    chatsController.onloadMessages(idMio, idUsuarioActual);
+                    chatsController.onloadMessages(Mediador.getInstance().getIdMio(), idUsuarioActual);
                     System.out.println("Cargando mensajes con: " + seleccionado.getName() + ", con id:" + seleccionado.getId()) ;
                 }
             }
@@ -148,7 +146,7 @@ public class ChatUI extends JFrame implements iChatView {
                     if (seleccionado != null) {
                         System.out.println("idSeleccionado: " + idUsuarioActual);
                         idUsuarioActual = seleccionado.getId();
-                        Zumbido zumbido = new Zumbido(idMio);
+                        Zumbido zumbido = new Zumbido(Mediador.getInstance().getIdMio());
                         Mediador.getInstance().sendMessage(idUsuarioActual, zumbido);
                     }
                 }
@@ -751,7 +749,7 @@ public class ChatUI extends JFrame implements iChatView {
         try {
             System.out.println("Enviando 0018...");
             System.out.println("Conexion terminada");
-            Message message = new FueraLinea(idMio);
+            Message message = new FueraLinea(Mediador.getInstance().getIdMio());
             Mediador.getInstance().enviarMensajeATodos(message);
             mostrarMensajeSistema("CONEXION TERMINADA");
         } catch (Exception e) {
@@ -1035,7 +1033,7 @@ public class ChatUI extends JFrame implements iChatView {
             Mensaje mensaje = (Mensaje) message;
             if (mensaje.getIdUsuario().equals(idUsuarioActual))
                 agregarMensajeUI(mensaje.getMensaje(), false, Mediador.getInstance().obtenerHoraActual(), false, mensaje.getIdMensaje());
-            chatsController.guardarEnBd(mensaje.getIdMensaje(), mensaje.getMensaje(), mensaje.getIdUsuario(), idMio, Mediador.getInstance().obtenerHoraActual());
+            chatsController.guardarEnBd(mensaje.getIdMensaje(), mensaje.getMensaje(), mensaje.getIdUsuario(), Mediador.getInstance().getIdMio(), Mediador.getInstance().obtenerHoraActual());
 
             if (mensaje.getIdUsuario().equals(idUsuarioActual)) {
                 ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(mensaje.getIdMensaje());
@@ -1046,7 +1044,7 @@ public class ChatUI extends JFrame implements iChatView {
             if (mensaje.getMensaje().toLowerCase().equals("chau")){
                 System.out.println("Enviando 0018...");
                 System.out.println("Conexion terminada");
-                Message message1 = new FueraLinea(idMio);
+                Message message1 = new FueraLinea(Mediador.getInstance().getIdMio());
                 Mediador.getInstance().enviarChau(message1, mensaje.getIdUsuario());
                 mostrarMensajeSistema("CONEXION TERMINADA");
                 actualizarEstadoContacto(mensaje.getIdUsuario(), false);
@@ -1097,7 +1095,7 @@ public class ChatUI extends JFrame implements iChatView {
 //                ultimaFecha = fechaActual;
 //            }
 
-            boolean esMio = c.getIdEmisor().equals(idMio);
+            boolean esMio = c.getIdEmisor().equals(Mediador.getInstance().getIdMio());
             boolean leido = c.getLeido().equals("1");
 
             agregarMensajeUI(
