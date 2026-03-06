@@ -654,28 +654,6 @@ public class ChatUI extends JFrame implements iChatView {
         card.setBounds(35, 80, 350, 300);
         card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
 
-
-        // ===== BOTON CERRAR =====
-        JButton btnCerrar = new JButton();
-
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/x1.png"));
-            Image img = icon.getImage().getScaledInstance(40, 30, Image.SCALE_SMOOTH);
-            btnCerrar.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            btnCerrar.setText("X");
-        }
-
-        btnCerrar.setBounds(10, 10, 25, 25);
-
-        btnCerrar.setBorderPainted(false);
-        btnCerrar.setContentAreaFilled(false);
-        btnCerrar.setFocusPainted(false);
-        btnCerrar.setOpaque(false);
-        btnCerrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        btnCerrar.addActionListener(e -> dialog.dispose());
-
         // ===== IMAGEN =====
         JLabel imageLabel = new JLabel();
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -703,7 +681,7 @@ public class ChatUI extends JFrame implements iChatView {
         jtName.setBounds(30, 190, 290, 30);
 
         // ===== BOTON =====
-        jBtnAceptar = new JButton("ACPETAR");
+        jBtnAceptar = new JButton("ACEPTAR");
         jBtnAceptar.setBounds(75, 235, 200, 35);
         jBtnAceptar.setBackground(Color.GRAY);
         jBtnAceptar.setForeground(Color.BLACK);
@@ -719,7 +697,6 @@ public class ChatUI extends JFrame implements iChatView {
         card.add(ipLabel);
         card.add(jtName);
         card.add(jBtnAceptar);
-        card.add(btnCerrar);
 
         // ===== AGREGAMOS AL ROOT =====
         root.add(imageLabel);

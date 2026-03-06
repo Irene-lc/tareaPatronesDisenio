@@ -39,7 +39,35 @@ public class ConnectionDB {
         return conn;
     }
 
+//    private void crearTablaSiNoExiste(Connection conn) throws SQLException {
+//
+//        String sqlContact = """
+//        CREATE TABLE IF NOT EXISTS contact (
+//            id TEXT PRIMARY KEY,
+//            name TEXT NOT NULL,
+//            ip TEXT NOT NULL UNIQUE
+//        );
+//    """;
+//
+//        conn.createStatement().execute(sqlContact);
+//
+//        String sqlChats = """
+//        CREATE TABLE IF NOT EXISTS chats (
+//            idMensaje TEXT PRIMARY KEY,
+//            mensajeTxt TEXT NOT NULL,
+//            hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+//            idEmisor TEXT NOT NULL,
+//            idReceptor TEXT NOT NULL,
+//            leido TEXT NOT NULL
+//        );
+//    """;
+//
+//        conn.createStatement().execute(sqlChats);
+//    }
+
     private void crearTablaSiNoExiste(Connection conn) throws SQLException {
+
+        conn.createStatement().execute("PRAGMA foreign_keys = ON");
 
         String sqlContact = """
         CREATE TABLE IF NOT EXISTS contact (
@@ -58,10 +86,19 @@ public class ConnectionDB {
             hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             idEmisor TEXT NOT NULL,
             idReceptor TEXT NOT NULL,
-            leido TEXT NOT NULL
+            leido TEXT NOT NULL,
+
+            FOREIGN KEY (idEmisor) REFERENCES contact(id)
+                ON DELETE CASCADE
+                ON UPDATE CASCADE,
+
+            FOREIGN KEY (idReceptor) REFERENCES contact(id)
+                ON DELETE CASCADE
+                ON UPDATE CASCADE
         );
     """;
 
         conn.createStatement().execute(sqlChats);
     }
+
 }

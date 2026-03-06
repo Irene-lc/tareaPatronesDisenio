@@ -67,7 +67,6 @@ public class ContactDao {
 
     public Contact findByIp(String ip) throws ConnectException, SQLException {
         String query = "SELECT * FROM contact WHERE ip ='" + ip + "'";
-        System.out.println(query);
         List<Contact> list = helper.executeQuery(query, resultReader);
         if (list.isEmpty()) {
             return null;
