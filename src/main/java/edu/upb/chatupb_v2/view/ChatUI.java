@@ -5,6 +5,7 @@
 package edu.upb.chatupb_v2.view;
 
 import edu.upb.chatupb_v2.controller.ChatsController;
+import edu.upb.chatupb_v2.controller.CobroController;
 import edu.upb.chatupb_v2.controller.ContactController;
 import edu.upb.chatupb_v2.model.entities.message.*;
 import edu.upb.chatupb_v2.controller.Mediador;
@@ -18,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -78,8 +80,8 @@ public class ChatUI extends JFrame implements iChatView {
             }
         });
 
-        jBtnOff = new JButton("off");
-        jBtnOff.addActionListener(new ActionListener() {
+        jBtnCobrar = new JButton("cobrar");
+        jBtnCobrar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 jBtnOffActionPerformed(evt);
             }
@@ -167,7 +169,7 @@ public class ChatUI extends JFrame implements iChatView {
 
         // Panel superior (botones off y +)
         JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        panelSuperior.add(jBtnOff);
+        panelSuperior.add(jBtnCobrar);
         panelSuperior.add(jBtnNuevaConexion);
 
         // Panel inferior (campo mensaje + enviar)
@@ -729,6 +731,83 @@ public class ChatUI extends JFrame implements iChatView {
         dialog.setVisible(true);
     }
 
+
+    public boolean showCobroPopup() {
+
+        final boolean[] accepted = {false};
+
+        JDialog dialog = new JDialog(this, true);
+        dialog.setSize(350, 320);
+        dialog.setLocationRelativeTo(this);
+        dialog.setUndecorated(true);
+        dialog.setBackground(new Color(0,0,0,0));
+
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+
+        // ===== CARD =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(40, 100, 270, 150);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("Cobrar 10 bs");
+        title.setFont(new Font("Arial", Font.BOLD, 14));
+        title.setForeground(new Color(37,29,75));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setBounds(20, 20, 230, 40);
+
+        // ===== BOTON ACCEPT =====
+        JButton acceptButton = new JButton("BOB");
+        acceptButton.setBounds(30, 80, 90, 35);
+        acceptButton.setBackground(Color.lightGray);
+        acceptButton.setForeground(Color.BLACK);
+        acceptButton.setFocusPainted(false);
+
+        acceptButton.addActionListener(e -> {
+            accepted[0] = true;
+            dialog.dispose();
+        });
+
+        // ===== BOTON DECLINE =====
+        JButton declineButton = new JButton("CRIPTO");
+        declineButton.setBounds(150, 80, 90, 35);
+        declineButton.setBackground(Color.GRAY);
+        declineButton.setForeground(Color.BLACK);
+        declineButton.setFocusPainted(false);
+
+        declineButton.addActionListener(e -> {
+            accepted[0] = false;
+            dialog.dispose();
+        });
+
+        card.add(title);
+        card.add(acceptButton);
+        card.add(declineButton);
+
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setBounds(120, 0, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotRequest.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Img");
+        }
+
+        root.add(card);
+        root.add(imageLabel);
+
+        dialog.add(root);
+        dialog.setVisible(true);
+
+        return accepted[0];
+    }
+
     private void jBtnEnviarActionPerformed(ActionEvent evt) {//GEN-FIRST:event_jBtnEnviarActionPerformed
         String mensajeTxt = jtMensaje.getText().toString();
         if (mensajeTxt.isEmpty() || idUsuarioActual == null) {
@@ -745,15 +824,22 @@ public class ChatUI extends JFrame implements iChatView {
 //        }
     }//GEN-LAST:event_jBtnEnviarActionPerformed
     private void jBtnOffActionPerformed(ActionEvent evt) {
-        try {
-            System.out.println("Enviando 0018...");
-            System.out.println("Conexion terminada");
-            Message message = new FueraLinea(Mediador.getInstance().getIdMio());
-            Mediador.getInstance().enviarMensajeATodos(message);
-            mostrarMensajeSistema("CONEXION TERMINADA");
-        } catch (Exception e) {
-            e.printStackTrace();
+        CobroController cobroController = new CobroController();
+        boolean bob = showCobroPopup();
+        if (bob) {
+            cobroController.cobrar(new BigDecimal(10), "bolivianos");
+        } else  {
+            cobroController.cobrar(new BigDecimal(10), "cripto");
         }
+//        try {
+//            System.out.println("Enviando 0018...");
+//            System.out.println("Conexion terminada");
+//            Message message = new FueraLinea(Mediador.getInstance().getIdMio());
+//            Mediador.getInstance().enviarMensajeATodos(message);
+//            mostrarMensajeSistema("CONEXION TERMINADA");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
     private void jBtnNuevaConexionActionPerformed(ActionEvent evt) {
         showNuevaConexionPopup();
@@ -1028,7 +1114,7 @@ public class ChatUI extends JFrame implements iChatView {
     private JPanel jPanelChat;
     private JScrollPane jScrollPaneChat;
     private JButton jBtnNuevaConexion;
-    private JButton jBtnOff;
+    private JButton jBtnCobrar;
     private JList<Contact> jContactos;
     private JButton jBtnConectar;
     private JButton jBtnAceptar;
