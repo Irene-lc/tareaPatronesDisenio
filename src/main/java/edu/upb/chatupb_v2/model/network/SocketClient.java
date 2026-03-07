@@ -32,6 +32,7 @@ public class SocketClient extends Thread {
 
     private String algoritmo;
     private SecretKey secretKey;
+    private boolean canalSeguro = false;
 
     private List<SocketListener> socketListener = new ArrayList<>();
 
@@ -47,8 +48,10 @@ public class SocketClient extends Thread {
         this.ip = ip;
         dout = new DataOutputStream(socket.getOutputStream());
         br = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-        ListaProtocolos listaProtocolos = new ListaProtocolos("AES_128,AES_256");
-        send(listaProtocolos);
+        if (!canalSeguro) {
+            ListaProtocolos listaProtocolos = new ListaProtocolos("AES_128,AES_256");
+            send(listaProtocolos);
+        }
     }
 
 
@@ -142,6 +145,7 @@ public class SocketClient extends Thread {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+                        canalSeguro = true;
                         break;
                     case "015":
                         RespuestaEncriptado respuestaEncriptado = RespuestaEncriptado.parse(message);
@@ -149,6 +153,7 @@ public class SocketClient extends Thread {
                         String llave = respuestaEncriptado.getLlave();
                         byte[] llaveDecodificada = Base64.getDecoder().decode(llave);
                         secretKey = new SecretKeySpec(llaveDecodificada, "AES");
+                        canalSeguro = true;
                         break;
                     case "0018":
                         FueraLinea fueraLinea = FueraLinea.parse(message);
@@ -221,10 +226,14 @@ public class SocketClient extends Thread {
     }
     public void send(Message message) throws IOException { //enviar mensaje a quien me habló
         String messageStr = message.generarTrama();
-        if (message instanceof RespuestaEncriptado || message instanceof ListaProtocolos) {
-            messageStr = message.generarTrama();
-        } else {
-            messageStr = encriptar(messageStr) + System.lineSeparator();
+        if (canalSeguro) {
+            if (message instanceof RespuestaEncriptado || message instanceof ListaProtocolos) {
+                messageStr = message.generarTrama();
+                System.out.println("es 014 o 015");
+            } else {
+                System.out.println("no es 014 o 015");
+                messageStr = encriptar(messageStr) + System.lineSeparator();
+            }
         }
         System.out.println("ENVIANDO: " + messageStr);
         try {

@@ -84,7 +84,7 @@ public class Mediador implements SocketListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("Enviando comando: " + message.generarTrama());
+//        System.out.println("Enviando comando: " + message.generarTrama());
     }
     public void enviarMensajePorChat(String idCliente, String mensaje) {
         if (!clientes.containsKey(idCliente)) {
@@ -138,13 +138,13 @@ public class Mediador implements SocketListener {
             e.printStackTrace();
             throw new OperationException("No se logró establecer la conexión");
         }
-        Message message = new Invitacion(idMio, nombre);
-        try {
-            client.send(message);
-            System.out.println("Enviando 001...");
-        } catch (IOException e) {
-            throw new OperationException("No se logró enviar la invitación");
-        }
+//        Message message = new Invitacion(idMio, nombre);
+//        try {
+//            client.send(message);
+//            System.out.println("Enviando 001...");
+//        } catch (IOException e) {
+//            throw new OperationException("No se logró enviar la invitación");
+//        }
     }
     public void aceptarInvitacion(SocketClient socketClient, Invitacion invitacion) {
         addClient(invitacion.getIdUsuario(), invitacion.getNombre(), socketClient);
