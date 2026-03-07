@@ -226,6 +226,7 @@ public class SocketClient extends Thread {
     }
     public void send(Message message) throws IOException { //enviar mensaje a quien me habló
         String messageStr = message.generarTrama();
+        System.out.println("canal seguro: " + canalSeguro);
         if (canalSeguro) {
             if (message instanceof RespuestaEncriptado || message instanceof ListaProtocolos) {
                 messageStr = message.generarTrama();

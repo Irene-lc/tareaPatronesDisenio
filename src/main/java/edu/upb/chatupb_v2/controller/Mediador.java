@@ -39,17 +39,17 @@ public class Mediador implements SocketListener {
     public void addClient(String idUsuario, String nombreClient, SocketClient client) {
         this.clientes.put(idUsuario, client);
 
-        System.out.println("Creando contacto:");
-        System.out.println("ID contacto: " + idUsuario);
-        System.out.println("Nombre contacto: " + nombreClient);
-        System.out.println("IP contacto: " + client.getIp());
-        System.out.println("------");
+//        System.out.println("Creando contacto:");
+//        System.out.println("ID contacto: " + idUsuario);
+//        System.out.println("Nombre contacto: " + nombreClient);
+//        System.out.println("IP contacto: " + client.getIp());
+//        System.out.println("------");
 
         Contact nuevo = new Contact(idUsuario, nombreClient, client.getIp(), false);
         try {
             if (this.contactDao.existById(idUsuario)) {
                 Contact contact = this.contactDao.findById(idUsuario);
-                System.out.println("El contacto ya se encuentra registrado");
+//                System.out.println("El contacto ya se encuentra registrado");
                 if (!contact.getIp().equals(client.getIp()) || !contact.getName().equals(nombreClient)) {
                     this.contactDao.update(nuevo);
                     if (chatUI != null)
