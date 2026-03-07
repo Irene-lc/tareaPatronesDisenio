@@ -688,8 +688,10 @@ public class ChatUI extends JFrame implements iChatView {
         jBtnAceptar.setFocusPainted(false);
 
         jBtnAceptar.addActionListener(evt -> {
-            Mediador.getInstance().primerRegistro(jtName.getText());
-            dialog.dispose();
+            if (!jtName.getText().isEmpty()) {
+                Mediador.getInstance().primerRegistro(jtName.getText());
+                dialog.dispose();
+            }
         });
 
         // ===== AGREGAMOS AL CARD =====

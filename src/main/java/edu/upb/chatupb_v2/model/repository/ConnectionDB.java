@@ -73,7 +73,7 @@ public class ConnectionDB {
         CREATE TABLE IF NOT EXISTS contact (
             id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
-            ip TEXT NOT NULL UNIQUE
+            ip TEXT NOT NULL
         );
     """;
 

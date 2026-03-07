@@ -134,17 +134,27 @@ public class Mediador implements SocketListener {
             client = new SocketClient(ip);
             client.addListener(this); // El mediador se subscribe a los eventos de SocketClient para escuchar
             client.start();
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new OperationException("No se logró establecer la conexión");
         }
-//        Message message = new Invitacion(idMio, nombre);
-//        try {
-//            client.send(message);
-//            System.out.println("Enviando 001...");
-//        } catch (IOException e) {
-//            throw new OperationException("No se logró enviar la invitación");
-//        }
+
+        try {
+            while (!client.canalSeguro) {
+                Thread.sleep(50);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Message message = new Invitacion(idMio, nombre);
+        try {
+            client.send(message);
+            System.out.println("Enviando 001...");
+        } catch (IOException e) {
+            throw new OperationException("No se logró enviar la invitación");
+        }
     }
     public void aceptarInvitacion(SocketClient socketClient, Invitacion invitacion) {
         addClient(invitacion.getIdUsuario(), invitacion.getNombre(), socketClient);

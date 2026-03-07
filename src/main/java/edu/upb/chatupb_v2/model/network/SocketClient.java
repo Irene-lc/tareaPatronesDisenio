@@ -32,7 +32,7 @@ public class SocketClient extends Thread {
 
     private String algoritmo;
     private SecretKey secretKey;
-    private boolean canalSeguro = false;
+    public boolean canalSeguro;
 
     private List<SocketListener> socketListener = new ArrayList<>();
 
@@ -60,10 +60,11 @@ public class SocketClient extends Thread {
         try {
             String message;
             while ((message = br.readLine()) != null) {
+                System.out.println("Comando recibido: " + message);
                 if (!message.contains("|"))
                     message = desencriptar(message);
 
-                System.out.println("Comando recibido: " + message);
+                System.out.println("Comando desencriptado: " + message);
 
                 String split[] = message.split(Pattern.quote("|"));
                 if (split.length == 0) {
@@ -228,13 +229,7 @@ public class SocketClient extends Thread {
         String messageStr = message.generarTrama();
         System.out.println("canal seguro: " + canalSeguro);
         if (canalSeguro) {
-            if (message instanceof RespuestaEncriptado || message instanceof ListaProtocolos) {
-                messageStr = message.generarTrama();
-                System.out.println("es 014 o 015");
-            } else {
-                System.out.println("no es 014 o 015");
-                messageStr = encriptar(messageStr) + System.lineSeparator();
-            }
+            messageStr = encriptar(messageStr) + System.lineSeparator();
         }
         System.out.println("ENVIANDO: " + messageStr);
         try {
