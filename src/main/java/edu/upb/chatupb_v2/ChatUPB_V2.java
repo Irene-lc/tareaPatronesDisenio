@@ -5,9 +5,16 @@ package edu.upb.chatupb_v2;
 
 import edu.upb.chatupb_v2.controller.ChatsController;
 import edu.upb.chatupb_v2.controller.ContactController;
+import edu.upb.chatupb_v2.model.entities.message.ListaProtocolos;
 import edu.upb.chatupb_v2.model.network.ChatServer;
 import edu.upb.chatupb_v2.controller.Mediador;
 import edu.upb.chatupb_v2.view.ChatUI;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 public class ChatUPB_V2 {
 
