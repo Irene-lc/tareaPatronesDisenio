@@ -225,6 +225,7 @@ public class Mediador implements SocketListener {
         }
     }
     public void actualizarLeido(String idMensaje) {
+        System.out.println("se acutalizo el leido");
         try {
             this.chatsDao.updateLeido(idMensaje);
         } catch (Exception e) {
@@ -297,6 +298,7 @@ public class Mediador implements SocketListener {
         }
         if (message instanceof ConfirmarRecibido) {
             ConfirmarRecibido confirmarRecibido = (ConfirmarRecibido) message;
+            System.out.println("Se lleyo el mensaje: " + confirmarRecibido.getIdMensaje());
             actualizarLeido(confirmarRecibido.getIdMensaje());
         }
         if (message instanceof Zumbido) {

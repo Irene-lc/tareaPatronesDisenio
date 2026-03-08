@@ -33,6 +33,7 @@ public class SocketClient extends Thread {
     private String algoritmo;
     private SecretKey secretKey;
     public boolean canalSeguro;
+    public boolean enviarProtocolos = false;
 
     private List<SocketListener> socketListener = new ArrayList<>();
 
@@ -48,9 +49,10 @@ public class SocketClient extends Thread {
         this.ip = ip;
         dout = new DataOutputStream(socket.getOutputStream());
         br = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-        if (!canalSeguro) {
+        if (!enviarProtocolos) {
             ListaProtocolos listaProtocolos = new ListaProtocolos("AES_128,AES_256");
             send(listaProtocolos);
+            enviarProtocolos = true;
         }
     }
 
@@ -66,7 +68,6 @@ public class SocketClient extends Thread {
                     message = desencriptar(message);
                     System.out.println("Comando desencriptado: " + message);
                 }
-
 
                 String split[] = message.split(Pattern.quote("|"));
                 if (split.length == 0) {
@@ -131,7 +132,6 @@ public class SocketClient extends Thread {
                             close();
                             return;
                         }
-
                         if (flag256 && flag128) {
                             String[] listaEncriptado = new String[]{"AES_256", "AES_128"};
                             int r = new Random().nextInt(2);
@@ -152,10 +152,10 @@ public class SocketClient extends Thread {
 //                            String llave = Base64.getEncoder().encodeToString(generarLlave(elegido).getEncoded());
                             RespuestaEncriptado respuestaEncriptado = new RespuestaEncriptado(algoritmo,llave);
                             send(respuestaEncriptado);
+                            break;
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        canalSeguro = true;
                         break;
                     case "015":
                         RespuestaEncriptado respuestaEncriptado = RespuestaEncriptado.parse(message);
