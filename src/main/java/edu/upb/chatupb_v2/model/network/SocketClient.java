@@ -61,7 +61,7 @@ public class SocketClient extends Thread {
             String message;
             while ((message = br.readLine()) != null) {
                 System.out.println("Comando recibido: " + message);
-                if (!message.contains("|"))
+                if (canalSeguro)
                     message = desencriptar(message);
 
                 System.out.println("Comando desencriptado: " + message);
@@ -119,8 +119,16 @@ public class SocketClient extends Thread {
                             if (p.equals("AES_128"))
                                 flag128 = true;
                         }
-                        if (!flag256 && !flag128)
-                            socket.close();
+                        if (!flag256 && !flag128) {
+                            System.out.println("No se pudo establecer el canal de conexion seguro");
+                            if (socketListener != null){
+                                for (SocketListener listener : socketListener) {
+                                    java.awt.EventQueue.invokeLater(() -> listener.onNotSecure(this));
+                                }
+                            }
+                            close();
+                            return;
+                        }
 
                         if (flag256 && flag128) {
                             String[] listaEncriptado = new String[]{"AES_256", "AES_128"};
@@ -134,7 +142,6 @@ public class SocketClient extends Thread {
                         }
 
                         System.out.println("Se eligio: " + algoritmo);
-
                         try {
                             secretKey = generarLlave(algoritmo);
                             byte[] llaveByte = secretKey.getEncoded();
@@ -147,6 +154,9 @@ public class SocketClient extends Thread {
                             e.printStackTrace();
                         }
                         canalSeguro = true;
+                        for (SocketListener listener : socketListener) {
+                            java.awt.EventQueue.invokeLater(() -> listener.onSecure(this));
+                        }
                         break;
                     case "015":
                         RespuestaEncriptado respuestaEncriptado = RespuestaEncriptado.parse(message);
@@ -155,6 +165,9 @@ public class SocketClient extends Thread {
                         byte[] llaveDecodificada = Base64.getDecoder().decode(llave);
                         secretKey = new SecretKeySpec(llaveDecodificada, "AES");
                         canalSeguro = true;
+                        for (SocketListener listener : socketListener) {
+                            java.awt.EventQueue.invokeLater(() -> listener.onSecure(this));
+                        }
                         break;
                     case "0018":
                         FueraLinea fueraLinea = FueraLinea.parse(message);
@@ -227,7 +240,6 @@ public class SocketClient extends Thread {
     }
     public void send(Message message) throws IOException { //enviar mensaje a quien me habló
         String messageStr = message.generarTrama();
-        System.out.println("canal seguro: " + canalSeguro);
         if (canalSeguro) {
             messageStr = encriptar(messageStr) + System.lineSeparator();
         }

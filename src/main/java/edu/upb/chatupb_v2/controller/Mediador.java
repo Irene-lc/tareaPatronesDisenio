@@ -140,21 +140,14 @@ public class Mediador implements SocketListener {
             throw new OperationException("No se logró establecer la conexión");
         }
 
-        try {
-            while (!client.canalSeguro) {
-                Thread.sleep(50);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        Message message = new Invitacion(idMio, nombre);
-        try {
-            client.send(message);
-            System.out.println("Enviando 001...");
-        } catch (IOException e) {
-            throw new OperationException("No se logró enviar la invitación");
-        }
+//        Message message = new Invitacion(idMio, nombre);
+//        try {
+//            client.send(message);
+//            System.out.println("Enviando 001...");
+//        } catch (IOException e) {
+//            throw new OperationException("No se logró enviar la invitación");
+//        }
     }
     public void aceptarInvitacion(SocketClient socketClient, Invitacion invitacion) {
         addClient(invitacion.getIdUsuario(), invitacion.getNombre(), socketClient);
@@ -334,6 +327,22 @@ public class Mediador implements SocketListener {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onNotSecure(SocketClient socketClient) {
+        chatUI.showNotSecurePopup();
+    }
+
+    @Override
+    public void onSecure(SocketClient client) {
+        Message message = new Invitacion(idMio, nombre);
+        try {
+            client.send(message);
+            System.out.println("Enviando 001...");
+        } catch (IOException e) {
+            throw new OperationException("No se logró enviar la invitación");
         }
     }
 }
