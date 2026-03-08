@@ -158,9 +158,8 @@ public class Mediador implements SocketListener {
             chatUI.actualizarValores(invitacion.getIdUsuario());
         }
     }
-    public void rechazarInvitacion(SocketClient socketClient) {
+    public void rechazarInvitacion(SocketClient client) {
         try {
-            SocketClient client = new SocketClient(socketClient.getIp());
             Message rechazar = new Rechazar();
             client.send(rechazar);
         } catch (Exception e) {

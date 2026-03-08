@@ -152,6 +152,7 @@ public class SocketClient extends Thread {
 //                            String llave = Base64.getEncoder().encodeToString(generarLlave(elegido).getEncoded());
                             RespuestaEncriptado respuestaEncriptado = new RespuestaEncriptado(algoritmo,llave);
                             send(respuestaEncriptado);
+                            canalSeguro = true;
                             break;
                         } catch (Exception e) {
                             e.printStackTrace();
