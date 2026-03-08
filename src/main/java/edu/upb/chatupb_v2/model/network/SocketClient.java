@@ -33,7 +33,6 @@ public class SocketClient extends Thread {
     private String algoritmo;
     private SecretKey secretKey;
     public boolean canalSeguro;
-    public boolean enviarProtocolos = false;
 
     private List<SocketListener> socketListener = new ArrayList<>();
 
@@ -49,10 +48,10 @@ public class SocketClient extends Thread {
         this.ip = ip;
         dout = new DataOutputStream(socket.getOutputStream());
         br = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-        if (!enviarProtocolos) {
+        if (!canalSeguro) {
             ListaProtocolos listaProtocolos = new ListaProtocolos("AES_128,AES_256");
             send(listaProtocolos);
-            enviarProtocolos = true;
+            canalSeguro = true;
         }
     }
 
@@ -153,7 +152,6 @@ public class SocketClient extends Thread {
                             RespuestaEncriptado respuestaEncriptado = new RespuestaEncriptado(algoritmo,llave);
                             send(respuestaEncriptado);
                             canalSeguro = true;
-                            break;
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
