@@ -60,6 +60,7 @@ public class SocketClient extends Thread {
         try {
             String message;
             while ((message = br.readLine()) != null) {
+                System.out.println("canal seguro: " + canalSeguro);
                 System.out.println("Comando recibido: " + message);
                 if (canalSeguro) {
                     message = desencriptar(message);
@@ -237,8 +238,10 @@ public class SocketClient extends Thread {
         }
     }
     public void send(Message message) throws IOException { //enviar mensaje a quien me habló
+        System.out.println("canal seguro: " + canalSeguro);
         String messageStr = message.generarTrama();
         if (canalSeguro) {
+            System.out.println("Encriptando mensaje");
             messageStr = encriptar(messageStr) + System.lineSeparator();
         }
         System.out.println("ENVIANDO: " + messageStr);
