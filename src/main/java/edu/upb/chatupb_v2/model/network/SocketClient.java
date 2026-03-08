@@ -155,9 +155,6 @@ public class SocketClient extends Thread {
                             e.printStackTrace();
                         }
                         canalSeguro = true;
-                        for (SocketListener listener : socketListener) {
-                            java.awt.EventQueue.invokeLater(() -> listener.onSecure(this));
-                        }
                         break;
                     case "015":
                         RespuestaEncriptado respuestaEncriptado = RespuestaEncriptado.parse(message);
@@ -166,6 +163,9 @@ public class SocketClient extends Thread {
                         byte[] llaveDecodificada = Base64.getDecoder().decode(llave);
                         secretKey = new SecretKeySpec(llaveDecodificada, "AES");
                         canalSeguro = true;
+                        for (SocketListener listener : socketListener) {
+                            java.awt.EventQueue.invokeLater(() -> listener.onSecure(this));
+                        }
                         break;
                     case "0018":
                         FueraLinea fueraLinea = FueraLinea.parse(message);
