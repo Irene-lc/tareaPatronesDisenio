@@ -61,10 +61,11 @@ public class SocketClient extends Thread {
             String message;
             while ((message = br.readLine()) != null) {
                 System.out.println("Comando recibido: " + message);
-                if (canalSeguro)
+                if (canalSeguro) {
                     message = desencriptar(message);
+                    System.out.println("Comando desencriptado: " + message);
+                }
 
-                System.out.println("Comando desencriptado: " + message);
 
                 String split[] = message.split(Pattern.quote("|"));
                 if (split.length == 0) {
@@ -165,9 +166,6 @@ public class SocketClient extends Thread {
                         byte[] llaveDecodificada = Base64.getDecoder().decode(llave);
                         secretKey = new SecretKeySpec(llaveDecodificada, "AES");
                         canalSeguro = true;
-                        for (SocketListener listener : socketListener) {
-                            java.awt.EventQueue.invokeLater(() -> listener.onSecure(this));
-                        }
                         break;
                     case "0018":
                         FueraLinea fueraLinea = FueraLinea.parse(message);
