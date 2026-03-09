@@ -190,8 +190,6 @@ public class SocketClient extends Thread {
             } else {
                 System.out.println("Socket cerrado correctamente.");
             }
-        } finally {
-            close();
         }
     }
 
@@ -264,6 +262,7 @@ public class SocketClient extends Thread {
             this.socket.close();
             this.br.close();
             this.dout.close();
+            Mediador.getInstance().cerrar();
         } catch (Exception e) {
             e.printStackTrace();
         }

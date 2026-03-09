@@ -836,12 +836,26 @@ public class ChatUI extends JFrame implements iChatView {
     public void actualizarValores(String idUsuarioActual) {
         this.idUsuarioActual = idUsuarioActual;
     }
-    private JLabel crearFotoPerfil() {
+    private JLabel crearFotoPerfilyo() {
 
         JLabel foto = new JLabel();
 
         try {
             ImageIcon icon = new ImageIcon(getClass().getResource("/images/user.png"));
+            Image img = icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+            foto.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            foto.setText("");
+        }
+
+        return foto;
+    }
+    private JLabel crearFotoPerfil() {
+
+        JLabel foto = new JLabel();
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/use.png"));
             Image img = icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
             foto.setIcon(new ImageIcon(img));
         } catch (Exception e) {
@@ -899,14 +913,30 @@ public class ChatUI extends JFrame implements iChatView {
         JPanel bubble = crearBurbuja(texto, esMio, soloHora, leido, idMensaje);
 
         if (esMio) {
-            fila.add(bubble, BorderLayout.EAST);
+            // Mensaje propio: avatar a la DERECHA
+            JPanel contenedor = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+            contenedor.setOpaque(false);
+            contenedor.add(bubble);
+            contenedor.add(crearFotoPerfilyo()); // avatar después de la burbuja
+            fila.add(contenedor, BorderLayout.EAST);
         } else {
+            // Mensaje recibido: avatar a la IZQUIERDA
             JPanel contenedor = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
             contenedor.setOpaque(false);
-            contenedor.add(crearFotoPerfil());
+            contenedor.add(crearFotoPerfil()); // avatar antes de la burbuja
             contenedor.add(bubble);
             fila.add(contenedor, BorderLayout.WEST);
         }
+
+//        if (esMio) {
+//            fila.add(bubble, BorderLayout.EAST);
+//        } else {
+//            JPanel contenedor = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+//            contenedor.setOpaque(false);
+//            contenedor.add(crearFotoPerfil());
+//            contenedor.add(bubble);
+//            fila.add(contenedor, BorderLayout.WEST);
+//        }
 
         return fila;
     }

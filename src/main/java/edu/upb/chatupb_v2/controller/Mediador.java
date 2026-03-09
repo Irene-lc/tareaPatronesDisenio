@@ -105,6 +105,11 @@ public class Mediador implements SocketListener {
         }
         clientes.clear();
     }
+    public void cerrar() {
+        for (SocketClient cliente : clientes.values()) {
+            cliente.close();
+        }
+    }
     public void enviarChau(Message message, String idUsuario) {
         try {
             SocketClient client = clientes.get(idUsuario);
@@ -283,7 +288,7 @@ public class Mediador implements SocketListener {
         }
         if (message instanceof ConfirmarRecibido) {
             ConfirmarRecibido confirmarRecibido = (ConfirmarRecibido) message;
-            System.out.println("Se lleyo el mensaje: " + confirmarRecibido.getIdMensaje());
+            System.out.println("Se leyo el mensaje: " + confirmarRecibido.getIdMensaje());
             actualizarLeido(confirmarRecibido.getIdMensaje());
             try {
                 System.out.println("mensaje en db: " + this.chatsDao.existById(confirmarRecibido.getIdMensaje()));;
