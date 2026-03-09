@@ -191,17 +191,8 @@ public class Mediador implements SocketListener {
     public void enviarRespuestaHello(SocketClient client, String id) {
         Contact contact;
         try {
-            System.out.println("Buscando id: '" + id + "'");
-            System.out.println("Todos los contactos:");
-
-            for (Contact c : contactDao.findAll()) {
-                System.out.println("BD -> " + c.getId());
-            }
             contact = this.contactDao.findById(id);
             if (contact == null) {
-                System.out.println("El contacto no esta en la base de datos");
-                System.out.println("id length: " + id.length());
-                System.out.println("id: '" + id + "'");
                 System.out.println("Enviando 006...");
                 Message message = new RechazarHello();
                 client.send(message);

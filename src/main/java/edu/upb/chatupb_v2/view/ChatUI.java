@@ -104,13 +104,10 @@ public class ChatUI extends JFrame implements iChatView {
 
         jContactos.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-
                 Contact seleccionado = jContactos.getSelectedValue();
-
                 if (seleccionado != null && chatsController != null) {
                     idUsuarioActual = seleccionado.getId();
                     limpiarChat();
-                    System.out.println("idusuarioactuak: " + idUsuarioActual);
                     chatsController.onloadMessages(Mediador.getInstance().getIdMio(), idUsuarioActual);
                     System.out.println("Cargando mensajes con: " + seleccionado.getName() + ", con id:" + seleccionado.getId()) ;
                 }

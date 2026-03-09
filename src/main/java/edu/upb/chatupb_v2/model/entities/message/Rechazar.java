@@ -9,7 +9,7 @@ public class Rechazar extends Message {
 
     public static Rechazar parse(String trama) {
         String[] split = trama.split(Pattern.quote("|"));
-        if (split.length != 2) {
+        if (split.length != 1) {
             throw new IllegalArgumentException("Formato de trama no valido");
         }
         return new Rechazar();
