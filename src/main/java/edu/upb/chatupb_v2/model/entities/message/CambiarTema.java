@@ -26,7 +26,7 @@ public class CambiarTema extends Message {
 
     @Override
     public String generarTrama() {
-        return getCodigo() + "|" + idUsuario + "|" + idTema + System.lineSeparator();
+        return getCodigo() + "|" + idUsuario + "|" + idTema;
     }
 
     public String getIdUsuario() {

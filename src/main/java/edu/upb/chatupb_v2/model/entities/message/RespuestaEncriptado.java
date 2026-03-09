@@ -26,7 +26,7 @@ public class RespuestaEncriptado extends Message {
 
     @Override
     public String generarTrama() {
-        return getCodigo() + "|" + algEncriptacion + "|" + llave + System.lineSeparator();
+        return getCodigo() + "|" + algEncriptacion + "|" + llave;
     }
 
     public String getAlgEncriptacion() {

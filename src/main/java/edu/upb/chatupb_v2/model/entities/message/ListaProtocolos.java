@@ -24,7 +24,7 @@ public class ListaProtocolos extends Message {
 
     @Override
     public String generarTrama() {
-        return getCodigo() + "|" + listaComandos + System.lineSeparator();
+        return getCodigo() + "|" + listaComandos;
     }
 
     public String getListaComandos() {

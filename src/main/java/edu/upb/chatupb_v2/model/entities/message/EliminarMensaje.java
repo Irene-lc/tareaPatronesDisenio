@@ -23,7 +23,7 @@ public class EliminarMensaje extends Message {
     }
     @Override
     public String generarTrama() {
-        return getCodigo() + "|" + idMensaje + System.lineSeparator();
+        return getCodigo() + "|" + idMensaje;
     }
 
     public String getIdMensaje() {

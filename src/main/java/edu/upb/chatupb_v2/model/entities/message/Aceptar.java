@@ -27,7 +27,7 @@ public class Aceptar extends Message {
 
     @Override
     public String generarTrama() {
-        return getCodigo() + "|" + idUsuario + "|" + nombre + System.lineSeparator();
+        return getCodigo() + "|" + idUsuario + "|" + nombre;
     }
 
     public String getNombre() {

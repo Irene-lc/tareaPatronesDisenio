@@ -248,6 +248,7 @@ public class SocketClient extends Thread {
             System.out.println("Encriptando mensaje");
             messageStr = encriptar(messageStr);
         }
+        messageStr += System.lineSeparator();
         System.out.println("ENVIANDO: " + messageStr);
         try {
             dout.write(messageStr.getBytes("UTF-8"));

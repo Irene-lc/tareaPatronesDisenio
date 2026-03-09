@@ -28,7 +28,7 @@ public class Mensaje extends Message {
 
     @Override
     public String generarTrama() {
-        return getCodigo() + "|" + idUsuario + "|" + idMensaje + "|" + mensaje + System.lineSeparator();
+        return getCodigo() + "|" + idUsuario + "|" + idMensaje + "|" + mensaje;
     }
 
     public String getIdUsuario() {

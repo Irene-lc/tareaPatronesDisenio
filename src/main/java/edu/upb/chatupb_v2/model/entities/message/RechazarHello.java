@@ -17,7 +17,7 @@ public class RechazarHello extends Message {
 
     @Override
     public String generarTrama() {
-        return getCodigo() + "|" + System.lineSeparator();
+        return getCodigo() + "|";
     }
 }
 
