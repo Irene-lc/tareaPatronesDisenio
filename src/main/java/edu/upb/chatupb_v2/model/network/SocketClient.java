@@ -148,7 +148,6 @@ public class SocketClient extends Thread {
                         System.out.println("Se eligio: " + algoritmo);
                         try {
                             secretKey = generarLlave(algoritmo);
-                            System.out.println("secretkey: " + secretKey);
                             byte[] llaveByte = secretKey.getEncoded();
                             String llave = Base64.getEncoder().encodeToString(llaveByte);
                             System.out.println("llave: " + llave);
@@ -166,7 +165,6 @@ public class SocketClient extends Thread {
                         String llave = respuestaEncriptado.getLlave();
                         byte[] llaveDecodificada = Base64.getDecoder().decode(llave);
                         secretKey = new SecretKeySpec(llaveDecodificada, "AES");
-                        System.out.println("secretkey2: " + secretKey);
                         canalSeguro = true;
                         if (canalSeguro) {
                             for (SocketListener listener : socketListener) {
@@ -248,7 +246,7 @@ public class SocketClient extends Thread {
         String messageStr = message.generarTrama();
         if (canalSeguro) {
             System.out.println("Encriptando mensaje");
-            messageStr = encriptar(messageStr) + System.lineSeparator();
+            messageStr = encriptar(messageStr);
         }
         System.out.println("ENVIANDO: " + messageStr);
         try {
