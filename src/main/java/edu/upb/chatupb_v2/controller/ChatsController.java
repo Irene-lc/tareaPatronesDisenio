@@ -28,12 +28,7 @@ public class ChatsController {
     }
     public void onloadMessages(String idEmisor, String idReceptor) {
         try {
-            System.out.println("Buscando mensajes entre:");
-            System.out.println("idMio: " + idEmisor);
-            System.out.println("idCliente: " + idReceptor);
-
             List<Chats> chats = chatsDao.findByContact(idEmisor, idReceptor);
-            System.out.println("Mensajes encontrados: " + chats.size() + '\n');
             iChatView.onloadMessages(chats);
         } catch (Exception e) {
             e.printStackTrace();

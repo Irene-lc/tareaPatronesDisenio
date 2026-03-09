@@ -799,16 +799,11 @@ public class ChatUI extends JFrame implements iChatView {
         }
 
         for (int i = 0; i < contacModel.size(); i++) {
-            System.out.println("contacModel.get(i).getId(): " + contacModel.get(i).getId());
-            System.out.println("idCliente: (ChatView) " + contact.getId());
             if (contacModel.get(i).getId().equals(contact.getId())) {
                 return;
             }
         }
-        System.out.println("nombreCliente: (ChatView) " + contact.getName());
-        System.out.println("ip: (ChatView)" + contact.getIp());
         contacModel.addElement(contact);
-        System.out.println("Agregando contacto con id al conctacModel: (ChatView)" + contact.getId());
     }
     public void actualizarContacto(Contact contact) {
         for (int i = 0; i < contacModel.size(); i++) {

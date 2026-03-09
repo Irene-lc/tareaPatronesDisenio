@@ -4,6 +4,7 @@
  */
 package edu.upb.chatupb_v2.model.network;
 
+import edu.upb.chatupb_v2.controller.FormaConectar;
 import edu.upb.chatupb_v2.controller.Mediador;
 import edu.upb.chatupb_v2.controller.exception.OperationException;
 import edu.upb.chatupb_v2.model.entities.message.*;
@@ -31,8 +32,9 @@ public class SocketClient extends Thread {
     private final BufferedReader br;
 
     private String algoritmo;
-    private SecretKey secretKey;
-    public boolean canalSeguro;
+    private volatile SecretKey secretKey;
+    public volatile boolean canalSeguro;
+    public FormaConectar formaConectar;
 
     private List<SocketListener> socketListener = new ArrayList<>();
 
@@ -43,15 +45,16 @@ public class SocketClient extends Thread {
         br = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
     }
 
-    public SocketClient(String ip) throws IOException {
+    public SocketClient(String ip, FormaConectar formaConectar) throws IOException {
         this.socket = new Socket(ip, 1900); // solicita conectarse
         this.ip = ip;
+        this.formaConectar = formaConectar;
         dout = new DataOutputStream(socket.getOutputStream());
         br = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
         if (!canalSeguro) {
+            System.out.println("Enviando 014...");
             ListaProtocolos listaProtocolos = new ListaProtocolos("AES_128,AES_256");
             send(listaProtocolos);
-            canalSeguro = true;
         }
     }
 
@@ -145,6 +148,7 @@ public class SocketClient extends Thread {
                         System.out.println("Se eligio: " + algoritmo);
                         try {
                             secretKey = generarLlave(algoritmo);
+                            System.out.println("secretkey: " + secretKey);
                             byte[] llaveByte = secretKey.getEncoded();
                             String llave = Base64.getEncoder().encodeToString(llaveByte);
                             System.out.println("llave: " + llave);
@@ -162,9 +166,12 @@ public class SocketClient extends Thread {
                         String llave = respuestaEncriptado.getLlave();
                         byte[] llaveDecodificada = Base64.getDecoder().decode(llave);
                         secretKey = new SecretKeySpec(llaveDecodificada, "AES");
+                        System.out.println("secretkey2: " + secretKey);
                         canalSeguro = true;
-                        for (SocketListener listener : socketListener) {
-                            java.awt.EventQueue.invokeLater(() -> listener.onSecure(this));
+                        if (canalSeguro) {
+                            for (SocketListener listener : socketListener) {
+                                java.awt.EventQueue.invokeLater(() -> listener.onSecure(this, formaConectar));
+                            }
                         }
                         break;
                     case "0018":

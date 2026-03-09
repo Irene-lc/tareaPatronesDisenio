@@ -39,26 +39,14 @@ public class Mediador implements SocketListener {
     public void addClient(String idUsuario, String nombreClient, SocketClient client) {
         this.clientes.put(idUsuario, client);
 
-//        System.out.println("Creando contacto:");
-//        System.out.println("ID contacto: " + idUsuario);
-//        System.out.println("Nombre contacto: " + nombreClient);
-//        System.out.println("IP contacto: " + client.getIp());
-//        System.out.println("------");
-
         Contact nuevo = new Contact(idUsuario, nombreClient, client.getIp(), false);
         try {
             if (this.contactDao.existById(idUsuario)) {
                 Contact contact = this.contactDao.findById(idUsuario);
-//                System.out.println("El contacto ya se encuentra registrado");
                 if (!contact.getIp().equals(client.getIp()) || !contact.getName().equals(nombreClient)) {
                     this.contactDao.update(nuevo);
                     if (chatUI != null)
                         chatUI.actualizarContacto(nuevo);
-//                    System.out.println();
-//                    System.out.println("Contacto Antiguo: " + contact.getName() + " con ip: " + contact.getIp() + " con nombre: " + contact.getName());
-//                    System.out.println("Se actualizó la Ip del contacto correctamente");
-//                    contact = this.contactDao.findById(idUsuario);
-//                    System.out.println("Contacto Nuevo: " + contact.getName() + " con ip: " + contact.getIp() + " con nombre: " + contact.getName());
                 }
                 return;
             }
@@ -127,28 +115,6 @@ public class Mediador implements SocketListener {
             e.printStackTrace();
         }
     }
-
-    public void establecerConexion(String ip) {
-        SocketClient client;
-        try {
-            client = new SocketClient(ip);
-            client.addListener(this); // El mediador se subscribe a los eventos de SocketClient para escuchar
-            client.start();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new OperationException("No se logró establecer la conexión");
-        }
-
-
-//        Message message = new Invitacion(idMio, nombre);
-//        try {
-//            client.send(message);
-//            System.out.println("Enviando 001...");
-//        } catch (IOException e) {
-//            throw new OperationException("No se logró enviar la invitación");
-//        }
-    }
     public void aceptarInvitacion(SocketClient socketClient, Invitacion invitacion) {
         addClient(invitacion.getIdUsuario(), invitacion.getNombre(), socketClient);
 
@@ -180,26 +146,47 @@ public class Mediador implements SocketListener {
                 java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return ahora.format(formatter);
     }
+
+    public void establecerConexion(String ip) {
+        SocketClient client;
+        try {
+            client = new SocketClient(ip, FormaConectar.ENVIAR_001);
+            client.addListener(this); // El mediador se subscribe a los eventos de SocketClient para escuchar
+            client.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new OperationException("No se logró establecer la conexión");
+        }
+
+
+//        Message message = new Invitacion(idMio, nombre);
+//        try {
+//            client.send(message);
+//            System.out.println("Enviando 001...");
+//        } catch (IOException e) {
+//            throw new OperationException("No se logró enviar la invitación");
+//        }
+    }
     public void enviarHello(String id) {
         SocketClient client;
         Contact contact;
         try {
             contact = this.contactDao.findById(id);
-            System.out.println("ip contacto: "+ contact.getIp());
-            client = new SocketClient(contact.getIp());
+//            client = clientes.get(id);
+            client = new SocketClient(contact.getIp(), FormaConectar.ENVIAR_004);
             client.addListener(this);
             client.start();
         } catch (Exception e) {
             e.printStackTrace();
             throw new OperationException("No se logró establecer la conexión");
         }
-        Message message = new Hello(idMio);
-        try {
-            client.send(message);
-            System.out.println("Enviando 004...");
-        } catch (IOException e) {
-            throw new OperationException("No se logró enviar la invitación");
-        }
+//        Message message = new Hello(idMio);
+//        try {
+//            client.send(message);
+//            System.out.println("Enviando 004...");
+//        } catch (IOException e) {
+//            throw new OperationException("No se logró enviar la invitación");
+//        }
     }
     public void enviarRespuestaHello(SocketClient client, String id) {
         Contact contact;
@@ -207,6 +194,7 @@ public class Mediador implements SocketListener {
             contact = this.contactDao.findById(id);
             if (contact == null) {
                 System.out.println("El contacto no esta en la base de datos");
+                System.out.println("id llego: " + id);
                 System.out.println("Enviando 006...");
                 Message message = new RechazarHello();
                 client.send(message);
@@ -299,6 +287,11 @@ public class Mediador implements SocketListener {
             ConfirmarRecibido confirmarRecibido = (ConfirmarRecibido) message;
             System.out.println("Se lleyo el mensaje: " + confirmarRecibido.getIdMensaje());
             actualizarLeido(confirmarRecibido.getIdMensaje());
+            try {
+                System.out.println("mensaje en db: " + this.chatsDao.existById(confirmarRecibido.getIdMensaje()));;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         if (message instanceof Zumbido) {
             Zumbido zumbido = (Zumbido) message;
@@ -337,13 +330,25 @@ public class Mediador implements SocketListener {
     }
 
     @Override
-    public void onSecure(SocketClient client) {
-        Message message = new Invitacion(idMio, nombre);
-        try {
-            client.send(message);
-            System.out.println("Enviando 001...");
-        } catch (IOException e) {
-            throw new OperationException("No se logró enviar la invitación");
+    public void onSecure(SocketClient client, FormaConectar formaConectar) {
+        if (formaConectar == FormaConectar.ENVIAR_001) {
+            Message message = new Invitacion(idMio, nombre);
+            try {
+                client.send(message);
+                System.out.println("Enviando 001...");
+            } catch (IOException e) {
+                throw new OperationException("No se logró enviar la invitación");
+            }
+            return;
+        }
+        if (formaConectar == FormaConectar.ENVIAR_004) {
+            Message message = new Hello(idMio);
+            try {
+                client.send(message);
+                System.out.println("Enviando 004...");
+            } catch (IOException e) {
+                throw new OperationException("No se logró enviar la invitación");
+            }
         }
     }
 }
