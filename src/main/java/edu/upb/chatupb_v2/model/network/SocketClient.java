@@ -95,6 +95,10 @@ public class SocketClient extends Thread {
                         FueraLinea fueraLinea = FueraLinea.parse(message);
                         notificar(fueraLinea);
                         break;
+                    case "020":
+                        Parcial parcial = Parcial.parse(message);
+                        notificar(parcial);
+                        break;
                 }
             }
         } catch (IOException e) {

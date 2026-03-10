@@ -9,8 +9,11 @@ import edu.upb.chatupb_v2.model.network.ChatServer;
 import edu.upb.chatupb_v2.controller.Mediador;
 import edu.upb.chatupb_v2.view.ChatUI;
 
-public class ChatUPB_V2 {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
+public class ChatUPB_V2 {
     public static void main(String[] args) {
         /* Create and display the form */
         final ChatUI chatUI = new ChatUI();

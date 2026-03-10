@@ -16,7 +16,7 @@ public class ContactController {
     }
     public void onload() {
         try {
-            List<Contact> contacts = contactDao.findAllMenosYo();
+            List<Contact> contacts = contactDao.findAll();
             for (Contact c : contacts) {
                 c.setStateConnect(false);
             }

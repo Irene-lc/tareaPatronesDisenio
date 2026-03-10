@@ -13,6 +13,7 @@ import edu.upb.chatupb_v2.model.repository.Chats;
 import edu.upb.chatupb_v2.model.repository.Contact;
 import lombok.Setter;
 
+import javax.print.attribute.standard.Media;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -122,17 +123,21 @@ public class ChatUI extends JFrame implements iChatView {
         jContactos.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    System.out.println();
-                    System.out.println("Dos clicks");
-                    Contact seleccionado = jContactos.getSelectedValue();
-                    if (seleccionado != null && chatsController != null) {
-                        System.out.println("idSeleccionado: " + idUsuarioActual);
-                        //prueba
-                        idUsuarioActual = seleccionado.getId();
-//                        showHelloEnviarPopup(seleccionado.getName());
-                        Mediador.getInstance().enviarHello(idUsuarioActual);
-                    }
+//                if (e.getClickCount() == 2) {
+//                    System.out.println();
+//                    System.out.println("Dos clicks");
+//                    Contact seleccionado = jContactos.getSelectedValue();
+//                    if (seleccionado != null && chatsController != null) {
+//                        System.out.println("idSeleccionado: " + idUsuarioActual);
+//                        //prueba
+//                        idUsuarioActual = seleccionado.getId();
+////                        showHelloEnviarPopup(seleccionado.getName());
+//                        Mediador.getInstance().enviarHello(idUsuarioActual);
+//                    }
+//                }
+                if (e.getClickCount() == 3) {
+                    System.out.println("3 clicks");
+                    showParcialAquienPopup();
                 }
             }
         });
@@ -265,6 +270,60 @@ public class ChatUI extends JFrame implements iChatView {
 
         // ===== TITULO =====
         JLabel title = new JLabel("Conexion aceptada");
+        title.setFont(new Font("Arial", Font.BOLD, 16));
+        title.setForeground(new Color(37,29,75));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setBounds(20, 20, 180, 30);
+
+        // ===== BOTON OK =====
+        JButton okButton = new JButton("Ok");
+        okButton.setBounds(85, 60, 50, 30);
+        okButton.setBackground(new Color(202,203,233));
+        okButton.setFocusPainted(false);
+
+        okButton.addActionListener(e -> dialog.dispose());
+
+        card.add(title);
+        card.add(okButton);
+
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setBounds(85, 0, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAccept.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Img");
+        }
+
+        root.add(card);
+        root.add(imageLabel);
+
+        dialog.add(root);
+        dialog.setVisible(true);
+    }
+    private void showParcialPopup() {
+
+        JDialog dialog = new JDialog(this, true);
+        dialog.setSize(320, 300);
+        dialog.setLocationRelativeTo(this);
+        dialog.setUndecorated(true);
+        dialog.setBackground(new Color(0,0,0,0));
+
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+
+        // ===== CARD =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(40, 90, 220, 110);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("Contacto agregado");
         title.setFont(new Font("Arial", Font.BOLD, 16));
         title.setForeground(new Color(37,29,75));
         title.setHorizontalAlignment(SwingConstants.CENTER);
@@ -629,6 +688,108 @@ public class ChatUI extends JFrame implements iChatView {
         card.add(ipLabel);
         card.add(jtIp);
         card.add(jBtnConectar);
+        card.add(btnCerrar);
+
+        // ===== AGREGAMOS AL ROOT =====
+        root.add(imageLabel);
+        root.add(card);
+
+        dialog.add(root);
+        dialog.setVisible(true);
+    }
+    private void showParcialAquienPopup() {
+
+        JDialog dialog = new JDialog(this, true);
+        dialog.setSize(420, 450);
+        dialog.setLocationRelativeTo(this);
+        dialog.setUndecorated(true);
+        dialog.setBackground(new Color(0,0,0,0));
+
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+
+        // ===== CARD PANEL =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(35, 80, 350, 300);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+
+        // ===== BOTON CERRAR =====
+        JButton btnCerrar = new JButton();
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/x1.png"));
+            Image img = icon.getImage().getScaledInstance(40, 30, Image.SCALE_SMOOTH);
+            btnCerrar.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            btnCerrar.setText("X");
+        }
+
+        btnCerrar.setBounds(10, 10, 25, 25);
+
+        btnCerrar.setBorderPainted(false);
+        btnCerrar.setContentAreaFilled(false);
+        btnCerrar.setFocusPainted(false);
+        btnCerrar.setOpaque(false);
+        btnCerrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        btnCerrar.addActionListener(e -> dialog.dispose());
+
+
+//        btnCerrar.setBounds(310, 10, 30, 25);
+//        btnCerrar.setBackground(Color.WHITE);
+//        btnCerrar.setForeground(Color.RED);
+//        btnCerrar.setFocusPainted(false);
+//        btnCerrar.setBorder(null);
+//
+//        btnCerrar.addActionListener(e -> dialog.dispose());
+
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        imageLabel.setBounds(155, 20, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAdd.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Imagen no encontrada");
+        }
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("Enviar a:");
+        title.setFont(new Font("Arial", Font.BOLD, 18));
+        title.setBounds(110, 70, 200, 30);
+
+        // ===== IP =====
+        JLabel ipLabel = new JLabel("Nombre:");
+        ipLabel.setFont(new Font("Arial", Font.PLAIN, 13));
+        ipLabel.setBounds(30, 170, 200, 20);
+
+        jtNamePrueba = new JTextField();
+        jtNamePrueba.setBounds(30, 190, 290, 30);
+
+        // ===== BOTON =====
+        jtEnviaPrueba = new JButton("ENVIAR");
+        jtEnviaPrueba.setBounds(75, 235, 200, 35);
+        jtEnviaPrueba.setBackground(Color.GRAY);
+        jtEnviaPrueba.setForeground(Color.BLACK);
+        jtEnviaPrueba.setFocusPainted(false);
+
+        jtEnviaPrueba.addActionListener(evt -> {
+//            Mediador.getInstance().establecerConexion(jtNamePrueba.getText());
+            Mediador.getInstance().enviarContacto(idUsuarioActual, jtNamePrueba.getText());
+            dialog.dispose();
+        });
+
+        // ===== AGREGAMOS AL CARD =====
+        card.add(title);
+        card.add(ipLabel);
+        card.add(jtNamePrueba);
+        card.add(jtEnviaPrueba);
         card.add(btnCerrar);
 
         // ===== AGREGAMOS AL ROOT =====
@@ -1119,6 +1280,8 @@ public class ChatUI extends JFrame implements iChatView {
     private JButton jBtnConectar;
     private JButton jBtnAceptar;
     private JTextField jtIp;
+    private JTextField jtNamePrueba;
+    private JButton jtEnviaPrueba;
     private JTextField jtName;
 
     public void onMessage(Message message) {
@@ -1171,6 +1334,10 @@ public class ChatUI extends JFrame implements iChatView {
             showOffPopup();
             mostrarMensajeSistema("CONEXION TERMINADA");
             actualizarEstadoContacto(idUsuarioActual, false);
+        }
+        if (message instanceof Parcial) {
+            System.out.println("contacto agregado");
+            showParcialPopup();
         }
     }
 

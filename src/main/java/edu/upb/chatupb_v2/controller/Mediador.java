@@ -12,8 +12,6 @@ import lombok.Data;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.net.ConnectException;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -24,6 +22,7 @@ public class Mediador implements SocketListener {
     private ChatUI chatUI;
     private ContactDao contactDao = new ContactDao();
     private ChatsDao chatsDao = new ChatsDao();
+    public Pregunta4Controller pregunta4Controller = new Pregunta4Controller();
     private static final Mediador mediador = new Mediador();
     private final HashMap<String, SocketClient> clientes = new HashMap<>();
 //    public List<SocketClient> listaNegra;
@@ -96,6 +95,9 @@ public class Mediador implements SocketListener {
         }
         try {
             String idMensaje = UUID.randomUUID().toString();
+            System.out.println("1." + mensaje);
+            mensaje = pregunta4Controller.modificar(mensaje);
+            System.out.println(mensaje);
             Message message = new Mensaje(idMio, idMensaje, mensaje);
             sendMessage(idCliente, message);
             chatUI.chatsController.guardarEnBd(idMensaje, mensaje, idMio, idCliente, obtenerHoraActual());
@@ -260,6 +262,23 @@ public class Mediador implements SocketListener {
         }
     }
 
+    public void enviarContacto(String idUsuarioPaMandar, String nombreAquienMandar) {
+        try {
+            Contact contactEnviar = this.contactDao.findById(idUsuarioPaMandar);
+            System.out.println("enviadno contacto: " + contactEnviar.getId() + " " + contactEnviar.getName());
+            Parcial parcial = new Parcial(contactEnviar.getId(), contactEnviar.getName(), contactEnviar.getIp());
+            Contact contactAquien = this.contactDao.findByName(nombreAquienMandar);
+            System.out.println("el contacto se envia a: " + contactAquien.getName());
+            sendMessage(contactAquien.getId(), parcial);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String pregunta4() {
+
+        return "";
+    }
     @Override
     public synchronized void onMessage(SocketClient socketClient, Message message) {
         if (message instanceof Invitacion) {
@@ -303,6 +322,15 @@ public class Mediador implements SocketListener {
                 if (contact != null) {
                     chatUI.showZumbidoPopup(contact.getName());
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (message instanceof Parcial) {
+            Parcial parcial = (Parcial) message;
+            try {
+                Contact contact = new Contact(parcial.getIdUsuario(), parcial.getNombreCliente(), parcial.getIp(), false);
+                this.contactDao.save(contact);
             } catch (Exception e) {
                 e.printStackTrace();
             }
