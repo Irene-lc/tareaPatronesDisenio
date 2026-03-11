@@ -1,6 +1,6 @@
 package edu.upb.chatupb_v2.controller;
 
-import edu.upb.chatupb_v2.model.repository.Contact;
+import edu.upb.chatupb_v2.model.entities.message.Contact;
 import edu.upb.chatupb_v2.model.repository.ContactDao;
 import edu.upb.chatupb_v2.view.iChatView;
 

@@ -1,5 +1,8 @@
 package edu.upb.chatupb_v2.model.entities.message;
 
+import edu.upb.chatupb_v2.model.network.SocketClient;
+
+import java.io.IOException;
 import java.util.regex.Pattern;
 
 public class Mensaje extends Message {
@@ -30,6 +33,18 @@ public class Mensaje extends Message {
     public String generarTrama() {
         return getCodigo() + "|" + idUsuario + "|" + idMensaje + "|" + mensaje + System.lineSeparator();
     }
+
+    @Override
+    public void execute(SocketClient client) throws IOException {
+        //cONVERTIR IMAGEN EN BASE64
+        try {
+            client.send(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //Guardar en BD
+    }
+
 
     public String getIdUsuario() {
         return idUsuario;

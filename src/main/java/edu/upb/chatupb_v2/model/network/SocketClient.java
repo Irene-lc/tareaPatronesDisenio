@@ -87,6 +87,10 @@ public class SocketClient extends Thread {
                         ConfirmarRecibido confirmarRecibido = ConfirmarRecibido.parse(message);
                         notificar(confirmarRecibido);
                         break;
+                    case "009":
+                        EliminarMensaje eliminarMensaje = EliminarMensaje.parse(message);
+                        notificar(eliminarMensaje);
+                        break;
                     case "010":
                         Zumbido zumbido = Zumbido.parse(message);
                         notificar(zumbido);

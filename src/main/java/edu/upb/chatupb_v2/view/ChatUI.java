@@ -8,8 +8,6 @@ import edu.upb.chatupb_v2.controller.ChatsController;
 import edu.upb.chatupb_v2.controller.ContactController;
 import edu.upb.chatupb_v2.model.entities.message.*;
 import edu.upb.chatupb_v2.controller.Mediador;
-import edu.upb.chatupb_v2.model.repository.Chats;
-import edu.upb.chatupb_v2.model.repository.Contact;
 import lombok.Setter;
 
 import javax.swing.*;
@@ -110,9 +108,7 @@ public class ChatUI extends JFrame implements iChatView {
                 if (seleccionado != null && chatsController != null) {
                     idUsuarioActual = seleccionado.getId();
                     limpiarChat();
-                    System.out.println("idusuarioactuak: " + idUsuarioActual);
                     chatsController.onloadMessages(Mediador.getInstance().getIdMio(), idUsuarioActual);
-                    System.out.println("Cargando mensajes con: " + seleccionado.getName() + ", con id:" + seleccionado.getId()) ;
                 }
             }
         });
@@ -125,34 +121,43 @@ public class ChatUI extends JFrame implements iChatView {
                     System.out.println("Dos clicks");
                     Contact seleccionado = jContactos.getSelectedValue();
                     if (seleccionado != null && chatsController != null) {
-                        System.out.println("idSeleccionado: " + idUsuarioActual);
                         //prueba
                         idUsuarioActual = seleccionado.getId();
-//                        showHelloEnviarPopup(seleccionado.getName());
                         Mediador.getInstance().enviarHello(idUsuarioActual);
                     }
                 }
-            }
-        });
-
-
-        jContactos.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
                     System.out.println();
                     System.out.println("click derecho");
                     Contact seleccionado = jContactos.getSelectedValue();
                     if (seleccionado != null) {
-                        System.out.println("idSeleccionado: " + idUsuarioActual);
                         idUsuarioActual = seleccionado.getId();
                         Zumbido zumbido = new Zumbido(Mediador.getInstance().getIdMio());
                         Mediador.getInstance().sendMessage(idUsuarioActual, zumbido);
                     }
                 }
+//                if (e.isPopupTrigger()) {
+//                    popup.show(e.getComponent(), e.getX(), e.getY());
+//                }
             }
         });
 
+
+//        jContactos.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                if (SwingUtilities.isRightMouseButton(e)) {
+//                    System.out.println();
+//                    System.out.println("click derecho");
+//                    Contact seleccionado = jContactos.getSelectedValue();
+//                    if (seleccionado != null) {
+//                        idUsuarioActual = seleccionado.getId();
+//                        Zumbido zumbido = new Zumbido(Mediador.getInstance().getIdMio());
+//                        Mediador.getInstance().sendMessage(idUsuarioActual, zumbido);
+//                    }
+//                }
+//            }
+//        });
 
 
         JScrollPane scrollContactos = new JScrollPane(jContactos);
@@ -351,7 +356,6 @@ public class ChatUI extends JFrame implements iChatView {
         dialog.add(root);
         dialog.setVisible(true);
     }
-
     public void showZumbidoPopup(String nombre) {
 
         JDialog dialog = new JDialog(this, true);
@@ -738,36 +742,26 @@ public class ChatUI extends JFrame implements iChatView {
 
     public void agregarContacto(Contact contact) {
         if (contact == null || contact.getId() == null) {
-            System.out.println("Contacto inválido");
             return;
         }
 
         for (int i = 0; i < contacModel.size(); i++) {
-            System.out.println("contacModel.get(i).getId(): " + contacModel.get(i).getId());
-            System.out.println("idCliente: (ChatView) " + contact.getId());
             if (contacModel.get(i).getId().equals(contact.getId())) {
                 return;
             }
         }
-        System.out.println("nombreCliente: (ChatView) " + contact.getName());
-        System.out.println("ip: (ChatView)" + contact.getIp());
         contacModel.addElement(contact);
-        System.out.println("Agregando contacto con id al conctacModel: (ChatView)" + contact.getId());
     }
     public void actualizarContacto(Contact contact) {
         for (int i = 0; i < contacModel.size(); i++) {
             Contact c = contacModel.get(i);
-
             if (c.getId().equals(contact.getId())) {
-
                 c.setName(contact.getName());
                 c.setIp(contact.getIp());
-
                 contacModel.set(i, c);
                 break;
             }
         }
-
         jContactos.repaint();
     }
     public void mostrarMensajeSistema(String texto) {
@@ -788,10 +782,8 @@ public class ChatUI extends JFrame implements iChatView {
     public void actualizarValores(String idUsuarioActual) {
         this.idUsuarioActual = idUsuarioActual;
     }
-    private JLabel crearFotoPerfil() {
-
+    private JLabel crearFotoPerfilyo() {
         JLabel foto = new JLabel();
-
         try {
             ImageIcon icon = new ImageIcon(getClass().getResource("/images/user.png"));
             Image img = icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
@@ -799,11 +791,20 @@ public class ChatUI extends JFrame implements iChatView {
         } catch (Exception e) {
             foto.setText("");
         }
-
+        return foto;
+    }
+    private JLabel crearFotoPerfil() {
+        JLabel foto = new JLabel();
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/people.png"));
+            Image img = icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+            foto.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            foto.setText("");
+        }
         return foto;
     }
     private JPanel crearBurbuja(String texto, boolean esMio, String hora, boolean leido, String idMensaje) {
-
         JPanel bubble = new JPanel(new BorderLayout());
         bubble.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
         bubble.setOpaque(true);
@@ -813,12 +814,10 @@ public class ChatUI extends JFrame implements iChatView {
         } else {
             bubble.setBackground(new Color(230,230,230));
         }
-
         JLabel lblTexto = new JLabel(
                 "<html><div style='max-width:250px;'>" + texto + "</div></html>"
         );
 //        lblHora.setHorizontalAlignment(SwingConstants.RIGHT);
-
         JLabel lblHora = new JLabel(hora);
         lblHora.setFont(new Font("Arial", Font.PLAIN, 9));
         lblHora.setForeground(Color.DARK_GRAY);
@@ -851,11 +850,17 @@ public class ChatUI extends JFrame implements iChatView {
         JPanel bubble = crearBurbuja(texto, esMio, soloHora, leido, idMensaje);
 
         if (esMio) {
-            fila.add(bubble, BorderLayout.EAST);
+            // Mensaje propio: avatar a la DERECHA
+            JPanel contenedor = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+            contenedor.setOpaque(false);
+            contenedor.add(bubble);
+            contenedor.add(crearFotoPerfilyo()); // avatar después de la burbuja
+            fila.add(contenedor, BorderLayout.EAST);
         } else {
+            // Mensaje recibido: avatar a la IZQUIERDA
             JPanel contenedor = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
             contenedor.setOpaque(false);
-            contenedor.add(crearFotoPerfil());
+            contenedor.add(crearFotoPerfil()); // avatar antes de la burbuja
             contenedor.add(bubble);
             fila.add(contenedor, BorderLayout.WEST);
         }
@@ -880,14 +885,10 @@ public class ChatUI extends JFrame implements iChatView {
         }
     }
     public void agregarMensajeUI(String texto, boolean esMio, String fechaHora, boolean leido, String idMensaje) {
-
         JPanel mensaje = crearFilaMensaje(texto, esMio, fechaHora, leido, idMensaje);
-
         jPanelChat.add(mensaje);
-
         jPanelChat.revalidate();
         jPanelChat.repaint();
-
         SwingUtilities.invokeLater(() -> {
             JScrollBar vertical = jScrollPaneChat.getVerticalScrollBar();
             vertical.setValue(vertical.getMaximum());
@@ -898,7 +899,6 @@ public class ChatUI extends JFrame implements iChatView {
         jPanelChat.revalidate();
         jPanelChat.repaint();
     }
-
     private String mensajePorFecha(String fechaHora) {
         try {
             java.time.LocalDateTime dateTime =
@@ -1082,7 +1082,7 @@ public class ChatUI extends JFrame implements iChatView {
         String ultimaFecha = "";
 
         for (Chats c : chats) {
-            String fechaActual = mensajePorFecha(c.getHora());
+//            String fechaActual = mensajePorFecha(c.getHora());
 
 //            if (!fechaActual.equals(ultimaFecha)) {
 //                agregarSeparadorFecha(fechaActual);

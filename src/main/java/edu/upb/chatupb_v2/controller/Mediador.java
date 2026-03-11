@@ -7,13 +7,11 @@ import edu.upb.chatupb_v2.model.network.SocketListener;
 import edu.upb.chatupb_v2.model.repository.ChatsDao;
 import edu.upb.chatupb_v2.model.repository.ContactDao;
 import edu.upb.chatupb_v2.view.ChatUI;
-import edu.upb.chatupb_v2.model.repository.Contact;
+import edu.upb.chatupb_v2.model.entities.message.Contact;
 import lombok.Data;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.net.ConnectException;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -26,7 +24,6 @@ public class Mediador implements SocketListener {
     private ChatsDao chatsDao = new ChatsDao();
     private static final Mediador mediador = new Mediador();
     private final HashMap<String, SocketClient> clientes = new HashMap<>();
-//    public List<SocketClient> listaNegra;
     private String idMio;
     private String nombre;
 
@@ -38,27 +35,14 @@ public class Mediador implements SocketListener {
     }
     public void addClient(String idUsuario, String nombreClient, SocketClient client) {
         this.clientes.put(idUsuario, client);
-
-        System.out.println("Creando contacto:");
-        System.out.println("ID contacto: " + idUsuario);
-        System.out.println("Nombre contacto: " + nombreClient);
-        System.out.println("IP contacto: " + client.getIp());
-        System.out.println("------");
-
         Contact nuevo = new Contact(idUsuario, nombreClient, client.getIp(), false);
         try {
             if (this.contactDao.existById(idUsuario)) {
                 Contact contact = this.contactDao.findById(idUsuario);
-                System.out.println("El contacto ya se encuentra registrado");
                 if (!contact.getIp().equals(client.getIp()) || !contact.getName().equals(nombreClient)) {
                     this.contactDao.update(nuevo);
                     if (chatUI != null)
                         chatUI.actualizarContacto(nuevo);
-//                    System.out.println();
-//                    System.out.println("Contacto Antiguo: " + contact.getName() + " con ip: " + contact.getIp() + " con nombre: " + contact.getName());
-//                    System.out.println("Se actualizó la Ip del contacto correctamente");
-//                    contact = this.contactDao.findById(idUsuario);
-//                    System.out.println("Contacto Nuevo: " + contact.getName() + " con ip: " + contact.getIp() + " con nombre: " + contact.getName());
                 }
                 return;
             }
@@ -77,6 +61,11 @@ public class Mediador implements SocketListener {
     }
     public void sendMessage(String key, Message message) { //enviar mensajes tipo chat privado
         SocketClient cliente = this.clientes.get(key);
+        try {
+            message.execute(cliente);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (cliente == null)
             return;
         try {
@@ -90,7 +79,6 @@ public class Mediador implements SocketListener {
         if (!clientes.containsKey(idCliente)) {
             if (chatUI != null) {
                 chatUI.mostrarMensajeSistema("No hay conexion con cliente");
-                System.out.println("Cliente no en lsitaContactos");
             }
             return;
         }
@@ -183,7 +171,6 @@ public class Mediador implements SocketListener {
         Contact contact;
         try {
             contact = this.contactDao.findById(id);
-            System.out.println("ip contacto: "+ contact.getIp());
             client = new SocketClient(contact.getIp());
             client.addListener(this);
             client.start();
@@ -204,12 +191,10 @@ public class Mediador implements SocketListener {
         try {
             contact = this.contactDao.findById(id);
             if (contact == null) {
-                System.out.println("El contacto no esta en la base de datos");
                 System.out.println("Enviando 006...");
                 Message message = new RechazarHello();
                 client.send(message);
             } else {
-                System.out.println("Se encontro el contacto con ip: " + contact.getIp() + " con Nombre: " + contact.getName());
                 clientes.put(id, client);
                 chatUI.actualizarValores(id);
 //                chatUI.showHelloPopup(contact.getName());

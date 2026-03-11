@@ -1,5 +1,6 @@
 package edu.upb.chatupb_v2.model.repository;
 
+import edu.upb.chatupb_v2.model.entities.message.Chats;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.ConnectException;

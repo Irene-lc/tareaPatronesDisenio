@@ -4,7 +4,7 @@
  */
 package edu.upb.chatupb_v2.view;
 
-import edu.upb.chatupb_v2.model.repository.Contact;
+import edu.upb.chatupb_v2.model.entities.message.Contact;
 
 import java.awt.*;
 import javax.swing.*;
