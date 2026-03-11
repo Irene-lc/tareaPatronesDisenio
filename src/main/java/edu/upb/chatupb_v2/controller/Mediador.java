@@ -61,11 +61,6 @@ public class Mediador implements SocketListener {
     }
     public void sendMessage(String key, Message message) { //enviar mensajes tipo chat privado
         SocketClient cliente = this.clientes.get(key);
-        try {
-            message.execute(cliente);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         if (cliente == null)
             return;
         try {

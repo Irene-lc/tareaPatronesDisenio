@@ -33,11 +33,6 @@ public class Invitacion extends Message {
         return getCodigo() + "|" + idUsuario + "|" + nombre + System.lineSeparator();
     }
 
-    @Override
-    public void execute(SocketClient client) throws IOException {
-        client.send(this);
-    }
-
     public String getIdUsuario() {
         return idUsuario;
     }

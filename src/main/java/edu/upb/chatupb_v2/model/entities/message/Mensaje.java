@@ -34,18 +34,6 @@ public class Mensaje extends Message {
         return getCodigo() + "|" + idUsuario + "|" + idMensaje + "|" + mensaje + System.lineSeparator();
     }
 
-    @Override
-    public void execute(SocketClient client) throws IOException {
-        //cONVERTIR IMAGEN EN BASE64
-        try {
-            client.send(this);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        //Guardar en BD
-    }
-
-
     public String getIdUsuario() {
         return idUsuario;
     }

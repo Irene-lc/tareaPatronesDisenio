@@ -22,7 +22,6 @@ public abstract class Message {
     }
 
     public abstract String generarTrama();
-    public abstract void execute(SocketClient client) throws IOException;
 //    public String getIp() {return ip;}
 //    public void setIp(String ip) {this.ip = ip;}
 
