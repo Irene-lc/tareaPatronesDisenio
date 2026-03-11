@@ -115,7 +115,6 @@ public class Mediador implements SocketListener {
             e.printStackTrace();
         }
     }
-
     public void establecerConexion(String ip) {
         SocketClient client;
         try {

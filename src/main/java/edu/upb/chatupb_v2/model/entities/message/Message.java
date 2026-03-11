@@ -1,7 +1,6 @@
 package edu.upb.chatupb_v2.model.entities.message;
 
 import edu.upb.chatupb_v2.model.network.SocketClient;
-import edu.upb.chatupb_v2.model.repository.DaoHelper;
 
 import java.io.IOException;
 
