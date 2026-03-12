@@ -84,6 +84,14 @@ public class ContactDao {
         }
         return list.get(0);
     }
+    public Contact findByName(String name) throws ConnectException, SQLException {
+        String query = "SELECT * FROM contact WHERE name ='" + name + "'";
+        List<Contact> list = helper.executeQuery(query, resultReader);
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
+    }
 
     public void update(String query) throws Exception {
         helper.update(query, null);

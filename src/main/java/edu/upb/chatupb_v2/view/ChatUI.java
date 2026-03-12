@@ -57,6 +57,15 @@ public class ChatUI extends JFrame implements iChatView {
 //        jScrollPaneChat.setViewportView(jPanelChat);
 
         jContactos = new JList<>();
+        jPopupMenu = new JPopupMenu();
+        itemHello = new JMenuItem("Enviar hello");
+        itemZumbido = new JMenuItem("Enviar Zumbido");
+        itemInvitacion = new JMenuItem("Enviar invitacion");
+        itemEnviarContacto = new JMenuItem("Enviar contacto");
+        jPopupMenu.add(itemHello);
+        jPopupMenu.add(itemZumbido);
+        jPopupMenu.add(itemInvitacion);
+        jPopupMenu.add(itemEnviarContacto);
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(900, 600);
@@ -114,51 +123,55 @@ public class ChatUI extends JFrame implements iChatView {
         });
 
         jContactos.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    System.out.println();
-                    System.out.println("Dos clicks");
-                    Contact seleccionado = jContactos.getSelectedValue();
-                    if (seleccionado != null && chatsController != null) {
-                        //prueba
-                        idUsuarioActual = seleccionado.getId();
-                        Mediador.getInstance().enviarHello(idUsuarioActual);
-                    }
-                }
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    System.out.println();
-                    System.out.println("click derecho");
-                    Contact seleccionado = jContactos.getSelectedValue();
-                    if (seleccionado != null) {
-                        idUsuarioActual = seleccionado.getId();
-                        Zumbido zumbido = new Zumbido(Mediador.getInstance().getIdMio());
-                        Mediador.getInstance().sendMessage(idUsuarioActual, zumbido);
-                    }
-                }
-//                if (e.isPopupTrigger()) {
-//                    popup.show(e.getComponent(), e.getX(), e.getY());
-//                }
-            }
-        });
-
-
-//        jContactos.addMouseListener(new MouseAdapter() {
 //            @Override
 //            public void mouseClicked(MouseEvent e) {
 //                if (SwingUtilities.isRightMouseButton(e)) {
-//                    System.out.println();
 //                    System.out.println("click derecho");
-//                    Contact seleccionado = jContactos.getSelectedValue();
-//                    if (seleccionado != null) {
-//                        idUsuarioActual = seleccionado.getId();
-//                        Zumbido zumbido = new Zumbido(Mediador.getInstance().getIdMio());
-//                        Mediador.getInstance().sendMessage(idUsuarioActual, zumbido);
+//                    int pos = jContactos.locationToIndex(e.getPoint());
+//                    if (pos != -1) {
+//                        jContactos.setSelectedIndex(pos);
+//                        jPopupMenu.show(jContactos, e.getX(), e.getY());
 //                    }
 //                }
 //            }
-//        });
+            private void mostrarMenu(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    int pos = jContactos.locationToIndex(e.getPoint());
+                    if (pos != -1) {
+                        jContactos.setSelectedIndex(pos);
+                        jPopupMenu.show(jContactos, e.getX(), e.getY());
+                    }
+                }
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                mostrarMenu(e);
+            }
 
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                mostrarMenu(e);
+            }
+        });
+
+        itemHello.addActionListener(e -> {
+            Contact seleccionado = jContactos.getSelectedValue();
+            if (seleccionado != null && chatsController != null) {
+                idUsuarioActual = seleccionado.getId();
+                Mediador.getInstance().enviarHello(idUsuarioActual);
+            }
+        });
+        itemZumbido.addActionListener(e -> {
+            Contact seleccionado = jContactos.getSelectedValue();
+            if (seleccionado != null) {
+                idUsuarioActual = seleccionado.getId();
+                Zumbido zumbido = new Zumbido(Mediador.getInstance().getIdMio());
+                Mediador.getInstance().sendMessage(idUsuarioActual, zumbido);
+            }
+        });
+        itemEnviarContacto.addActionListener(e -> {
+            showEnviarContactoPopup();
+        });
 
         JScrollPane scrollContactos = new JScrollPane(jContactos);
         scrollContactos.setBorder(null);
@@ -709,7 +722,108 @@ public class ChatUI extends JFrame implements iChatView {
         dialog.add(root);
         dialog.setVisible(true);
     }
+    private void showEnviarContactoPopup() {
 
+        JDialog dialog = new JDialog(this, true);
+        dialog.setSize(420, 450);
+        dialog.setLocationRelativeTo(this);
+        dialog.setUndecorated(true);
+        dialog.setBackground(new Color(0,0,0,0));
+
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+
+        // ===== CARD PANEL =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(35, 80, 350, 300);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+
+        // ===== BOTON CERRAR =====
+        JButton btnCerrar = new JButton();
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/x1.png"));
+            Image img = icon.getImage().getScaledInstance(40, 30, Image.SCALE_SMOOTH);
+            btnCerrar.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            btnCerrar.setText("X");
+        }
+
+        btnCerrar.setBounds(10, 10, 25, 25);
+
+        btnCerrar.setBorderPainted(false);
+        btnCerrar.setContentAreaFilled(false);
+        btnCerrar.setFocusPainted(false);
+        btnCerrar.setOpaque(false);
+        btnCerrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        btnCerrar.addActionListener(e -> dialog.dispose());
+
+
+        btnCerrar.setBounds(310, 10, 30, 25);
+        btnCerrar.setBackground(Color.WHITE);
+        btnCerrar.setForeground(Color.RED);
+        btnCerrar.setFocusPainted(false);
+        btnCerrar.setBorder(null);
+
+        btnCerrar.addActionListener(e -> dialog.dispose());
+
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        imageLabel.setBounds(155, 20, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAdd.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Imagen no encontrada");
+        }
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("Enviar a:");
+        title.setFont(new Font("Arial", Font.BOLD, 18));
+        title.setBounds(110, 70, 200, 30);
+
+        // ===== IP =====
+        JLabel ipLabel = new JLabel("Nombre:");
+        ipLabel.setFont(new Font("Arial", Font.PLAIN, 13));
+        ipLabel.setBounds(30, 170, 200, 20);
+
+        jtNameEnviarContacto = new JTextField();
+        jtNameEnviarContacto.setBounds(30, 190, 290, 30);
+
+        // ===== BOTON =====
+        jBtnEnviarContacto = new JButton("ENVIAR");
+        jBtnEnviarContacto.setBounds(75, 235, 200, 35);
+        jBtnEnviarContacto.setBackground(Color.GRAY);
+        jBtnEnviarContacto.setForeground(Color.BLACK);
+        jBtnEnviarContacto.setFocusPainted(false);
+
+        jBtnEnviarContacto.addActionListener(evt -> {
+//            Mediador.getInstance().establecerConexion(jtNamePrueba.getText());
+            Mediador.getInstance().enviarContacto(idUsuarioActual, jtNameEnviarContacto.getText());
+            dialog.dispose();
+        });
+
+        // ===== AGREGAMOS AL CARD =====
+        card.add(title);
+        card.add(ipLabel);
+        card.add(jtNameEnviarContacto);
+        card.add(jBtnEnviarContacto);
+        card.add(btnCerrar);
+
+        // ===== AGREGAMOS AL ROOT =====
+        root.add(imageLabel);
+        root.add(card);
+
+        dialog.add(root);
+        dialog.setVisible(true);
+    }
     private void jBtnEnviarActionPerformed(ActionEvent evt) {//GEN-FIRST:event_jBtnEnviarActionPerformed
         String mensajeTxt = jtMensaje.getText().toString();
         if (mensajeTxt.isEmpty() || idUsuarioActual == null) {
@@ -929,19 +1043,23 @@ public class ChatUI extends JFrame implements iChatView {
         jPanelChat.add(panelFecha);
     }
     public void actualizarChecksAzules(String idMensaje) {
-        for (Component comp : jPanelChat.getComponents()) {
-            if (comp instanceof JPanel panelFila) {
-                for (Component subComp : panelFila.getComponents()) {
-                    if (subComp instanceof JPanel bubble) {
-                        for (Component inner : bubble.getComponents()) {
-                            if (inner instanceof JPanel panelInferior) {
-                                for (Component checkComp : panelInferior.getComponents()) {
-                                    if (checkComp instanceof JLabel lbl) {
-                                        if (idMensaje.equals(lbl.getName())) {
-                                            lbl.setText("✔✔");
-                                            lbl.setForeground(Color.BLUE);
-                                        }
-                                    }
+
+        for (Component filaComp : jPanelChat.getComponents()) {
+            if (!(filaComp instanceof JPanel fila)) continue;
+            for (Component contenedorComp : fila.getComponents()) {
+                if (!(contenedorComp instanceof JPanel contenedor)) continue;
+                for (Component bubbleComp : contenedor.getComponents()) {
+                    if (!(bubbleComp instanceof JPanel bubble)) continue;
+                    for (Component inner : bubble.getComponents()) {
+                        if (!(inner instanceof JPanel panelInferior)) continue;
+                        for (Component checkComp : panelInferior.getComponents()) {
+                            if (checkComp instanceof JLabel lbl) {
+                                if (idMensaje.equals(lbl.getName())) {
+                                    lbl.setText("✔✔");
+                                    lbl.setForeground(Color.BLUE);
+                                    panelInferior.revalidate();
+                                    panelInferior.repaint();
+                                    return;
                                 }
                             }
                         }
@@ -949,9 +1067,6 @@ public class ChatUI extends JFrame implements iChatView {
                 }
             }
         }
-
-        jPanelChat.revalidate();
-        jPanelChat.repaint();
     }
     public void actualizarEstadoContacto(String id, boolean estado) {
         for (int i = 0; i < contacModel.size(); i++) {
@@ -1007,10 +1122,17 @@ public class ChatUI extends JFrame implements iChatView {
     private JButton jBtnNuevaConexion;
     private JButton jBtnOff;
     private JList<Contact> jContactos;
+    private JPopupMenu jPopupMenu;
+    private JMenuItem itemZumbido;
+    private JMenuItem itemHello;
+    private JMenuItem itemInvitacion;
+    private JMenuItem itemEnviarContacto;
     private JButton jBtnConectar;
     private JButton jBtnAceptar;
     private JTextField jtIp;
     private JTextField jtName;
+    private JTextField jtNameEnviarContacto;
+    private JButton jBtnEnviarContacto;
 
     public void onMessage(Message message) {
         if (message instanceof Aceptar) {
@@ -1033,7 +1155,7 @@ public class ChatUI extends JFrame implements iChatView {
                 ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(mensaje.getIdMensaje());
                 System.out.println("Enviando 008...");
                 Mediador.getInstance().sendMessage(idUsuarioActual, confirmarRecibido);
-                Mediador.getInstance().actualizarLeido(mensaje.getIdMensaje());
+                Mediador.getInstance().actualizarLeidoBd(mensaje.getIdMensaje());
             }
             if (mensaje.getMensaje().toLowerCase().equals("chau")){
                 System.out.println("Enviando 0018...");
@@ -1055,13 +1177,20 @@ public class ChatUI extends JFrame implements iChatView {
             System.out.println("Hello Rechazado");
         }
         if (message instanceof ConfirmarRecibido) {
-            actualizarChecksAzules(((ConfirmarRecibido) message).getIdMensaje());
+            SwingUtilities.invokeLater(() ->
+                    actualizarChecksAzules(((ConfirmarRecibido) message).getIdMensaje())
+            );
+
         }
         if (message instanceof FueraLinea) {
             System.out.println("Conexión terminada por cliente");
             showOffPopup();
             mostrarMensajeSistema("CONEXION TERMINADA");
             actualizarEstadoContacto(idUsuarioActual, false);
+        }
+        if (message instanceof EnviarContacto) {
+            jPanelChat.revalidate();
+            jPanelChat.repaint();
         }
     }
 
@@ -1103,7 +1232,7 @@ public class ChatUI extends JFrame implements iChatView {
                 System.out.println("Enviando 008...");
                 ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(c.getIdMensaje());
                 Mediador.getInstance().sendMessage(c.getIdEmisor(), confirmarRecibido);
-                Mediador.getInstance().actualizarLeido(c.getIdMensaje());
+                Mediador.getInstance().actualizarLeidoBd(c.getIdMensaje());
             }
         }
     }

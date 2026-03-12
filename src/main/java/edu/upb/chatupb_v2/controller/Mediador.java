@@ -201,7 +201,7 @@ public class Mediador implements SocketListener {
             throw new OperationException("No se logró establecer la conexión");
         }
     }
-    public void actualizarLeido(String idMensaje) {
+    public void actualizarLeidoBd(String idMensaje) {
         try {
             this.chatsDao.updateLeido(idMensaje);
         } catch (Exception e) {
@@ -235,6 +235,18 @@ public class Mediador implements SocketListener {
                 idMio = contact.getId();
                 nombre = contact.getName();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void enviarContacto(String idUsuarioPaMandar, String nombreAquienMandar) {
+        try {
+            Contact contactEnviar = this.contactDao.findById(idUsuarioPaMandar);
+            System.out.println("enviadno contacto: " + contactEnviar.getId() + " " + contactEnviar.getName());
+            EnviarContacto enviarContacto = new EnviarContacto(contactEnviar.getId(), contactEnviar.getName(), contactEnviar.getIp());
+            Contact contactAquien = this.contactDao.findByName(nombreAquienMandar);
+            System.out.println("el contacto se envia a: " + contactAquien.getName());
+            sendMessage(contactAquien.getId(), enviarContacto);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -274,7 +286,7 @@ public class Mediador implements SocketListener {
         }
         if (message instanceof ConfirmarRecibido) {
             ConfirmarRecibido confirmarRecibido = (ConfirmarRecibido) message;
-            actualizarLeido(confirmarRecibido.getIdMensaje());
+            actualizarLeidoBd(confirmarRecibido.getIdMensaje());
         }
         if (message instanceof Zumbido) {
             Zumbido zumbido = (Zumbido) message;
