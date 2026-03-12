@@ -831,6 +831,60 @@ public class ChatUI extends JFrame implements iChatView {
         dialog.add(root);
         dialog.setVisible(true);
     }
+    private void showParcialPopup() {
+
+        JDialog dialog = new JDialog(this, true);
+        dialog.setSize(320, 300);
+        dialog.setLocationRelativeTo(this);
+        dialog.setUndecorated(true);
+        dialog.setBackground(new Color(0,0,0,0));
+
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+
+        // ===== CARD =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(40, 90, 220, 110);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("Contacto agregado");
+        title.setFont(new Font("Arial", Font.BOLD, 16));
+        title.setForeground(new Color(37,29,75));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setBounds(20, 20, 180, 30);
+
+        // ===== BOTON OK =====
+        JButton okButton = new JButton("Ok");
+        okButton.setBounds(85, 60, 50, 30);
+        okButton.setBackground(new Color(202,203,233));
+        okButton.setFocusPainted(false);
+
+        okButton.addActionListener(e -> dialog.dispose());
+
+        card.add(title);
+        card.add(okButton);
+
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setBounds(85, 0, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAccept.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Img");
+        }
+
+        root.add(card);
+        root.add(imageLabel);
+
+        dialog.add(root);
+        dialog.setVisible(true);
+    }
     private void jBtnEnviarActionPerformed(ActionEvent evt) {//GEN-FIRST:event_jBtnEnviarActionPerformed
         String mensajeTxt = jtMensaje.getText().toString();
         if (mensajeTxt.isEmpty() || idUsuarioActual == null) {
@@ -1195,15 +1249,11 @@ public class ChatUI extends JFrame implements iChatView {
             mostrarMensajeSistema("CONEXION TERMINADA");
             actualizarEstadoContacto(idUsuarioActual, false);
         }
-//        if (message instanceof EnviarContacto) {
-//            EnviarContacto enviarContacto = (EnviarContacto) message;
-//            Contact nuevo = new Contact(enviarContacto.getIdUsuario(), enviarContacto.getNombreCliente(), enviarContacto.getIp(), false);
-//            SwingUtilities.invokeLater(() -> {
-//                        agregarContacto(nuevo);
-//                        jContactos.revalidate();
-//                        jContactos.repaint();
-//            });
-//        }
+
+        if (message instanceof EnviarContacto) {
+            System.out.println("contacto agregado");
+            showParcialPopup();
+        }
     }
 
     @Override

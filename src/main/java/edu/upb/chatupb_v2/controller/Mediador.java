@@ -301,8 +301,12 @@ public class Mediador implements SocketListener {
         }
         if (message instanceof EnviarContacto) {
             EnviarContacto enviarContacto = (EnviarContacto) message;
-            addClient(enviarContacto.getIdUsuario(), enviarContacto.getNombreCliente(), socketClient);
-
+            try {
+                Contact contact = new Contact(enviarContacto.getIdUsuario(), enviarContacto.getNombreCliente(), enviarContacto.getIp(), false);
+                this.contactDao.save(contact);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         SwingUtilities.invokeLater(() -> {
