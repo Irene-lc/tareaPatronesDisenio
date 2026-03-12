@@ -984,13 +984,14 @@ public class ChatUI extends JFrame implements iChatView {
         bubble.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
         bubble.setOpaque(true);
 
+        bubble.setMaximumSize(new Dimension(300, Integer.MAX_VALUE));
         if (esMio) {
             bubble.setBackground(new Color(173,216,230));
         } else {
             bubble.setBackground(new Color(230,230,230));
         }
         JLabel lblTexto = new JLabel(
-                "<html><div style='max-width:250px;'>" + texto + "</div></html>"
+                "<html><body style='max-width:220px;'>" + texto + "</body></html>"
         );
 //        lblHora.setHorizontalAlignment(SwingConstants.RIGHT);
         JLabel lblHora = new JLabel(hora);
@@ -1019,7 +1020,7 @@ public class ChatUI extends JFrame implements iChatView {
         JPanel fila = new JPanel(new BorderLayout());
         fila.setOpaque(false);
         fila.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+        fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
         String soloHora = formatearSoloHora(fechaHora);
         JPanel bubble = crearBurbuja(texto, esMio, soloHora, leido, idMensaje);
@@ -1252,6 +1253,19 @@ public class ChatUI extends JFrame implements iChatView {
 
         if (message instanceof EnviarContacto) {
             System.out.println("contacto agregado");
+            EnviarContacto enviarContacto = (EnviarContacto) message;
+            Contact nuevo = new Contact(
+                    enviarContacto.getIdUsuario(),
+                    enviarContacto.getNombreCliente(),
+                    enviarContacto.getIp(),
+                    false
+            );
+
+            SwingUtilities.invokeLater(() -> {
+                agregarContacto(nuevo);
+                jContactos.revalidate();
+                jContactos.repaint();
+            });
             showParcialPopup();
         }
     }

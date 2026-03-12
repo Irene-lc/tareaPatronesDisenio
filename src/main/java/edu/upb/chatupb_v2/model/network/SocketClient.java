@@ -99,6 +99,10 @@ public class SocketClient extends Thread {
                         FueraLinea fueraLinea = FueraLinea.parse(message);
                         notificar(fueraLinea);
                         break;
+                    case "020":
+                        EnviarContacto enviarContacto = EnviarContacto.parse(message);
+                        notificar(enviarContacto);
+                        break;
                 }
             }
         } catch (IOException e) {
