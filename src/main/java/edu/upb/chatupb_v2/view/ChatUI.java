@@ -172,6 +172,13 @@ public class ChatUI extends JFrame implements iChatView {
         itemEnviarContacto.addActionListener(e -> {
             showEnviarContactoPopup();
         });
+        itemInvitacion.addActionListener(e -> {
+            Contact seleccionado = jContactos.getSelectedValue();
+            if (seleccionado != null) {
+                idUsuarioActual = seleccionado.getId();
+                Mediador.getInstance().establecerConexion(seleccionado.getIp());
+            }
+        });
 
         JScrollPane scrollContactos = new JScrollPane(jContactos);
         scrollContactos.setBorder(null);
@@ -1188,10 +1195,15 @@ public class ChatUI extends JFrame implements iChatView {
             mostrarMensajeSistema("CONEXION TERMINADA");
             actualizarEstadoContacto(idUsuarioActual, false);
         }
-        if (message instanceof EnviarContacto) {
-            jPanelChat.revalidate();
-            jPanelChat.repaint();
-        }
+//        if (message instanceof EnviarContacto) {
+//            EnviarContacto enviarContacto = (EnviarContacto) message;
+//            Contact nuevo = new Contact(enviarContacto.getIdUsuario(), enviarContacto.getNombreCliente(), enviarContacto.getIp(), false);
+//            SwingUtilities.invokeLater(() -> {
+//                        agregarContacto(nuevo);
+//                        jContactos.revalidate();
+//                        jContactos.repaint();
+//            });
+//        }
     }
 
     @Override
@@ -1199,6 +1211,7 @@ public class ChatUI extends JFrame implements iChatView {
         try {
             if (contacts.isEmpty())
                 System.out.println("BD vacia");
+            contacModel.clear();
             contacModel.addAll(contacts);
         } catch (Exception e) {
             e.printStackTrace();

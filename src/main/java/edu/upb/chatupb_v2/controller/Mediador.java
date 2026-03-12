@@ -47,7 +47,6 @@ public class Mediador implements SocketListener {
                 return;
             }
             this.contactDao.save(nuevo);
-            chatUI.actualizarEstadoContacto(idUsuario, true);
         } catch (Exception e) {
             e.printStackTrace();
             throw new OperationException("No se pudo guardar el contacto en la base de datos");
@@ -131,10 +130,10 @@ public class Mediador implements SocketListener {
     }
     public void aceptarInvitacion(SocketClient socketClient, Invitacion invitacion) {
         addClient(invitacion.getIdUsuario(), invitacion.getNombre(), socketClient);
-
         Message aceptar = new Aceptar(idMio, nombre);
         sendMessage(invitacion.getIdUsuario(), aceptar);
         if (chatUI != null) {
+            chatUI.actualizarEstadoContacto(invitacion.getIdUsuario(), true);
             chatUI.actualizarValores(invitacion.getIdUsuario());
         }
     }
@@ -152,6 +151,7 @@ public class Mediador implements SocketListener {
         Aceptar aceptar = (Aceptar) message;
         addClient(aceptar.getIdUsuario(), aceptar.getNombre(), socketClient);
         if (chatUI != null) {
+            chatUI.actualizarEstadoContacto(aceptar.getIdUsuario(), true);
             chatUI.actualizarValores(aceptar.getIdUsuario());
         }
     }
@@ -298,6 +298,11 @@ public class Mediador implements SocketListener {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+        if (message instanceof EnviarContacto) {
+            EnviarContacto enviarContacto = (EnviarContacto) message;
+            addClient(enviarContacto.getIdUsuario(), enviarContacto.getNombreCliente(), socketClient);
+
         }
 
         SwingUtilities.invokeLater(() -> {
