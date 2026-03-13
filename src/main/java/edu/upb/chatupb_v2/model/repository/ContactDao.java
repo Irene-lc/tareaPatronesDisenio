@@ -1,0 +1,150 @@
+package edu.upb.chatupb_v2.model.repository;
+
+import edu.upb.chatupb_v2.model.entities.message.Contact;
+import lombok.extern.slf4j.Slf4j;
+
+import java.net.ConnectException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+@Slf4j
+public class ContactDao implements IContactDao{
+
+
+    private DaoHelper<Contact> helper;
+
+    public ContactDao() {
+        helper = new DaoHelper<>();
+    }
+
+    DaoHelper.ResultReader<Contact> resultReader = result -> {
+        Contact prefacturaSync = new Contact();
+        if (existColumn(result, Contact.Column.ID)) {
+            prefacturaSync.setId(result.getString(Contact.Column.ID));
+        }
+        if (existColumn(result, Contact.Column.NAME)) {
+            prefacturaSync.setName(result.getString(Contact.Column.NAME));
+        }
+        if (existColumn(result, Contact.Column.IP)) {
+            prefacturaSync.setIp(result.getString(Contact.Column.IP));
+        }
+        return prefacturaSync;
+    };
+
+    public static boolean existColumn(ResultSet result, String columnName) {
+        try {
+            result.findColumn(columnName);
+            return true;
+        } catch (SQLException sqlex) {
+            //log.error("No se encontro la columna: {}", columnName); // log innecesario
+        }
+        return false;
+    }
+
+    public List<Contact> findAll() throws ConnectException, SQLException {
+        String query = "SELECT * FROM contact";
+        return helper.executeQuery(query, resultReader);
+    }
+    public List<Contact> findAllMenosYo() throws ConnectException, SQLException {
+        String query = "SELECT * FROM contact LIMIT -1 OFFSET 1";
+        return helper.executeQuery(query, resultReader);
+    }
+
+    public boolean exist(String argument) throws ConnectException, SQLException {
+        String query = "SELECT count(*) FROM contact WHERE " + argument;
+        return helper.executeQueryCount(query, null) == 1;
+    }
+
+    public boolean existByIp(String ip) throws ConnectException, SQLException {
+        String query = "SELECT count(*) FROM contact WHERE ip ='" + ip + "'";
+        return helper.executeQueryCount(query, null) == 1;
+    }
+    public boolean existById(String id) throws ConnectException, SQLException {
+        String query = "SELECT count(*) FROM contact WHERE id ='" + id + "'";
+        return helper.executeQueryCount(query, null) == 1;
+    }
+
+    public Contact findByIp(String ip) throws ConnectException, SQLException {
+        String query = "SELECT * FROM contact WHERE ip ='" + ip + "'";
+        List<Contact> list = helper.executeQuery(query, resultReader);
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
+    }
+    public Contact findById(String id) throws ConnectException, SQLException {
+        String query = "SELECT * FROM contact WHERE id ='" + id + "'";
+
+        List<Contact> list = helper.executeQuery(query, resultReader);
+
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
+    }
+    public Contact findByName(String name) throws ConnectException, SQLException {
+        String query = "SELECT * FROM contact WHERE name ='" + name + "'";
+        List<Contact> list = helper.executeQuery(query, resultReader);
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
+    }
+
+    public void update(String query) throws Exception {
+        helper.update(query, null);
+    }
+
+    public void save(Contact contact) throws Exception {
+        String query = "INSERT INTO contact(id, name, ip) values (?,?,?)";
+        DaoHelper.QueryParameters params = new DaoHelper.QueryParameters() {
+            @Override
+            public void setParameters(PreparedStatement pst) throws SQLException {
+                pst.setString(1, contact.getId());
+                pst.setString(2, contact.getName());
+                pst.setString(3, contact.getIp());
+            }
+        };
+        helper.insert(query, params, contact);
+    }
+
+    public void update(String query, String conditionWhere) throws SQLException, ConnectException {
+        if (query.trim().endsWith("%s")) {
+            query = String.format(query, conditionWhere);
+        } else {
+            query = String.format("%s %s", query, conditionWhere);
+        }
+        helper.update(query, null);
+    }
+    public void update(Contact contact) throws Exception {
+        String query = "UPDATE contact SET ip=?, name=? WHERE id=?";
+        DaoHelper.QueryParameters params = pst -> {
+            pst.setString(1, contact.getIp());
+            pst.setString(2, contact.getName());
+            pst.setString(3, contact.getId());
+        };
+        helper.update(query, params);
+    }
+
+    public void updateIp(String id, String ip) throws Exception {
+        String query = "UPDATE contact SET ip=? WHERE id=?";
+        DaoHelper.QueryParameters params = pst -> {
+            pst.setString(1, ip);
+            pst.setString(2, id);
+        };
+        helper.update(query, params);
+    }
+    public Contact findUsuarioPrincipal() throws ConnectException, SQLException {
+        String query = "SELECT * FROM contact LIMIT 1";
+
+        List<Contact> list = helper.executeQuery(query, resultReader);
+
+        if (list.isEmpty()) {
+            return null;
+        }
+
+        return list.get(0);
+    }
+}
