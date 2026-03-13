@@ -38,7 +38,6 @@ public class ImageMessage extends Message {
         return getCodigo() + "|"
                 + idEmisor  + "|"
                 + idMensaje + "|"
-                + hora      + "|"
                 + Base64.getEncoder().encodeToString(image)
                 + System.lineSeparator();
     }
@@ -47,17 +46,16 @@ public class ImageMessage extends Message {
     public static ImageMessage parse(String trama) {
         // Limite 5 para que el base64 (que puede contener '=') no se parta
         String[] split = trama.split(Pattern.quote("|"), 5);
-        if (split.length != 5) {
+        if (split.length != 4) {
             throw new IllegalArgumentException("Trama de imagen invalida: " + trama);
         }
 
         String idEmisor   = split[1];
         String idMensaje  = split[2];
-        String hora       = split[3];
-        byte[] imagen     = Base64.getDecoder().decode(split[4].trim());
+        byte[] imagen     = Base64.getDecoder().decode(split[3].trim());
         String idReceptor = Mediador.getInstance().getIdMio();
 
-        return new ImageMessage(idEmisor, idReceptor, idMensaje, hora, imagen);
+        return new ImageMessage(idEmisor, idReceptor, idMensaje, Mediador.getInstance().obtenerHoraActual(), imagen);
     }
 
     /**
