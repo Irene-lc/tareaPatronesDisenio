@@ -95,6 +95,10 @@ public class SocketClient extends Thread {
                         Zumbido zumbido = Zumbido.parse(message);
                         notificar(zumbido);
                         break;
+                    case "021":
+                        ImageMessage imageMessage = ImageMessage.parse(message);
+                        notificar(imageMessage);
+                        break;
                     case "0018":
                         FueraLinea fueraLinea = FueraLinea.parse(message);
                         notificar(fueraLinea);

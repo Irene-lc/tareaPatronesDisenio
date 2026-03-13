@@ -3,7 +3,7 @@
  */
 package edu.upb.chatupb_v2;
 
-import edu.upb.chatupb_v2.controller.ChatsController;
+//import edu.upb.chatupb_v2.controller.ChatsController;
 import edu.upb.chatupb_v2.controller.ContactController;
 import edu.upb.chatupb_v2.model.network.ChatServer;
 import edu.upb.chatupb_v2.controller.Mediador;
@@ -16,10 +16,10 @@ public class ChatUPB_V2 {
         final ChatUI chatUI = new ChatUI();
 
         ContactController contactController = new ContactController(chatUI);
-        ChatsController chatsController = new ChatsController(chatUI);
+//        ChatsController chatsController = new ChatsController(chatUI);
 
         chatUI.setContactController(contactController);
-        chatUI.setChatsController(chatsController);
+//        chatUI.setChatsController(chatsController);
 
         Mediador.getInstance().setChatUI(chatUI);
 

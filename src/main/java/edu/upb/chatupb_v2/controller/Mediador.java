@@ -4,8 +4,9 @@ import edu.upb.chatupb_v2.controller.exception.OperationException;
 import edu.upb.chatupb_v2.model.entities.message.*;
 import edu.upb.chatupb_v2.model.network.SocketClient;
 import edu.upb.chatupb_v2.model.network.SocketListener;
-import edu.upb.chatupb_v2.model.repository.ChatsDao;
+//import edu.upb.chatupb_v2.model.repository.ChatsDao;
 import edu.upb.chatupb_v2.model.repository.ContactDao;
+import edu.upb.chatupb_v2.model.repository.MensajeDao;
 import edu.upb.chatupb_v2.view.ChatUI;
 import edu.upb.chatupb_v2.model.entities.message.Contact;
 import lombok.Data;
@@ -13,6 +14,7 @@ import lombok.Data;
 import javax.swing.*;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 // que el mediador se subscriba a los eventos
@@ -21,15 +23,14 @@ public class Mediador implements SocketListener {
 
     private ChatUI chatUI;
     private ContactDao contactDao = new ContactDao();
-    private ChatsDao chatsDao = new ChatsDao();
+    //    private ChatsDao chatsDao = new ChatsDao();
+    private MensajeDao mensajeDao = new MensajeDao();
     private static final Mediador mediador = new Mediador();
     private final HashMap<String, SocketClient> clientes = new HashMap<>();
     private String idMio;
     private String nombre;
-
     private Mediador() {
     }
-
     public static Mediador getInstance() { // de lo contrario no se puede acceder. Propiedad de singleton
         return mediador;
     }
@@ -68,11 +69,6 @@ public class Mediador implements SocketListener {
         }
         if (cliente == null)
             return;
-        try {
-            cliente.send(message);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         System.out.println("Enviando comando: " + message.generarTrama());
     }
     public void enviarMensajePorChat(String idCliente, String mensaje) {
@@ -84,16 +80,31 @@ public class Mediador implements SocketListener {
         }
         try {
             String idMensaje = UUID.randomUUID().toString();
-            Message message = new Mensaje(idMio, idMensaje, mensaje);
+            Message message = new Mensaje(idMensaje, "0", idCliente, idMio, obtenerHoraActual(), mensaje);
             sendMessage(idCliente, message);
-            chatUI.chatsController.guardarEnBd(idMensaje, mensaje, idMio, idCliente, obtenerHoraActual());
+//            chatUI.chatsController.guardarEnBd(idMensaje, mensaje, idMio, idCliente, obtenerHoraActual());
             if (chatUI != null)
                 chatUI.agregarMensajeUI(mensaje, true, obtenerHoraActual(), false, idMensaje);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
+    public void enviarImagen(String idCliente, byte[] imageBytes) {
+        if (!clientes.containsKey(idCliente)) {
+            if (chatUI != null) chatUI.mostrarMensajeSistema("No hay conexion con el cliente");
+            return;
+        }
+        try {
+            String idMensaje = java.util.UUID.randomUUID().toString();
+            String hora = obtenerHoraActual();
+            ImageMessage imageMessage = new ImageMessage(idMio, idCliente, idMensaje, hora, imageBytes);
+            sendMessage(idCliente, imageMessage);
+            if (chatUI != null)
+                chatUI.agregarImagenUI(imageBytes, true, hora, idMensaje);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public void enviarMensajeATodos(Message message) {
         for (SocketClient cliente : clientes.values()) {
             try {
@@ -207,7 +218,7 @@ public class Mediador implements SocketListener {
     }
     public void actualizarLeido(String idMensaje) {
         try {
-            this.chatsDao.updateLeido(idMensaje);
+            this.mensajeDao.updateLeido(idMensaje);
         } catch (Exception e) {
             e.printStackTrace();
             throw new OperationException("No se pudo actualizar a 'Mensaje Leido'");
@@ -243,7 +254,22 @@ public class Mediador implements SocketListener {
             e.printStackTrace();
         }
     }
+    public void cargarMensajes(String idContacto) {
 
+        try {
+
+            List<Mensaje> mensajes =
+                    mensajeDao.findByContact(idMio, idContacto);
+
+            if (chatUI != null) {
+                chatUI.onloadMessages(mensajes);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
     @Override
     public synchronized void onMessage(SocketClient socketClient, Message message) {
         if (message instanceof Invitacion) {
@@ -291,12 +317,54 @@ public class Mediador implements SocketListener {
                 e.printStackTrace();
             }
         }
+        if (message instanceof ImageMessage) {
+            ImageMessage img = (ImageMessage) message;
+            // Guardar en chats con "IMG:<base64>" como texto (el receptor guarda el mensaje)
+            try {
+                String base64 = java.util.Base64.getEncoder().encodeToString(img.getImage());
+                Mensaje mensajeImagen = new Mensaje(
+                        img.getIdMensaje(), "0",
+                        img.getIdReceptor(), img.getIdEmisor(),
+                        img.getHora(),
+                        ImageMessage.IMG_PREFIX + base64
+                );
+                mensajeDao.save(mensajeImagen);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (message instanceof Mensaje) {
+
+            Mensaje m = (Mensaje) message;
+
+            try {
+                mensajeDao.save(m);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (message instanceof ImageMessage) {
+            ImageMessage img = (ImageMessage) message;
+            // Receptor guarda en chats con "IMG:<base64>" como mensajeTxt
+            try {
+                String base64 = java.util.Base64.getEncoder().encodeToString(img.getImage());
+                Mensaje mensajeImagen = new Mensaje(
+                        img.getIdMensaje(), "0",
+                        img.getIdReceptor(), img.getIdEmisor(),
+                        img.getHora(),
+                        ImageMessage.IMG_PREFIX + base64
+                );
+                mensajeDao.save(mensajeImagen);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
 
         SwingUtilities.invokeLater(() -> {
             chatUI.onMessage(message);
         });
     }
-
     @Override
     public void onDisconnect(SocketClient socketClient) {
         try {

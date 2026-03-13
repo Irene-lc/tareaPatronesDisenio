@@ -9,13 +9,13 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConnectionDB {
- 
+
     private static final ConnectionDB connection = new ConnectionDB();
-    
+
     private ConnectionDB(){
-       
+
     }
-    
+
     public static ConnectionDB getInstance(){
         return connection;
     }
@@ -99,6 +99,27 @@ public class ConnectionDB {
     """;
 
         conn.createStatement().execute(sqlChats);
+
+        String sqlImagenes = """
+        CREATE TABLE IF NOT EXISTS imagenes (
+            idMensaje TEXT PRIMARY KEY,
+            imagen BLOB NOT NULL,
+            hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            idEmisor TEXT NOT NULL,
+            idReceptor TEXT NOT NULL,
+            leido TEXT NOT NULL DEFAULT '0',
+
+            FOREIGN KEY (idEmisor) REFERENCES contact(id)
+                ON DELETE CASCADE
+                ON UPDATE CASCADE,
+
+            FOREIGN KEY (idReceptor) REFERENCES contact(id)
+                ON DELETE CASCADE
+                ON UPDATE CASCADE
+        );
+    """;
+
+        conn.createStatement().execute(sqlImagenes);
     }
 
 }
