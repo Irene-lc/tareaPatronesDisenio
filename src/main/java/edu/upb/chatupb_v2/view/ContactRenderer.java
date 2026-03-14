@@ -12,6 +12,58 @@ import javax.swing.*;
 public class ContactRenderer extends JLabel implements ListCellRenderer<Contact> {
 
     protected static final Font SELECTED_FONT = new Font("Comic Sans MS", Font.PLAIN, 12);
+    static class PuntoRedondo extends JComponent {
+
+        private boolean encendido = false;
+
+        public PuntoRedondo(int size) {
+            setPreferredSize(new Dimension(size, size));
+        }
+
+        public void setEncendido(boolean encendido) {
+            this.encendido = encendido;
+            repaint();
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            if (!encendido)
+                return;
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(new Color(0, 100, 0));
+            g2.fillOval(0, 0, getWidth(), getHeight());
+            g2.dispose();
+        }
+    }
+    static class Campana extends JLabel {
+        public Campana() {
+            setText("🔔");
+            setFont(new Font("Segoe UI Emoji", Font.PLAIN, 13));
+            setVisible(false);
+        }
+        public void setEncendida(boolean encendida) {
+            setVisible(encendida);
+        }
+    }
+
+    private PuntoRedondo punto = new PuntoRedondo(10);
+    private Campana campana = new Campana();
+
+    public ContactRenderer() {
+        setLayout(new BorderLayout());
+        setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+
+        JPanel derecha = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 8));
+        derecha.setOpaque(false);
+        derecha.add(campana);
+        derecha.add(punto);
+
+        add(derecha, BorderLayout.EAST);
+    }
+
+
 
     @Override
     public Component getListCellRendererComponent(JList<? extends Contact> list, Contact contac, int index, boolean isSelected, boolean cellHasFocus) {
@@ -22,45 +74,27 @@ public class ContactRenderer extends JLabel implements ListCellRenderer<Contact>
             imageIcon = new ImageIcon(getClass().getResource("/images/off-line.png"));
         }
 
-        Image imgScaled = imageIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+        Image imgScaled = imageIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
 
         ImageIcon scaledIcon = new ImageIcon(imgScaled);
         setIcon(scaledIcon);
 
         setText( "<html><p>"+ contac.getName()+"</p></html>");
 
+        campana.setEncendida(contac.isZumbido());
+        punto.setEncendido(contac.isMensajesNoLeidos());
+
         if (isSelected) {
-            setBackground(Color.BLUE);
+//            setBackground(Color.BLUE);
+            setBackground(new Color(220,220,220));
             setFont(SELECTED_FONT);
         } else {
             setFont(UIManager.getFont("Label.font"));
             setBackground(Color.WHITE);
         }
+
+        setOpaque(true);
         return this;
     }
 }
 
-//public class ContactRenderer extends JLabel implements ListCellRenderer<Contact> {
-//
-//    @Override
-//    public Component getListCellRendererComponent(
-//            JList<? extends Contact> list,
-//            Contact contact,
-//            int index,
-//            boolean isSelected,
-//            boolean cellHasFocus) {
-//
-//        setText("<html><b>" + contact.getNombreCliente() + "</b><br/>" +
-//                "<small>" + contact.getIp() + "</small></html>");
-//
-//        if (isSelected) {
-//            setBackground(new Color(220, 220, 255));
-//            setOpaque(true);
-//        } else {
-//            setBackground(Color.WHITE);
-//            setOpaque(true);
-//        }
-//
-//        return this;
-//    }
-//}

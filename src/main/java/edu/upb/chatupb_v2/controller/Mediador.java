@@ -35,7 +35,7 @@ public class Mediador implements SocketListener {
     }
     public void addClient(String idUsuario, String nombreClient, SocketClient client) {
         this.clientes.put(idUsuario, client);
-        Contact nuevo = new Contact(idUsuario, nombreClient, client.getIp(), false);
+        Contact nuevo = new Contact(idUsuario, nombreClient, client.getIp(), false, false, false);
         try {
             if (this.contactDao.existById(idUsuario)) {
                 Contact contact = this.contactDao.findById(idUsuario);
@@ -221,7 +221,7 @@ public class Mediador implements SocketListener {
     public void primerRegistro(String nombre) {
         String idMio = "aed70cc4-7f4f-4e6d-974b-2dd32160a490";
         this.nombre = nombre;
-        Contact contact = new Contact(idMio, nombre, "localhost", false);
+        Contact contact = new Contact(idMio, nombre, "localhost",false,false, false);
         try {
             this.contactDao.save(contact);
         } catch (Exception e) {
@@ -251,6 +251,7 @@ public class Mediador implements SocketListener {
             e.printStackTrace();
         }
     }
+
 
     @Override
     public synchronized void onMessage(SocketClient socketClient, Message message) {
@@ -293,6 +294,7 @@ public class Mediador implements SocketListener {
             try {
                 Contact contact = this.contactDao.findById(zumbido.getIdUsuario());
                 if (contact != null) {
+                    chatUI.marcarZumbido(zumbido.getIdUsuario(), true);
                     chatUI.showZumbidoPopup(contact.getName());
                 }
             } catch (Exception e) {
@@ -302,11 +304,14 @@ public class Mediador implements SocketListener {
         if (message instanceof EnviarContacto) {
             EnviarContacto enviarContacto = (EnviarContacto) message;
             try {
-                Contact contact = new Contact(enviarContacto.getIdUsuario(), enviarContacto.getNombreCliente(), enviarContacto.getIp(), false);
+                Contact contact = new Contact(enviarContacto.getIdUsuario(), enviarContacto.getNombreCliente(), enviarContacto.getIp(), false, false, false);
                 this.contactDao.save(contact);
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+        if (message instanceof EliminarMensaje) {
+
         }
 
         SwingUtilities.invokeLater(() -> {
