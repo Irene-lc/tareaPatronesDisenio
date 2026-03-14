@@ -22,8 +22,6 @@ public class Contact implements Serializable, Model {
         public static final String ID= "id";
         public static final String NAME ="name";
         public static final String IP ="ip";
-
-
     }
     @Override
     public void setId(String id) {
@@ -33,5 +31,7 @@ public class Contact implements Serializable, Model {
     private String name;
     private String ip;
     private boolean stateConnect = false;
+    private boolean mensajesNoLeidos = false;
+    private boolean zumbido = false;
 
 }

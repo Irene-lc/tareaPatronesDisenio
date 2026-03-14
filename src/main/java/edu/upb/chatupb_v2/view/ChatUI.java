@@ -108,13 +108,14 @@ public class ChatUI extends JFrame implements iChatView {
         jContactos = new JList<>(contacModel);
         jContactos.setCellRenderer(new ContactRenderer());
         jContactos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
+        jContactos.setFixedCellHeight(30);
         jContactos.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-
                 Contact seleccionado = jContactos.getSelectedValue();
-
                 if (seleccionado != null && chatsController != null) {
+//                    seleccionado.setMensajesNoLeidos(false);
+//                    seleccionado.setZumbido(false);
+                    jContactos.repaint();
                     idUsuarioActual = seleccionado.getId();
                     limpiarChat();
                     chatsController.onloadMessages(Mediador.getInstance().getIdMio(), idUsuarioActual);
@@ -1141,6 +1142,30 @@ public class ChatUI extends JFrame implements iChatView {
         }
         jContactos.repaint();
     }
+
+    public void marcarContactoConMensajeNuevo(String id) {
+        for (int i = 0; i < contacModel.size(); i++) {
+            Contact c = contacModel.get(i);
+            if (c.getId().equals(id)) {
+                c.setMensajesNoLeidos(true);
+                contacModel.set(i, c);
+                break;
+            }
+        }
+        jContactos.repaint();
+    }
+    public void marcarZumbido(String id, boolean estado) {
+        for (int i = 0; i < contacModel.size(); i++) {
+            Contact c = contacModel.get(i);
+            if (c.getId().equals(id)) {
+                c.setZumbido(estado);
+                contacModel.set(i, c);
+                break;
+            }
+        }
+        jContactos.repaint();
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -1207,6 +1232,9 @@ public class ChatUI extends JFrame implements iChatView {
         }
         if (message instanceof Mensaje) {
             Mensaje mensaje = (Mensaje) message;
+            if (!mensaje.getIdUsuario().equals(idUsuarioActual)) {
+                marcarContactoConMensajeNuevo(mensaje.getIdUsuario());
+            }
             if (mensaje.getIdUsuario().equals(idUsuarioActual) && !idUsuarioActual.equals(Mediador.getInstance().getIdMio())) {
                 agregarMensajeUI(mensaje.getMensaje(), false, Mediador.getInstance().obtenerHoraActual(), false, mensaje.getIdMensaje());
             }
@@ -1258,6 +1286,8 @@ public class ChatUI extends JFrame implements iChatView {
                     enviarContacto.getIdUsuario(),
                     enviarContacto.getNombreCliente(),
                     enviarContacto.getIp(),
+                    false,
+                    false,
                     false
             );
 
