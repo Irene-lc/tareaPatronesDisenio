@@ -1,2 +1,6 @@
 /target/
-.idea
+.idea/
+*.db
+*.sqlite
+*.sqlite3
+chat_upb.db
