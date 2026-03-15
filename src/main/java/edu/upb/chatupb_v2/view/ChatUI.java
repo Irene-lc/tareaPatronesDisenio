@@ -113,8 +113,8 @@ public class ChatUI extends JFrame implements iChatView {
             if (!e.getValueIsAdjusting()) {
                 Contact seleccionado = jContactos.getSelectedValue();
                 if (seleccionado != null && chatsController != null) {
-//                    seleccionado.setMensajesNoLeidos(false);
-//                    seleccionado.setZumbido(false);
+                    seleccionado.setMensajesNoLeidos(false);
+                    seleccionado.setZumbido(false);
                     jContactos.repaint();
                     idUsuarioActual = seleccionado.getId();
                     limpiarChat();
