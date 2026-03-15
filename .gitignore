@@ -1,6 +1,15 @@
 /target/
-.idea/
+# SQLite
 *.db
 *.sqlite
 *.sqlite3
-chat_upb.db
+
+# IntelliJ
+.idea/
+
+# NetBeans
+nbproject/private/
+
+# build
+/build/
+/dist/
