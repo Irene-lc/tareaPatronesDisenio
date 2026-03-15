@@ -122,7 +122,14 @@ public class ChatsDao {
         helper.update(query, params);
     }
     public void updateEliminarMensaje(String id) throws Exception {
-        String query = "UPDATE chats SET mensajeTxt = null WHERE idMensaje = ?";
+        String query = "UPDATE chats SET mensajeTxt = 'Eliminaste este mensaje' WHERE idMensaje = ?";
+        DaoHelper.QueryParameters params = pst -> {
+            pst.setString(1, id);
+        };
+        helper.update(query, params);
+    }
+    public void updateMensajeEliminado(String id) throws Exception {
+        String query = "UPDATE chats SET mensajeTxt = 'Se elimino este mensaje' WHERE idMensaje = ?";
         DaoHelper.QueryParameters params = pst -> {
             pst.setString(1, id);
         };

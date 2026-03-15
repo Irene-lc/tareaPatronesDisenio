@@ -23,6 +23,24 @@ public class ChatsController {
             e.printStackTrace();
         }
     }
+    public void eliminarMensajeBD(String idMensaje) {
+        try {
+            if (chatsDao.existById(idMensaje)) {
+                chatsDao.updateEliminarMensaje(idMensaje);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void mensajeeliminadoPorCLiente(String idMensaje) {
+        try {
+            if (chatsDao.existById(idMensaje)) {
+                chatsDao.updateMensajeEliminado(idMensaje);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public void onloadMessages(String idEmisor, String idReceptor) {
         try {
             List<Chats> chats = chatsDao.findByContact(idEmisor, idReceptor);

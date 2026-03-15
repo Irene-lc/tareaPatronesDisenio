@@ -128,11 +128,6 @@ public class ChatUI extends JFrame implements iChatView {
 //            public void mouseClicked(MouseEvent e) {
 //                if (SwingUtilities.isRightMouseButton(e)) {
 //                    System.out.println("click derecho");
-//                    int pos = jContactos.locationToIndex(e.getPoint());
-//                    if (pos != -1) {
-//                        jContactos.setSelectedIndex(pos);
-//                        jPopupMenu.show(jContactos, e.getX(), e.getY());
-//                    }
 //                }
 //            }
             private void mostrarMenu(MouseEvent e) {
@@ -832,7 +827,7 @@ public class ChatUI extends JFrame implements iChatView {
         dialog.add(root);
         dialog.setVisible(true);
     }
-    private void showParcialPopup() {
+    private void showAgregarContactoPopup() {
 
         JDialog dialog = new JDialog(this, true);
         dialog.setSize(320, 300);
@@ -980,20 +975,31 @@ public class ChatUI extends JFrame implements iChatView {
         }
         return foto;
     }
+
+
     private JPanel crearBurbuja(String texto, boolean esMio, String hora, boolean leido, String idMensaje) {
         JPanel bubble = new JPanel(new BorderLayout());
         bubble.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
         bubble.setOpaque(true);
-
         bubble.setMaximumSize(new Dimension(300, Integer.MAX_VALUE));
+
         if (esMio) {
             bubble.setBackground(new Color(173,216,230));
         } else {
             bubble.setBackground(new Color(230,230,230));
         }
-        JLabel lblTexto = new JLabel(
-                "<html><body style='max-width:220px;'>" + texto + "</body></html>"
-        );
+
+        JLabel lblTexto;
+        if (texto.equals("Eliminaste este mensaje")) {
+            lblTexto = new JLabel(
+                    "<html><body style='max-width:220px; color:gray;'><i> " + texto + "</i></body></html>"
+            );
+        } else {
+            lblTexto = new JLabel(
+                    "<html><body style='max-width:220px;'>" + texto + "</body></html>"
+            );
+        }
+
 //        lblHora.setHorizontalAlignment(SwingConstants.RIGHT);
         JLabel lblHora = new JLabel(hora);
         lblHora.setFont(new Font("Arial", Font.PLAIN, 9));
@@ -1001,7 +1007,6 @@ public class ChatUI extends JFrame implements iChatView {
 
         JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 0));
         panelInferior.setOpaque(false);
-
         panelInferior.add(lblHora);
 
         if (esMio) {
@@ -1009,7 +1014,43 @@ public class ChatUI extends JFrame implements iChatView {
             lblCheck.setName(idMensaje);
             lblCheck.setForeground(leido ? Color.BLUE : Color.GRAY);
             panelInferior.add(lblCheck);
+
+            JPopupMenu popupMensaje = new JPopupMenu();
+            JMenuItem itemEliminar = new JMenuItem("Eliminar mensaje");
+            itemEliminar.setFont(new Font("Arial", Font.PLAIN, 13));
+            if (!texto.equals("Eliminaste este mensaje")) {
+                itemEliminar.addActionListener(e -> {
+                    int confirm = JOptionPane.showConfirmDialog(
+                            this,
+                            "¿Deseas eliminar este mensaje?",
+                            "Eliminar",
+                            JOptionPane.YES_NO_OPTION
+                    );
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        lblTexto.setText("<html><body style='max-width:220px; color:gray;'><i>Eliminaste este mensaje</i></body></html>");
+                        bubble.revalidate();
+                        bubble.repaint();
+                        this.chatsController.eliminarMensajeBD(idMensaje);
+                        EliminarMensaje eliminarMensaje = new EliminarMensaje(idMensaje);
+                        Mediador.getInstance().sendMessage(idUsuarioActual, eliminarMensaje);
+                    }
+                });
+                popupMensaje.add(itemEliminar);
+            }
+
+            bubble.addMouseListener(new MouseAdapter() {
+                private void mostrarPopup(MouseEvent e) {
+                    if (SwingUtilities.isRightMouseButton(e)) {
+                        popupMensaje.show(bubble, e.getX(), e.getY());
+                    }
+                }
+                @Override
+                public void mousePressed(MouseEvent e) { mostrarPopup(e); }
+                @Override
+                public void mouseReleased(MouseEvent e) { mostrarPopup(e); }
+            });
         }
+
 
         bubble.add(lblTexto, BorderLayout.CENTER);
         bubble.add(panelInferior, BorderLayout.SOUTH);
@@ -1296,7 +1337,11 @@ public class ChatUI extends JFrame implements iChatView {
                 jContactos.revalidate();
                 jContactos.repaint();
             });
-            showParcialPopup();
+            showAgregarContactoPopup();
+        }
+        if (message instanceof EliminarMensaje) {
+            EliminarMensaje eliminarMensaje = (EliminarMensaje) message;
+            this.chatsController.mensajeeliminadoPorCLiente(eliminarMensaje.getIdMensaje());
         }
     }
 

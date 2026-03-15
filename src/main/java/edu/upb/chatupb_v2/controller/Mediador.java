@@ -252,7 +252,6 @@ public class Mediador implements SocketListener {
         }
     }
 
-
     @Override
     public synchronized void onMessage(SocketClient socketClient, Message message) {
         if (message instanceof Invitacion) {
