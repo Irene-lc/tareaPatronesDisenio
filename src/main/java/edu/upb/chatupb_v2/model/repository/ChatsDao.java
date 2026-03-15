@@ -135,4 +135,15 @@ public class ChatsDao {
         };
         helper.update(query, params);
     }
+
+    public String findMessage(String id) throws Exception {
+        String query = "SELECT mensajeTxt FROM chats WHERE idMensaje = ?";
+
+        DaoHelper.QueryParameters params = pst -> {
+            pst.setString(1, id);
+        };
+
+        return helper.executeQuerySingleString(query, params);
+    }
+
 }

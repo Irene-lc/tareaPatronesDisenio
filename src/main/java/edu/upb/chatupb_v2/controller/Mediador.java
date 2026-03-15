@@ -291,9 +291,9 @@ public class Mediador implements SocketListener {
         if (message instanceof Zumbido) {
             Zumbido zumbido = (Zumbido) message;
             try {
+                chatUI.marcarZumbido(zumbido.getIdUsuario());
                 Contact contact = this.contactDao.findById(zumbido.getIdUsuario());
                 if (contact != null) {
-                    chatUI.marcarZumbido(zumbido.getIdUsuario(), true);
                     chatUI.showZumbidoPopup(contact.getName());
                 }
             } catch (Exception e) {
@@ -309,8 +309,17 @@ public class Mediador implements SocketListener {
                 e.printStackTrace();
             }
         }
-        if (message instanceof EliminarMensaje) {
-
+        if (message instanceof FijarMensaje) {
+            FijarMensaje fijarMensaje = (FijarMensaje) message;
+            try {
+                if (chatsDao.existById(fijarMensaje.getIdMensaje())) {
+                    String mensaje = chatsDao.findMessage(fijarMensaje.getIdMensaje());
+                    if (chatUI != null)
+                        chatUI.fijarMensajeUI(fijarMensaje.getIdMensaje(), mensaje);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         SwingUtilities.invokeLater(() -> {

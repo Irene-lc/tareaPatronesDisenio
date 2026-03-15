@@ -71,4 +71,5 @@ public class CacheContactDao implements IContactDao{
             cacheContact.get(id).setIp(ip);
         }
     }
+
 }

@@ -30,6 +30,35 @@ public class DaoHelper<T>  {
         T getResult(CallableStatement callableStatement) throws SQLException;
     }
 
+    public String executeQuerySingleString(String query, QueryParameters params) throws ConnectException, SQLException {
+        Connection conn;
+        PreparedStatement st = null;
+        try {
+            conn = ConnectionDB.getInstance().getConection();
+        } catch (Exception ex) {
+            log.error("No se logro crear conexion a la base de datos", ex);
+            throw new ConnectException("No se logro crear conexion a la base de datos");
+        }
+        st = conn.prepareStatement(query);
+        try {
+            if (params != null) params.setParameters(st);
+            try (ResultSet rs = st.getResultSet()) {
+                if (st.execute()) {
+                    try (ResultSet result = st.getResultSet()) {
+                        if (result.next()) return result.getString(1);
+                    }
+                }
+            }
+            return null;
+        } catch (SQLException e) {
+            log.error("Excepcion sql al ejecutar la query : {}  causa => {}", query, e.getMessage());
+            throw e;
+        } finally {
+            if (st != null) st.close();
+            if (!conn.isClosed()) conn.close();
+        }
+    }
+
     public List<T> executeQuery(String query, ResultReader<T> reader) throws ConnectException, SQLException {
         return executeQuery(query, null, reader);
     }

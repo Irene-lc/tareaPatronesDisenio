@@ -11,6 +11,7 @@ import edu.upb.chatupb_v2.controller.Mediador;
 import lombok.Setter;
 
 import javax.swing.*;
+import javax.swing.border.AbstractBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,6 +23,21 @@ import java.util.List;
 public class ChatUI extends JFrame implements iChatView {
     public String idUsuarioActual;
     private DefaultListModel<Contact> contacModel = new DefaultListModel<>();
+
+    private static final Color BG_DARK       = new Color(15, 20, 35);
+    private static final Color BG_PANEL      = new Color(22, 28, 48);
+    private static final Color BG_SIDEBAR    = new Color(18, 24, 42);
+    private static final Color BG_INPUT      = new Color(30, 38, 62);
+    private static final Color BG_BUBBLE_ME  = new Color(79, 70, 229);
+    private static final Color BG_BUBBLE_YOU = new Color(36, 44, 70);
+    private static final Color ACCENT        = new Color(129, 140, 248);
+    private static final Color ACCENT_HOVER  = new Color(165, 180, 252);
+    private static final Color TEXT_PRIMARY  = new Color(240, 242, 255);
+    private static final Color TEXT_MUTED    = new Color(148, 163, 184);
+    private static final Color DIVIDER       = new Color(255, 255, 255, 18);
+    private static final Color BTN_SEND      = new Color(99, 102, 241);
+    private static final Color BTN_SEND_HOV  = new Color(129, 140, 248);
+    private static final Color SYSTEM_RED    = new Color(248, 113, 113);
 
     @Setter
     public ContactController contactController;
@@ -45,24 +61,34 @@ public class ChatUI extends JFrame implements iChatView {
 // </editor-fold>//GEN-END:initComponents
     private void initComponents() {
 
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         // ===== COMPONENTES CHAT =====
         jtMensaje = new JTextField();
         jPanelChat = new JPanel();
         jPanelChat.setLayout(new BoxLayout(jPanelChat, BoxLayout.Y_AXIS));
-        jPanelChat.setBackground(Color.WHITE);
+        jPanelChat.setBackground(BG_PANEL);
 
         jScrollPaneChat = new JScrollPane(jPanelChat);
         jScrollPaneChat.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-//        jScrollPaneChat = new JScrollPane();
-//        jScrollPaneChat.setViewportView(jPanelChat);
+
+        jScrollPaneChat.setBorder(null);
+        jScrollPaneChat.getViewport().setBackground(BG_PANEL);
+        styleScrollBar(jScrollPaneChat, new Color(79, 70, 229, 100));
 
         jContactos = new JList<>();
         jPopupMenu = new JPopupMenu();
-        itemHello = new JMenuItem("Enviar hello");
-        itemZumbido = new JMenuItem("Enviar Zumbido");
-        itemInvitacion = new JMenuItem("Enviar invitacion");
-        itemEnviarContacto = new JMenuItem("Enviar contacto");
-        itemActualizarIp = new JMenuItem("Actualizar Ip");
+        stylePopupMenu(jPopupMenu);
+
+        itemHello = createMenuItem("Enviar hello");
+        itemZumbido = createMenuItem("Enviar Zumbido");
+        itemInvitacion = createMenuItem("Enviar invitacion");
+        itemEnviarContacto = createMenuItem("Enviar contacto");
+        itemActualizarIp = createMenuItem("Actualizar Ip");
         jPopupMenu.add(itemHello);
         jPopupMenu.add(itemZumbido);
         jPopupMenu.add(itemInvitacion);
@@ -72,49 +98,71 @@ public class ChatUI extends JFrame implements iChatView {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(900, 600);
         setLocationRelativeTo(null);
+        setBackground(BG_DARK);
 
-        jBtnEnviar = new JButton("Enviar");
+        jBtnEnviar = createSendButton();
         jBtnEnviar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 jBtnEnviarActionPerformed(evt);
             }
         });
 
-        jBtnNuevaConexion = new JButton("+");
+        jBtnNuevaConexion = createIconButton("+", "Agregar contacto");
         jBtnNuevaConexion.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 jBtnNuevaConexionActionPerformed(evt);
             }
         });
 
-        jBtnOff = new JButton("off");
+        jBtnOff = createDangerButton("⏻");
         jBtnOff.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 jBtnOffActionPerformed(evt);
             }
         });
 
-        // ===== PANEL PRINCIPAL =====
+
+        // ===== LAYOUT PRINCIPAL =====
         setLayout(new BorderLayout());
+        getContentPane().setBackground(BG_DARK);
 
-        // PANEL IZQUIERDO (CONTACTOS)
-
+        // ─── SIDEBAR IZQUIERDO ───
         JPanel panelContactos = new JPanel(new BorderLayout());
-        panelContactos.setPreferredSize(new Dimension(220, 0));
-        panelContactos.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.LIGHT_GRAY));
+        panelContactos.setPreferredSize(new Dimension(240, 0));
+        panelContactos.setBackground(BG_SIDEBAR);
+        panelContactos.setBorder(BorderFactory.createMatteBorder(
+                0, 0, 0, 1, new Color(255, 255, 255, 18)));
 
-        JLabel lblContactos = new JLabel("Contactos", SwingConstants.CENTER);
-        lblContactos.setFont(new Font("Arial", Font.BOLD, 14));
-        lblContactos.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        // Header del sidebar
+        JPanel sidebarHeader = new JPanel(new BorderLayout());
+        sidebarHeader.setBackground(BG_SIDEBAR);
+        sidebarHeader.setBorder(BorderFactory.createEmptyBorder(20, 16, 12, 16));
 
+        JLabel lblContactos = new JLabel("Contactos");
+        lblContactos.setFont(new Font("Georgia", Font.BOLD, 17));
+        lblContactos.setForeground(TEXT_PRIMARY);
+
+        sidebarHeader.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
+
+        sidebarHeader.add(lblContactos, BorderLayout.WEST);
+        sidebarHeader.add(buildSidebarDivider(), BorderLayout.SOUTH);
+
+        lblContactoSeleccionado = new JLabel("ChatUPB");
+        // Lista de contactos
         jContactos = new JList<>(contacModel);
         jContactos.setCellRenderer(new ContactRenderer());
         jContactos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jContactos.setFixedCellHeight(30);
+        jContactos.setFixedCellHeight(58);
+        jContactos.setBackground(BG_SIDEBAR);
+        jContactos.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
+        jContactos.setSelectionBackground(new Color(79, 70, 229, 60));
+        jContactos.setSelectionForeground(TEXT_PRIMARY);
+
         jContactos.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 Contact seleccionado = jContactos.getSelectedValue();
                 if (seleccionado != null && chatsController != null) {
+                    lblContactoSeleccionado.setText(seleccionado.getName());
                     seleccionado.setMensajesNoLeidos(false);
                     seleccionado.setZumbido(false);
                     jContactos.repaint();
@@ -165,7 +213,8 @@ public class ChatUI extends JFrame implements iChatView {
                     if (cellBounds == null || !cellBounds.contains(e.getPoint())) {
                         jContactos.clearSelection();
                         limpiarChat();
-                        idUsuarioActual = "";
+                        idUsuarioActual = null;
+                        lblContactoSeleccionado.setText("ChatUPB");
                     }
                 }
                 mostrarMenu(e);
@@ -223,403 +272,520 @@ public class ChatUI extends JFrame implements iChatView {
 
         JScrollPane scrollContactos = new JScrollPane(jContactos);
         scrollContactos.setBorder(null);
+        scrollContactos.getViewport().setBackground(BG_SIDEBAR);
+        styleScrollBar(scrollContactos, new Color(100, 100, 100, 80));
 
-        panelContactos.add(lblContactos, BorderLayout.NORTH);
+//        panelContactos.add(lblContactos, BorderLayout.NORTH);
+//        panelContactos.add(scrollContactos, BorderLayout.CENTER);
+        panelContactos.add(sidebarHeader, BorderLayout.NORTH);
         panelContactos.add(scrollContactos, BorderLayout.CENTER);
 
         // PANEL DERECHO (CHAT)
-
         JPanel panelChat = new JPanel(new BorderLayout());
+        panelChat.setBackground(BG_PANEL);
 
         // Panel superior (botones off y +)
-        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        panelSuperior.add(jBtnOff);
-        panelSuperior.add(jBtnNuevaConexion);
+        JPanel panelSuperior = new JPanel(new BorderLayout());
+        panelSuperior.setBackground(BG_SIDEBAR);
+        panelSuperior.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 16));
+
+        lblContactoSeleccionado.setFont(new Font("Georgia", Font.BOLD, 15));
+        lblContactoSeleccionado.setForeground(ACCENT);
+        panelSuperior.add(lblContactoSeleccionado, BorderLayout.WEST);
+
+        JPanel botonesHeader = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        botonesHeader.setOpaque(false);
+        botonesHeader.add(jBtnOff);
+        botonesHeader.add(jBtnNuevaConexion);
+        panelSuperior.add(botonesHeader, BorderLayout.EAST);
+
+        JSeparator sep = new JSeparator();
+        sep.setForeground(DIVIDER);
+        sep.setBackground(BG_SIDEBAR);
+        panelSuperior.add(sep, BorderLayout.SOUTH);
 
         // Panel inferior (campo mensaje + enviar)
-        JPanel panelInferior = new JPanel(new BorderLayout(10, 0));
-        panelInferior.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        panelInferior.add(jtMensaje, BorderLayout.CENTER);
-        panelInferior.add(jBtnEnviar, BorderLayout.EAST);
+        JPanel panelInferior = buildInputPanel();
 
         panelChat.add(panelSuperior, BorderLayout.NORTH);
         panelChat.add(jScrollPaneChat, BorderLayout.CENTER);
         panelChat.add(panelInferior, BorderLayout.SOUTH);
 
-        //AGREGAR AL FRAME
         add(panelContactos, BorderLayout.WEST);
         add(panelChat, BorderLayout.CENTER);
+
+        // ── BANNER MENSAJE FIJADO (nuevo) ──
+        panelMensajeFijado = new JPanel(new BorderLayout());
+        panelMensajeFijado.setBackground(new Color(45, 38, 90));
+        panelMensajeFijado.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(79, 70, 229, 80)),
+                BorderFactory.createEmptyBorder(7, 16, 7, 16)
+        ));
+        panelMensajeFijado.setVisible(false);
+
+        JLabel iconPin = new JLabel("📌");
+        iconPin.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 13));
+        iconPin.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
+
+        lblMensajeFijado = new JLabel("Mensaje fijado");
+        lblMensajeFijado.setForeground(ACCENT);
+        lblMensajeFijado.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+
+        JButton btnDesfijar = new JButton("✕");
+        btnDesfijar.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        btnDesfijar.setForeground(TEXT_MUTED);
+        btnDesfijar.setContentAreaFilled(false);
+        btnDesfijar.setBorderPainted(false);
+        btnDesfijar.setFocusPainted(false);
+        btnDesfijar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnDesfijar.addActionListener(e -> desfijarMensaje());
+
+        JPanel pinLeft = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        pinLeft.setOpaque(false);
+        pinLeft.add(iconPin);
+        pinLeft.add(lblMensajeFijado);
+
+        panelMensajeFijado.add(pinLeft, BorderLayout.WEST);
+        panelMensajeFijado.add(btnDesfijar, BorderLayout.EAST);
+
+// Armar panel norte (header + pin banner)
+        JPanel panelNorte = new JPanel(new BorderLayout());
+        panelNorte.add(panelSuperior, BorderLayout.NORTH);
+        panelNorte.add(panelMensajeFijado, BorderLayout.SOUTH);
+
+        panelChat.add(panelNorte, BorderLayout.NORTH);
+        panelChat.add(jScrollPaneChat, BorderLayout.CENTER);
+        panelChat.add(panelInferior, BorderLayout.SOUTH);
 
         if (Mediador.getInstance().dbVacia()) {
             showNombrePopup();
         }
         Mediador.getInstance().cargarMisDatos();
     }
-    private void showOffPopup() {
 
+    private JPanel buildSidebarDivider() {
+        JPanel d = new JPanel();
+        d.setPreferredSize(new Dimension(0, 1));
+        d.setBackground(new Color(255, 255, 255, 15));
+        return d;
+    }
+    private JPanel buildInputPanel() {
+        JPanel panelInferior = new JPanel(new BorderLayout(10, 0));
+        panelInferior.setBackground(BG_SIDEBAR);
+        panelInferior.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
+
+        // Campo de texto estilizado
+        jtMensaje = new JTextField();
+        jtMensaje.setBackground(BG_INPUT);
+        jtMensaje.setForeground(TEXT_PRIMARY);
+        jtMensaje.setCaretColor(ACCENT);
+        jtMensaje.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
+        jtMensaje.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        jtMensaje.putClientProperty("JTextField.placeholderText", "Escribe un mensaje...");
+
+        // Acción de Enter
+        jtMensaje.addActionListener(evt -> jBtnEnviarActionPerformed(evt));
+
+        panelInferior.add(jtMensaje, BorderLayout.CENTER);
+        panelInferior.add(jBtnEnviar, BorderLayout.EAST);
+
+        return panelInferior;
+    }
+    private JButton createSendButton() {
+        JButton btn = new JButton("➤") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                Color bg = getModel().isRollover() ? BTN_SEND_HOV : BTN_SEND;
+                g2.setColor(bg);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 22, 22);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        btn.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        btn.setForeground(Color.WHITE);
+//        btn.setPreferredSize(new Dimension(68, 44));
+        btn.setMargin(new Insets(8, 20, 8, 20));
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
+    }
+    private JButton createIconButton(String text, String tooltip) {
+        JButton btn = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                Color bg = getModel().isRollover()
+                        ? new Color(79, 70, 229, 80)
+                        : new Color(79, 70, 229, 35);
+                g2.setColor(bg);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        btn.setForeground(ACCENT);
+//        btn.setPreferredSize(new Dimension(36, 32));
+        btn.setMargin(new Insets(4, 20, 4, 20));
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setToolTipText(tooltip);
+        return btn;
+    }
+    private JButton createDangerButton(String text) {
+        JButton btn = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                Color bg = getModel().isRollover()
+                        ? new Color(239, 68, 68, 90)
+                        : new Color(239, 68, 68, 35);
+                g2.setColor(bg);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        btn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
+        btn.setForeground(new Color(248, 113, 113));
+//        btn.setPreferredSize(new Dimension(36, 32));
+        btn.setMargin(new Insets(4, 20, 4, 20));
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setToolTipText("Desconectarse");
+        return btn;
+    }
+    private void styleScrollBar(JScrollPane sp, Color color) {
+        JScrollBar vsb = sp.getVerticalScrollBar();
+        vsb.setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
+            @Override
+            protected void configureScrollBarColors() {
+                thumbColor = color;
+                trackColor = new Color(0, 0, 0, 0);
+            }
+            @Override
+            protected JButton createDecreaseButton(int o) { return zeroButton(); }
+            @Override
+            protected JButton createIncreaseButton(int o) { return zeroButton(); }
+            private JButton zeroButton() {
+                JButton b = new JButton();
+                b.setPreferredSize(new Dimension(0, 0));
+                return b;
+            }
+            @Override
+            protected void paintThumb(Graphics g, JComponent c, Rectangle r) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(thumbColor);
+                g2.fillRoundRect(r.x + 2, r.y + 2, r.width - 4, r.height - 4, 8, 8);
+                g2.dispose();
+            }
+        });
+        vsb.setPreferredSize(new Dimension(6, 0));
+    }
+    private void stylePopupMenu(JPopupMenu menu) {
+        menu.setBackground(new Color(26, 32, 54));
+        menu.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(79, 70, 229, 80), 1),
+                BorderFactory.createEmptyBorder(4, 0, 4, 0)
+        ));
+    }
+    private JMenuItem createMenuItem(String text) {
+        JMenuItem item = new JMenuItem(text);
+        item.setBackground(new Color(26, 32, 54));
+        item.setForeground(TEXT_PRIMARY);
+        item.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        item.setBorder(BorderFactory.createEmptyBorder(7, 16, 7, 16));
+        item.setOpaque(true);
+        return item;
+    }
+
+    private JDialog createBaseDialog(int w, int h) {
         JDialog dialog = new JDialog(this, true);
-        dialog.setSize(320, 300);
+        dialog.setSize(w, h);
         dialog.setLocationRelativeTo(this);
         dialog.setUndecorated(true);
-        dialog.setBackground(new Color(0,0,0,0));
-
-        JPanel root = new JPanel(null);
-        root.setOpaque(false);
-
-        // ===== CARD =====
-        JPanel card = new JPanel();
+        dialog.setBackground(new Color(0, 0, 0, 0));
+        return dialog;
+    }
+    private JPanel createDarkCard(int x, int y, int w, int h) {
+        JPanel card = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(BG_PANEL);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                g2.setColor(new Color(79, 70, 229, 60));
+                g2.setStroke(new BasicStroke(1f));
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 20, 20);
+                g2.dispose();
+            }
+        };
         card.setLayout(null);
-        card.setBackground(Color.WHITE);
-        card.setBounds(40, 90, 250, 110);
-        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
-
-        // ===== TITULO =====
-        JLabel title = new JLabel("Su conexión fue terminada");
-        title.setFont(new Font("Arial", Font.BOLD, 16));
-        title.setForeground(new Color(37,29,75));
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setBounds(15, 20, 220, 30);
-
-        // ===== BOTON OK =====
-        JButton okButton = new JButton("Ok");
-        okButton.setBounds(100, 60, 50, 30);
-        okButton.setBackground(new Color(202,203,233));
-        okButton.setFocusPainted(false);
-
-        okButton.addActionListener(e -> dialog.dispose());
-
-        card.add(title);
-        card.add(okButton);
-
-        // ===== IMAGEN =====
-        JLabel imageLabel = new JLabel();
-        imageLabel.setBounds(115, 0, 110, 110);
-
+        card.setOpaque(false);
+        card.setBounds(x, y, w, h);
+        return card;
+    }
+    private JButton createPopupOkButton(String text, int x, int y, int w, int h) {
+        JButton btn = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                Color bg = getModel().isRollover() ? BTN_SEND_HOV : BTN_SEND;
+                g2.setColor(bg);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        btn.setBounds(x, y, w, h);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
+    }
+    private JTextField createDarkTextField(int x, int y, int w, int h) {
+        JTextField tf = new JTextField();
+        tf.setBounds(x, y, w, h);
+        tf.setBackground(BG_INPUT);
+        tf.setForeground(TEXT_PRIMARY);
+        tf.setCaretColor(ACCENT);
+        tf.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        tf.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
+        return tf;
+    }
+    private JLabel createRobotIcon(int x, int y, String imagePath) {
+        JLabel lbl = new JLabel();
+        lbl.setBounds(x, y, 90, 120);
+        lbl.setHorizontalAlignment(SwingConstants.CENTER);
         try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotOff.png"));
-            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
-            imageLabel.setIcon(new ImageIcon(img));
+            ImageIcon icon = new ImageIcon(getClass().getResource(imagePath));
+            Image img = icon.getImage().getScaledInstance(90, -1, Image.SCALE_SMOOTH);
+            lbl.setIcon(new ImageIcon(img));
         } catch (Exception e) {
-            imageLabel.setText("Img");
+            lbl.setText("🤖");
+            lbl.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 40));
         }
+        return lbl;
+    }
 
-        root.add(card);
-        root.add(imageLabel);
+    private void showOffPopup() {
+        JDialog dialog = createBaseDialog(360, 240);
+        JPanel root = new JPanel(null); root.setOpaque(false);
 
-        dialog.add(root);
-        dialog.setVisible(true);
+        JPanel card = createDarkCard(20, 30, 320, 170);
+
+        JLabel robot = createRobotIcon(230, -20, "/images/robotOff.png");
+        JLabel title = new JLabel("Conexión terminada");
+        title.setFont(new Font("Georgia", Font.BOLD, 16));
+        title.setForeground(TEXT_PRIMARY);
+        title.setBounds(20, 30, 200, 28);
+
+        JLabel sub = new JLabel("Tu sesión fue cerrada.");
+        sub.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        sub.setForeground(TEXT_MUTED);
+        sub.setBounds(20, 62, 200, 20);
+
+        JButton ok = createPopupOkButton("Aceptar", 20, 110, 100, 34);
+        ok.addActionListener(e -> dialog.dispose());
+
+        card.add(title); card.add(sub); card.add(ok);
+        root.add(robot); root.add(card);
+        dialog.add(root); dialog.setVisible(true);
     }
     private void showAcceptPopup() {
+        JDialog dialog = createBaseDialog(340, 220);
+        JPanel root = new JPanel(null); root.setOpaque(false);
 
-        JDialog dialog = new JDialog(this, true);
-        dialog.setSize(320, 300);
-        dialog.setLocationRelativeTo(this);
-        dialog.setUndecorated(true);
-        dialog.setBackground(new Color(0,0,0,0));
+        JPanel card = createDarkCard(20, 30, 300, 160);
 
-        JPanel root = new JPanel(null);
-        root.setOpaque(false);
+        JLabel robot = createRobotIcon(210, -15, "/images/robotAccept.png");
+        JLabel title = new JLabel("¡Conexión aceptada!");
+        title.setFont(new Font("Georgia", Font.BOLD, 16));
+        title.setForeground(TEXT_PRIMARY);
+        title.setBounds(20, 30, 200, 28);
 
-        // ===== CARD =====
-        JPanel card = new JPanel();
-        card.setLayout(null);
-        card.setBackground(Color.WHITE);
-        card.setBounds(40, 90, 220, 110);
-        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+        JButton ok = createPopupOkButton("OK", 20, 100, 90, 34);
+        ok.addActionListener(e -> dialog.dispose());
 
-        // ===== TITULO =====
-        JLabel title = new JLabel("Conexion aceptada");
-        title.setFont(new Font("Arial", Font.BOLD, 16));
-        title.setForeground(new Color(37,29,75));
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setBounds(20, 20, 180, 30);
-
-        // ===== BOTON OK =====
-        JButton okButton = new JButton("Ok");
-        okButton.setBounds(85, 60, 50, 30);
-        okButton.setBackground(new Color(202,203,233));
-        okButton.setFocusPainted(false);
-
-        okButton.addActionListener(e -> dialog.dispose());
-
-        card.add(title);
-        card.add(okButton);
-
-        // ===== IMAGEN =====
-        JLabel imageLabel = new JLabel();
-        imageLabel.setBounds(85, 0, 110, 110);
-
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAccept.png"));
-            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
-            imageLabel.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            imageLabel.setText("Img");
-        }
-
-        root.add(card);
-        root.add(imageLabel);
-
-        dialog.add(root);
-        dialog.setVisible(true);
+        card.add(title); card.add(ok);
+        root.add(robot); root.add(card);
+        dialog.add(root); dialog.setVisible(true);
     }
     private void showDeclinePopup() {
+        JDialog dialog = createBaseDialog(340, 220);
+        JPanel root = new JPanel(null); root.setOpaque(false);
 
-        JDialog dialog = new JDialog(this, true);
-        dialog.setSize(320, 300);
-        dialog.setLocationRelativeTo(this);
-        dialog.setUndecorated(true);
-        dialog.setBackground(new Color(0,0,0,0));
+        JPanel card = createDarkCard(20, 30, 300, 160);
 
-        JPanel root = new JPanel(null);
-        root.setOpaque(false);
+        JLabel robot = createRobotIcon(210, -15, "/images/robotDecline.png");
+        JLabel title = new JLabel("Conexión rechazada");
+        title.setFont(new Font("Georgia", Font.BOLD, 16));
+        title.setForeground(TEXT_PRIMARY);
+        title.setBounds(20, 30, 200, 28);
 
-        // ===== CARD =====
-        JPanel card = new JPanel();
-        card.setLayout(null);
-        card.setBackground(Color.WHITE);
-        card.setBounds(40, 90, 220, 110);
-        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+        JButton ok = createPopupOkButton("OK", 20, 100, 90, 34);
+        ok.addActionListener(e -> dialog.dispose());
 
-        // ===== TITULO =====
-        JLabel title = new JLabel("Conexion rechazada");
-        title.setFont(new Font("Arial", Font.BOLD, 16));
-        title.setForeground(new Color(37,29,75));
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setBounds(20, 20, 180, 30);
-
-        // ===== BOTON OK =====
-        JButton okButton = new JButton("Ok");
-        okButton.setBounds(85, 60, 50, 30);
-        okButton.setBackground(new Color(202,203,233));
-        okButton.setFocusPainted(false);
-
-        okButton.addActionListener(e -> dialog.dispose());
-
-        card.add(title);
-        card.add(okButton);
-
-        // ===== IMAGEN =====
-        JLabel imageLabel = new JLabel();
-        imageLabel.setBounds(85, 0, 110, 110);
-
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotDecline.png"));
-            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
-            imageLabel.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            imageLabel.setText("Img");
-        }
-
-        root.add(card);
-        root.add(imageLabel);
-
-        dialog.add(root);
-        dialog.setVisible(true);
+        card.add(title); card.add(ok);
+        root.add(robot); root.add(card);
+        dialog.add(root); dialog.setVisible(true);
     }
     public void showZumbidoPopup(String nombre) {
+        JDialog dialog = createBaseDialog(360, 230);
+        JPanel root = new JPanel(null); root.setOpaque(false);
 
-        JDialog dialog = new JDialog(this, true);
-        dialog.setSize(320, 300);
-        dialog.setLocationRelativeTo(this);
-        dialog.setUndecorated(true);
-        dialog.setBackground(new Color(0,0,0,0));
+        JPanel card = createDarkCard(20, 30, 320, 170);
 
-        JPanel root = new JPanel(null);
-        root.setOpaque(false);
+        JLabel robot = createRobotIcon(230, -15, "/images/robotAccept.png");
+        JLabel title = new JLabel("🔔 " + nombre + " te zumbó");
+        title.setFont(new Font("Georgia", Font.BOLD, 15));
+        title.setForeground(new Color(251, 191, 36));
+        title.setBounds(20, 30, 230, 28);
 
-        // ===== CARD =====
-        JPanel card = new JPanel();
-        card.setLayout(null);
-        card.setBackground(Color.WHITE);
-        card.setBounds(40, 90, 220, 110);
-        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+        JButton ok = createPopupOkButton("OK", 20, 110, 90, 34);
+        ok.addActionListener(e -> dialog.dispose());
 
-        // ===== TITULO =====
-        JLabel title = new JLabel(nombre + " te esta zumbando");
-        title.setFont(new Font("Arial", Font.BOLD, 16));
-        title.setForeground(new Color(37,29,75));
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setBounds(20, 20, 180, 30);
-
-        // ===== BOTON OK =====
-        JButton okButton = new JButton("Ok");
-        okButton.setBounds(85, 60, 50, 30);
-        okButton.setBackground(new Color(202,203,233));
-        okButton.setFocusPainted(false);
-
-        okButton.addActionListener(e -> dialog.dispose());
-
-        card.add(title);
-        card.add(okButton);
-
-        // ===== IMAGEN =====
-        JLabel imageLabel = new JLabel();
-        imageLabel.setBounds(85, 0, 110, 110);
-
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAccept.png"));
-            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
-            imageLabel.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            imageLabel.setText("Img");
-        }
-
-        root.add(card);
-        root.add(imageLabel);
-
-        dialog.add(root);
-        dialog.setVisible(true);
+        card.add(title); card.add(ok);
+        root.add(robot); root.add(card);
+        dialog.add(root); dialog.setVisible(true);
     }
     public boolean showInvitationPopup(String nombreContacto) {
-
         final boolean[] accepted = {false};
+        JDialog dialog = createBaseDialog(400, 270);
+        JPanel root = new JPanel(null); root.setOpaque(false);
+        JPanel card = createDarkCard(20, 40, 360, 200);
+        JLabel robot = createRobotIcon(260, -10, "/images/robotRequest.png");
 
-        JDialog dialog = new JDialog(this, true);
-        dialog.setSize(350, 320);
-        dialog.setLocationRelativeTo(this);
-        dialog.setUndecorated(true);
-        dialog.setBackground(new Color(0,0,0,0));
+        JLabel title = new JLabel("Invitación de conexión");
+        title.setFont(new Font("Georgia", Font.BOLD, 16));
+        title.setForeground(TEXT_PRIMARY);
+        title.setBounds(20, 20, 240, 28);
 
-        JPanel root = new JPanel(null);
-        root.setOpaque(false);
+        JLabel sub = new JLabel("<html><body style='color:#94a3b8;font-size:12px;'>" + nombreContacto + " quiere conectarse</body></html>");
+        sub.setBounds(20, 54, 240, 24);
 
-        // ===== CARD =====
-        JPanel card = new JPanel();
-        card.setLayout(null);
-        card.setBackground(Color.WHITE);
-        card.setBounds(40, 100, 270, 150);
-        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
-
-        // ===== TITULO =====
-        JLabel title = new JLabel("Llegó la invitación: " + nombreContacto);
-        title.setFont(new Font("Arial", Font.BOLD, 14));
-        title.setForeground(new Color(37,29,75));
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setBounds(20, 20, 230, 40);
-
-        // ===== BOTON ACCEPT =====
-        JButton acceptButton = new JButton("Aceptar");
-        acceptButton.setBounds(30, 80, 90, 35);
-        acceptButton.setBackground(Color.lightGray);
-        acceptButton.setForeground(Color.BLACK);
-        acceptButton.setFocusPainted(false);
-
-        acceptButton.addActionListener(e -> {
+        JButton accept = createPopupOkButton("Aceptar", 20, 140, 110, 36);
+        accept.addActionListener(e -> {
             accepted[0] = true;
             dialog.dispose();
         });
 
-        // ===== BOTON DECLINE =====
-        JButton declineButton = new JButton("Rechazar");
-        declineButton.setBounds(150, 80, 90, 35);
-        declineButton.setBackground(Color.GRAY);
-        declineButton.setForeground(Color.BLACK);
-        declineButton.setFocusPainted(false);
+        JButton decline = new JButton("Rechazar") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getModel().isRollover() ? new Color(239, 68, 68, 80) : new Color(239, 68, 68, 35));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        decline.setBounds(148, 140, 110, 36);
+        decline.setForeground(SYSTEM_RED);
+        decline.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        decline.setContentAreaFilled(false);
+        decline.setBorderPainted(false);
+        decline.setFocusPainted(false);
+        decline.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        decline.addActionListener(e -> { accepted[0] = false; dialog.dispose(); });
 
-        declineButton.addActionListener(e -> {
-            accepted[0] = false;
+        card.add(title); card.add(sub); card.add(accept); card.add(decline);
+        root.add(robot); root.add(card);
+        dialog.add(root); dialog.setVisible(true);
+        return accepted[0];
+    }
+    public boolean showEliminarMensajePopup() {
+        final boolean[] accepted = {false};
+        JDialog dialog = createBaseDialog(400, 270);
+        JPanel root = new JPanel(null); root.setOpaque(false);
+        JPanel card = createDarkCard(20, 40, 360, 150);
+        JLabel robot = createRobotIcon(260, -10, "/images/robotRequest.png");
+
+        JLabel title = new JLabel("<html><div style='text-align:left;'>¿Seguro que desea eliminar el mensaje?</div></html>");
+        title.setFont(new Font("Georgia", Font.BOLD, 16));
+        title.setForeground(TEXT_PRIMARY);
+        title.setBounds(20, 20, 310, 60); 
+
+        JButton accept = createPopupOkButton("Si", 20, 90, 110, 36);
+        accept.addActionListener(e -> {
+            accepted[0] = true;
             dialog.dispose();
         });
 
-        card.add(title);
-        card.add(acceptButton);
-        card.add(declineButton);
+        JButton decline = new JButton("No") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getModel().isRollover() ? new Color(239, 68, 68, 80) : new Color(239, 68, 68, 35));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        decline.setBounds(148, 90, 110, 36);
+        decline.setForeground(SYSTEM_RED);
+        decline.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        decline.setContentAreaFilled(false);
+        decline.setBorderPainted(false);
+        decline.setFocusPainted(false);
+        decline.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        decline.addActionListener(e -> { accepted[0] = false; dialog.dispose(); });
 
-        // ===== IMAGEN =====
-        JLabel imageLabel = new JLabel();
-        imageLabel.setBounds(120, 0, 110, 110);
-
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotRequest.png"));
-            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
-            imageLabel.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            imageLabel.setText("Img");
-        }
-
-        root.add(card);
-        root.add(imageLabel);
-
-        dialog.add(root);
-        dialog.setVisible(true);
-
+        card.add(title); card.add(accept); card.add(decline);
+        root.add(robot); root.add(card);
+        dialog.add(root); dialog.setVisible(true);
         return accepted[0];
     }
     private void showNoMessagePopup() {
+        JDialog dialog = createBaseDialog(340, 200);
+        JPanel root = new JPanel(null); root.setOpaque(false);
 
-        JDialog dialog = new JDialog(this, true);
-        dialog.setSize(320, 300);
-        dialog.setLocationRelativeTo(this);
-        dialog.setUndecorated(true);
-        dialog.setBackground(new Color(0,0,0,0));
+        JPanel card = createDarkCard(20, 25, 300, 150);
+        JLabel robot = createRobotIcon(210, -15, "/images/robotNoMessage.png");
 
-        JPanel root = new JPanel(null);
-        root.setOpaque(false);
+        JLabel title = new JLabel("Sin destinatario");
+        title.setFont(new Font("Georgia", Font.BOLD, 15));
+        title.setForeground(new Color(251, 191, 36));
+        title.setBounds(20, 25, 200, 28);
 
-        // ===== CARD =====
-        JPanel card = new JPanel();
-        card.setLayout(null);
-        card.setBackground(Color.WHITE);
-        card.setBounds(40, 90, 250, 110);
-        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+        JLabel sub = new JLabel("Selecciona un contacto primero.");
+        sub.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        sub.setForeground(TEXT_MUTED);
+        sub.setBounds(20, 56, 220, 20);
 
-        // ===== TITULO =====
-        JLabel title = new JLabel("No puede enviar mensajes");
-        title.setFont(new Font("Arial", Font.BOLD, 16));
-        title.setForeground(new Color(37,29,75));
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setBounds(15, 20, 220, 30);
+        JButton ok = createPopupOkButton("OK", 20, 98, 90, 34);
+        ok.addActionListener(e -> dialog.dispose());
 
-        // ===== BOTON OK =====
-        JButton okButton = new JButton("Ok");
-        okButton.setBounds(100, 60, 50, 30);
-        okButton.setBackground(new Color(202,203,233));
-        okButton.setFocusPainted(false);
-
-        okButton.addActionListener(e -> dialog.dispose());
-
-        card.add(title);
-        card.add(okButton);
-
-        // ===== IMAGEN =====
-        JLabel imageLabel = new JLabel();
-        imageLabel.setBounds(115, 0, 110, 110);
-
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotNoMessage.png"));
-            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
-            imageLabel.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            imageLabel.setText("Img");
-        }
-
-        root.add(card);
-        root.add(imageLabel);
-
-        dialog.add(root);
-        dialog.setVisible(true);
+        card.add(title); card.add(sub); card.add(ok);
+        root.add(robot); root.add(card);
+        dialog.add(root); dialog.setVisible(true);
     }
     private void showNuevaConexionPopup() {
+        JDialog dialog = createBaseDialog(420, 310);
+        JPanel root = new JPanel(null); root.setOpaque(false);
 
-        JDialog dialog = new JDialog(this, true);
-        dialog.setSize(420, 450);
-        dialog.setLocationRelativeTo(this);
-        dialog.setUndecorated(true);
-        dialog.setBackground(new Color(0,0,0,0));
+        JPanel card = createDarkCard(20, 40, 380, 250);
+        JLabel robot = createRobotIcon(280, -10, "/images/robotAdd.png");
 
-        JPanel root = new JPanel(null);
-        root.setOpaque(false);
-
-        // ===== CARD PANEL =====
-        JPanel card = new JPanel();
-        card.setLayout(null);
-        card.setBackground(Color.WHITE);
-        card.setBounds(35, 80, 350, 300);
-        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
-
-
-        // ===== BOTON CERRAR =====
         JButton btnCerrar = new JButton();
 
         try {
@@ -630,235 +796,73 @@ public class ChatUI extends JFrame implements iChatView {
             btnCerrar.setText("X");
         }
 
-        btnCerrar.setBounds(10, 10, 25, 25);
-
-        btnCerrar.setBorderPainted(false);
+        btnCerrar.setBounds(340, 12, 25, 25);
+        btnCerrar.setForeground(TEXT_MUTED);
+        btnCerrar.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         btnCerrar.setContentAreaFilled(false);
+        btnCerrar.setBorderPainted(false);
         btnCerrar.setFocusPainted(false);
-        btnCerrar.setOpaque(false);
         btnCerrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
         btnCerrar.addActionListener(e -> dialog.dispose());
 
+        JLabel title = new JLabel("Agregar Contacto");
+        title.setFont(new Font("Georgia", Font.BOLD, 18));
+        title.setForeground(TEXT_PRIMARY);
+        title.setBounds(24, 24, 240, 30);
 
-//        btnCerrar.setBounds(310, 10, 30, 25);
-//        btnCerrar.setBackground(Color.WHITE);
-//        btnCerrar.setForeground(Color.RED);
-//        btnCerrar.setFocusPainted(false);
-//        btnCerrar.setBorder(null);
-//
-//        btnCerrar.addActionListener(e -> dialog.dispose());
+        JLabel lbl = new JLabel("IP del contacto:");
+        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lbl.setForeground(TEXT_MUTED);
+        lbl.setBounds(24, 76, 200, 20);
 
-        // ===== IMAGEN =====
-        JLabel imageLabel = new JLabel();
-        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        imageLabel.setBounds(155, 20, 110, 110);
+        jtIp = createDarkTextField(24, 100, 330, 40);
 
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAdd.png"));
-            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
-            imageLabel.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            imageLabel.setText("Imagen no encontrada");
-        }
-
-        // ===== TITULO =====
-        JLabel title = new JLabel("Add Contact");
-        title.setFont(new Font("Arial", Font.BOLD, 18));
-        title.setBounds(110, 70, 200, 30);
-
-        // ===== IP =====
-        JLabel ipLabel = new JLabel("Contact IP:");
-        ipLabel.setFont(new Font("Arial", Font.PLAIN, 13));
-        ipLabel.setBounds(30, 170, 200, 20);
-
-        jtIp = new JTextField();
-        jtIp.setBounds(30, 190, 290, 30);
-
-        // ===== BOTON =====
-        jBtnConectar = new JButton("CONECTAR");
-        jBtnConectar.setBounds(75, 235, 200, 35);
-        jBtnConectar.setBackground(Color.GRAY);
-        jBtnConectar.setForeground(Color.BLACK);
-        jBtnConectar.setFocusPainted(false);
-
+        jBtnConectar = createPopupOkButton("Conectar", 24, 162, 140, 38);
         jBtnConectar.addActionListener(evt -> {
             Mediador.getInstance().establecerConexion(jtIp.getText());
             dialog.dispose();
         });
 
-        // ===== AGREGAMOS AL CARD =====
-        card.add(title);
-        card.add(ipLabel);
-        card.add(jtIp);
-        card.add(jBtnConectar);
-        card.add(btnCerrar);
-
-        // ===== AGREGAMOS AL ROOT =====
-        root.add(imageLabel);
-        root.add(card);
-
-        dialog.add(root);
-        dialog.setVisible(true);
+        card.add(btnCerrar); card.add(title); card.add(lbl); card.add(jtIp); card.add(jBtnConectar);
+        root.add(robot); root.add(card);
+        dialog.add(root); dialog.setVisible(true);
     }
     public void showNombrePopup() {
+        JDialog dialog = createBaseDialog(420, 310);
+        JPanel root = new JPanel(null); root.setOpaque(false);
 
-        JDialog dialog = new JDialog(this, true);
-        dialog.setSize(420, 450);
-        dialog.setLocationRelativeTo(this);
-        dialog.setUndecorated(true);
-        dialog.setBackground(new Color(0,0,0,0));
+        JPanel card = createDarkCard(20, 40, 380, 250);
+        JLabel robot = createRobotIcon(280, -10, "/images/robotAdd.png");
 
-        JPanel root = new JPanel(null);
-        root.setOpaque(false);
+        JLabel title = new JLabel("¡Bienvenido!");
+        title.setFont(new Font("Georgia", Font.BOLD, 20));
+        title.setForeground(ACCENT);
+        title.setBounds(24, 24, 200, 32);
 
-        // ===== CARD PANEL =====
-        JPanel card = new JPanel();
-        card.setLayout(null);
-        card.setBackground(Color.WHITE);
-        card.setBounds(35, 80, 350, 300);
-        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+        JLabel lbl = new JLabel("Tu nombre:");
+        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lbl.setForeground(TEXT_MUTED);
+        lbl.setBounds(24, 76, 200, 20);
 
-        // ===== IMAGEN =====
-        JLabel imageLabel = new JLabel();
-        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        imageLabel.setBounds(155, 20, 110, 110);
+        jtName = createDarkTextField(24, 100, 330, 40);
 
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAdd.png"));
-            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
-            imageLabel.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            imageLabel.setText("Imagen no encontrada");
-        }
-
-        // ===== TITULO =====
-        JLabel title = new JLabel("Ingrese su nombre");
-        title.setFont(new Font("Arial", Font.BOLD, 18));
-        title.setBounds(110, 70, 200, 30);
-
-        // ===== IP =====
-        JLabel ipLabel = new JLabel("Nombre:");
-        ipLabel.setFont(new Font("Arial", Font.PLAIN, 13));
-        ipLabel.setBounds(30, 170, 200, 20);
-
-        jtName = new JTextField();
-        jtName.setBounds(30, 190, 290, 30);
-
-        // ===== BOTON =====
-        jBtnAceptar = new JButton("ACEPTAR");
-        jBtnAceptar.setBounds(75, 235, 200, 35);
-        jBtnAceptar.setBackground(Color.GRAY);
-        jBtnAceptar.setForeground(Color.BLACK);
-        jBtnAceptar.setFocusPainted(false);
-
+        jBtnAceptar = createPopupOkButton("Comenzar →", 24, 162, 150, 38);
         jBtnAceptar.addActionListener(evt -> {
             Mediador.getInstance().primerRegistro(jtName.getText());
             dialog.dispose();
         });
 
-        // ===== AGREGAMOS AL CARD =====
-        card.add(title);
-        card.add(ipLabel);
-        card.add(jtName);
-        card.add(jBtnAceptar);
-
-        // ===== AGREGAMOS AL ROOT =====
-        root.add(imageLabel);
-        root.add(card);
-
-        dialog.add(root);
-        dialog.setVisible(true);
+        card.add(title); card.add(lbl); card.add(jtName); card.add(jBtnAceptar);
+        root.add(robot); root.add(card);
+        dialog.add(root); dialog.setVisible(true);
     }
     public void showIpPopup() {
+        JDialog dialog = createBaseDialog(420, 300);
+        JPanel root = new JPanel(null); root.setOpaque(false);
 
-        JDialog dialog = new JDialog(this, true);
-        dialog.setSize(420, 450);
-        dialog.setLocationRelativeTo(this);
-        dialog.setUndecorated(true);
-        dialog.setBackground(new Color(0,0,0,0));
+        JPanel card = createDarkCard(20, 40, 380, 240);
+        JLabel robot = createRobotIcon(260, -10, "/images/robotAdd.png");
 
-        JPanel root = new JPanel(null);
-        root.setOpaque(false);
-
-        // ===== CARD PANEL =====
-        JPanel card = new JPanel();
-        card.setLayout(null);
-        card.setBackground(Color.WHITE);
-        card.setBounds(35, 80, 350, 300);
-        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
-
-        // ===== IMAGEN =====
-        JLabel imageLabel = new JLabel();
-        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        imageLabel.setBounds(155, 20, 110, 110);
-
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAdd.png"));
-            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
-            imageLabel.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            imageLabel.setText("Imagen no encontrada");
-        }
-
-        // ===== TITULO =====
-        JLabel title = new JLabel("Ingrese la ip");
-        title.setFont(new Font("Arial", Font.BOLD, 18));
-        title.setBounds(110, 70, 200, 30);
-
-        // ===== IP =====
-        JLabel ipLabel = new JLabel("Ip:");
-        ipLabel.setFont(new Font("Arial", Font.PLAIN, 13));
-        ipLabel.setBounds(30, 170, 200, 20);
-
-        jtName = new JTextField();
-        jtName.setBounds(30, 190, 290, 30);
-
-        // ===== BOTON =====
-        jBtnAceptar = new JButton("ACEPTAR");
-        jBtnAceptar.setBounds(75, 235, 200, 35);
-        jBtnAceptar.setBackground(Color.GRAY);
-        jBtnAceptar.setForeground(Color.BLACK);
-        jBtnAceptar.setFocusPainted(false);
-
-        jBtnAceptar.addActionListener(evt -> {
-            this.contactController.actualizarIp(idUsuarioActual, jtName.getText());
-            dialog.dispose();
-        });
-
-        // ===== AGREGAMOS AL CARD =====
-        card.add(title);
-        card.add(ipLabel);
-        card.add(jtName);
-        card.add(jBtnAceptar);
-
-        // ===== AGREGAMOS AL ROOT =====
-        root.add(imageLabel);
-        root.add(card);
-
-        dialog.add(root);
-        dialog.setVisible(true);
-    }
-    private void showEnviarContactoPopup() {
-
-        JDialog dialog = new JDialog(this, true);
-        dialog.setSize(420, 450);
-        dialog.setLocationRelativeTo(this);
-        dialog.setUndecorated(true);
-        dialog.setBackground(new Color(0,0,0,0));
-
-        JPanel root = new JPanel(null);
-        root.setOpaque(false);
-
-        // ===== CARD PANEL =====
-        JPanel card = new JPanel();
-        card.setLayout(null);
-        card.setBackground(Color.WHITE);
-        card.setBounds(35, 80, 350, 300);
-        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
-
-
-        // ===== BOTON CERRAR =====
         JButton btnCerrar = new JButton();
 
         try {
@@ -869,132 +873,104 @@ public class ChatUI extends JFrame implements iChatView {
             btnCerrar.setText("X");
         }
 
-        btnCerrar.setBounds(10, 10, 25, 25);
-
-        btnCerrar.setBorderPainted(false);
+        btnCerrar.setBounds(340, 12, 25, 25);
+        btnCerrar.setForeground(TEXT_MUTED);
+        btnCerrar.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         btnCerrar.setContentAreaFilled(false);
+        btnCerrar.setBorderPainted(false);
         btnCerrar.setFocusPainted(false);
-        btnCerrar.setOpaque(false);
         btnCerrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
         btnCerrar.addActionListener(e -> dialog.dispose());
 
+        JLabel title = new JLabel("Actualizar IP");
+        title.setFont(new Font("Georgia", Font.BOLD, 18));
+        title.setForeground(TEXT_PRIMARY);
+        title.setBounds(24, 24, 200, 30);
 
-        btnCerrar.setBounds(310, 10, 30, 25);
-        btnCerrar.setBackground(Color.WHITE);
-        btnCerrar.setForeground(Color.RED);
-        btnCerrar.setFocusPainted(false);
-        btnCerrar.setBorder(null);
+        JLabel lbl = new JLabel("Nueva IP:");
+        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lbl.setForeground(TEXT_MUTED);
+        lbl.setBounds(24, 70, 200, 20);
 
-        btnCerrar.addActionListener(e -> dialog.dispose());
+        jtName = createDarkTextField(24, 94, 330, 40);
 
-        // ===== IMAGEN =====
-        JLabel imageLabel = new JLabel();
-        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        imageLabel.setBounds(155, 20, 110, 110);
+        jBtnAceptar = createPopupOkButton("Guardar", 24, 155, 120, 38);
+        jBtnAceptar.addActionListener(evt -> {
+            this.contactController.actualizarIp(idUsuarioActual, jtName.getText());
+            dialog.dispose();
+        });
 
+        card.add(btnCerrar); card.add(title); card.add(lbl); card.add(jtName); card.add(jBtnAceptar);
+        root.add(robot); root.add(card);
+        dialog.add(root); dialog.setVisible(true);
+    }
+    private void showEnviarContactoPopup() {
+        JDialog dialog = createBaseDialog(420, 310);
+        JPanel root = new JPanel(null); root.setOpaque(false);
+
+        JPanel card = createDarkCard(20, 40, 380, 250);
+        JLabel robot = createRobotIcon(280, -10, "/images/robotAdd.png");
+
+        JButton btnCerrar = new JButton();
         try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAdd.png"));
-            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
-            imageLabel.setIcon(new ImageIcon(img));
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/x1.png"));
+            Image img = icon.getImage().getScaledInstance(40, 30, Image.SCALE_SMOOTH);
+            btnCerrar.setIcon(new ImageIcon(img));
         } catch (Exception e) {
-            imageLabel.setText("Imagen no encontrada");
+            btnCerrar.setText("X");
         }
 
-        // ===== TITULO =====
-        JLabel title = new JLabel("Enviar a:");
-        title.setFont(new Font("Arial", Font.BOLD, 18));
-        title.setBounds(110, 70, 200, 30);
+        btnCerrar.setBounds(340, 12, 25, 25);
+        btnCerrar.setForeground(TEXT_MUTED);
+        btnCerrar.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        btnCerrar.setContentAreaFilled(false);
+        btnCerrar.setBorderPainted(false);
+        btnCerrar.setFocusPainted(false);
+        btnCerrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnCerrar.addActionListener(e -> dialog.dispose());
 
-        // ===== IP =====
-        JLabel ipLabel = new JLabel("Nombre:");
-        ipLabel.setFont(new Font("Arial", Font.PLAIN, 13));
-        ipLabel.setBounds(30, 170, 200, 20);
+        JLabel title = new JLabel("Compartir Contacto");
+        title.setFont(new Font("Georgia", Font.BOLD, 18));
+        title.setForeground(TEXT_PRIMARY);
+        title.setBounds(24, 24, 240, 30);
 
-        jtNameEnviarContacto = new JTextField();
-        jtNameEnviarContacto.setBounds(30, 190, 290, 30);
+        JLabel lbl = new JLabel("Nombre a compartir:");
+        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lbl.setForeground(TEXT_MUTED);
+        lbl.setBounds(24, 76, 220, 20);
 
-        // ===== BOTON =====
-        jBtnEnviarContacto = new JButton("ENVIAR");
-        jBtnEnviarContacto.setBounds(75, 235, 200, 35);
-        jBtnEnviarContacto.setBackground(Color.GRAY);
-        jBtnEnviarContacto.setForeground(Color.BLACK);
-        jBtnEnviarContacto.setFocusPainted(false);
+        jtNameEnviarContacto = createDarkTextField(24, 100, 330, 40);
 
+        jBtnEnviarContacto = createPopupOkButton("Enviar →", 24, 162, 120, 38);
         jBtnEnviarContacto.addActionListener(evt -> {
-//            Mediador.getInstance().establecerConexion(jtNamePrueba.getText());
             Mediador.getInstance().enviarContacto(idUsuarioActual, jtNameEnviarContacto.getText());
             dialog.dispose();
         });
 
-        // ===== AGREGAMOS AL CARD =====
-        card.add(title);
-        card.add(ipLabel);
-        card.add(jtNameEnviarContacto);
-        card.add(jBtnEnviarContacto);
-        card.add(btnCerrar);
-
-        // ===== AGREGAMOS AL ROOT =====
-        root.add(imageLabel);
-        root.add(card);
-
-        dialog.add(root);
-        dialog.setVisible(true);
+        card.add(btnCerrar); card.add(title); card.add(lbl); card.add(jtNameEnviarContacto); card.add(jBtnEnviarContacto);
+        root.add(robot); root.add(card);
+        dialog.add(root); dialog.setVisible(true);
     }
     private void showAgregarContactoPopup() {
+        JDialog dialog = createBaseDialog(340, 210);
+        JPanel root = new JPanel(null); root.setOpaque(false);
 
-        JDialog dialog = new JDialog(this, true);
-        dialog.setSize(320, 300);
-        dialog.setLocationRelativeTo(this);
-        dialog.setUndecorated(true);
-        dialog.setBackground(new Color(0,0,0,0));
+        JPanel card = createDarkCard(20, 30, 300, 160);
+        JLabel robot = createRobotIcon(210, -10, "/images/robotAccept.png");
 
-        JPanel root = new JPanel(null);
-        root.setOpaque(false);
+        JLabel title = new JLabel("✓ Contacto agregado");
+        title.setFont(new Font("Georgia", Font.BOLD, 16));
+        title.setForeground(new Color(134, 239, 172));
+        title.setBounds(20, 28, 220, 28);
 
-        // ===== CARD =====
-        JPanel card = new JPanel();
-        card.setLayout(null);
-        card.setBackground(Color.WHITE);
-        card.setBounds(40, 90, 220, 110);
-        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+        JButton ok = createPopupOkButton("OK", 20, 100, 90, 34);
+        ok.addActionListener(e -> dialog.dispose());
 
-        // ===== TITULO =====
-        JLabel title = new JLabel("Contacto agregado");
-        title.setFont(new Font("Arial", Font.BOLD, 16));
-        title.setForeground(new Color(37,29,75));
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setBounds(20, 20, 180, 30);
-
-        // ===== BOTON OK =====
-        JButton okButton = new JButton("Ok");
-        okButton.setBounds(85, 60, 50, 30);
-        okButton.setBackground(new Color(202,203,233));
-        okButton.setFocusPainted(false);
-
-        okButton.addActionListener(e -> dialog.dispose());
-
-        card.add(title);
-        card.add(okButton);
-
-        // ===== IMAGEN =====
-        JLabel imageLabel = new JLabel();
-        imageLabel.setBounds(85, 0, 110, 110);
-
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAccept.png"));
-            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
-            imageLabel.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            imageLabel.setText("Img");
-        }
-
-        root.add(card);
-        root.add(imageLabel);
-
-        dialog.add(root);
-        dialog.setVisible(true);
+        card.add(title); card.add(ok);
+        root.add(robot); root.add(card);
+        dialog.add(root); dialog.setVisible(true);
     }
+
     private void jBtnEnviarActionPerformed(ActionEvent evt) {//GEN-FIRST:event_jBtnEnviarActionPerformed
         String mensajeTxt = jtMensaje.getText().toString();
         if (mensajeTxt.isEmpty() || idUsuarioActual == null) {
@@ -1006,9 +982,6 @@ public class ChatUI extends JFrame implements iChatView {
         Mediador.getInstance().enviarMensajePorChat(idUsuarioActual, mensajeTxt);
         jtMensaje.setText("");
 
-//    }else {
-//            showNoMessagePopup();
-//        }
     }//GEN-LAST:event_jBtnEnviarActionPerformed
     private void jBtnOffActionPerformed(ActionEvent evt) {
         try {
@@ -1029,7 +1002,6 @@ public class ChatUI extends JFrame implements iChatView {
         if (contact == null || contact.getId() == null) {
             return;
         }
-
         for (int i = 0; i < contacModel.size(); i++) {
             if (contacModel.get(i).getId().equals(contact.getId())) {
                 return;
@@ -1050,16 +1022,18 @@ public class ChatUI extends JFrame implements iChatView {
         jContactos.repaint();
     }
     public void mostrarMensajeSistema(String texto) {
-
         JPanel panelSistema = new JPanel(new FlowLayout(FlowLayout.CENTER));
         panelSistema.setOpaque(false);
 
-        JLabel lblSistema = new JLabel(texto);
-        lblSistema.setForeground(Color.RED);
-        lblSistema.setFont(new Font("Arial", Font.BOLD, 12));
+        JLabel lblSistema = new JLabel("⚠ " + texto);
+        lblSistema.setForeground(SYSTEM_RED);
+        lblSistema.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        lblSistema.setBorder(BorderFactory.createCompoundBorder(
+                new ChatUI.RoundedBorder(10, new Color(239, 68, 68, 25), new Color(239, 68, 68, 60), 1),
+                BorderFactory.createEmptyBorder(4, 12, 4, 12)
+        ));
 
         panelSistema.add(lblSistema);
-
         jPanelChat.add(panelSistema);
         jPanelChat.revalidate();
         jPanelChat.repaint();
@@ -1067,6 +1041,23 @@ public class ChatUI extends JFrame implements iChatView {
     public void actualizarValores(String idUsuarioActual) {
         this.idUsuarioActual = idUsuarioActual;
     }
+
+    public void fijarMensajeUI(String idMensaje, String texto) {
+        mensajeFijadoId = idMensaje;
+        mensajeFijadoTexto = texto;
+        String textoCortado = texto.length() > 60 ? texto.substring(0, 57) + "…" : texto;
+        lblMensajeFijado.setText(textoCortado);
+        panelMensajeFijado.setVisible(true);
+        panelMensajeFijado.revalidate();
+        panelMensajeFijado.repaint();
+    }
+
+    private void desfijarMensaje() {
+        mensajeFijadoId = null;
+        mensajeFijadoTexto = null;
+        panelMensajeFijado.setVisible(false);
+    }
+
     private JLabel crearFotoPerfilyo() {
         JLabel foto = new JLabel();
         try {
@@ -1092,32 +1083,37 @@ public class ChatUI extends JFrame implements iChatView {
 
 
     private JPanel crearBurbuja(String texto, boolean esMio, String hora, boolean leido, String idMensaje) {
-        JPanel bubble = new JPanel(new BorderLayout());
-        bubble.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
-        bubble.setOpaque(true);
-        bubble.setMaximumSize(new Dimension(300, Integer.MAX_VALUE));
-
-        if (esMio) {
-            bubble.setBackground(new Color(173,216,230));
-        } else {
-            bubble.setBackground(new Color(230,230,230));
-        }
+        JPanel bubble = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
+                g2.dispose();
+            }
+        };
+        bubble.setOpaque(false);
+        bubble.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
+        bubble.setMaximumSize(new Dimension(320, Integer.MAX_VALUE));
+        bubble.setBackground(esMio ? BG_BUBBLE_ME : BG_BUBBLE_YOU);
 
         JLabel lblTexto;
+        String colorHex = esMio ? "#e0e7ff" : "#cbd5e1";
+
         if (texto.equals("Eliminaste este mensaje") || texto.equals("Se elimino este mensaje")) {
             lblTexto = new JLabel(
-                    "<html><body style='max-width:220px; color:gray;'><i> " + texto + "</i></body></html>"
+                    "<html><body style='max-width:230px; color:#6b7280; font-style:italic; font-family:Segoe UI;'>" + texto + "</body></html>"
             );
         } else {
             lblTexto = new JLabel(
-                    "<html><body style='max-width:220px;'>" + texto + "</body></html>"
+                    "<html><body style='max-width:230px; color:" + colorHex + "; font-family:Segoe UI;'>" + texto + "</body></html>"
             );
         }
 
-//        lblHora.setHorizontalAlignment(SwingConstants.RIGHT);
         JLabel lblHora = new JLabel(hora);
-        lblHora.setFont(new Font("Arial", Font.PLAIN, 9));
-        lblHora.setForeground(Color.DARK_GRAY);
+        lblHora.setFont(new Font("Segoe UI", Font.PLAIN, 9));
+        lblHora.setForeground(esMio ? new Color(196, 181, 253, 180) : new Color(148, 163, 184, 180));
 
         JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 0));
         panelInferior.setOpaque(false);
@@ -1127,12 +1123,13 @@ public class ChatUI extends JFrame implements iChatView {
         if (esMio) {
             JLabel lblCheck = new JLabel(leido ? "✔✔" : "✔");
             lblCheck.setName(idMensaje);
-            lblCheck.setForeground(leido ? Color.BLUE : Color.GRAY);
+            lblCheck.setFont(new Font("Segoe UI", Font.PLAIN, 9));
+            lblCheck.setForeground(leido ? new Color(167, 243, 208) : new Color(148, 163, 184));
             panelInferior.add(lblCheck);
 
             JPopupMenu popupMensaje = new JPopupMenu();
-            JMenuItem itemEliminar = new JMenuItem("Eliminar mensaje");
-            itemEliminar.setFont(new Font("Arial", Font.PLAIN, 13));
+            stylePopupMenu(popupMensaje);
+            JMenuItem itemEliminar = createMenuItem("🗑  Eliminar mensaje");
             if (!texto.equals("Eliminaste este mensaje")) {
                 itemEliminar.addActionListener(e -> {
                     int confirm = JOptionPane.showConfirmDialog(
@@ -1142,7 +1139,7 @@ public class ChatUI extends JFrame implements iChatView {
                             JOptionPane.YES_NO_OPTION
                     );
                     if (confirm == JOptionPane.YES_OPTION) {
-                        lblTexto.setText("<html><body style='max-width:220px; color:gray;'><i>Eliminaste este mensaje</i></body></html>");
+                        lblTexto.setText("<html><body style='max-width:230px; color:#6b7280; font-style:italic;'>Eliminaste este mensaje</body></html>");
                         bubble.revalidate();
                         bubble.repaint();
                         this.chatsController.eliminarMensajeBD(idMensaje);
@@ -1153,47 +1150,48 @@ public class ChatUI extends JFrame implements iChatView {
                 popupMensaje.add(itemEliminar);
             }
 
+            JMenuItem itemFijar = createMenuItem("📌  Fijar mensaje");
+            itemFijar.addActionListener(e -> {
+                fijarMensajeUI(idMensaje, texto);
+                FijarMensaje fijarMsg = new FijarMensaje(idMensaje);
+                Mediador.getInstance().sendMessage(idUsuarioActual, fijarMsg);
+            });
+            popupMensaje.add(itemFijar);
+
             bubble.addMouseListener(new MouseAdapter() {
                 private void mostrarPopup(MouseEvent e) {
-                    if (SwingUtilities.isRightMouseButton(e)) {
-                        popupMensaje.show(bubble, e.getX(), e.getY());
-                    }
+                    if (SwingUtilities.isRightMouseButton(e)) popupMensaje.show(bubble, e.getX(), e.getY());
                 }
-                @Override
-                public void mousePressed(MouseEvent e) { mostrarPopup(e); }
-                @Override
-                public void mouseReleased(MouseEvent e) { mostrarPopup(e); }
+                @Override public void mousePressed(MouseEvent e) { mostrarPopup(e); }
+                @Override public void mouseReleased(MouseEvent e) { mostrarPopup(e); }
             });
-        }
 
+
+        }
 
         bubble.add(lblTexto, BorderLayout.CENTER);
         bubble.add(panelInferior, BorderLayout.SOUTH);
-
         return bubble;
     }
     private JPanel crearFilaMensaje(String texto, boolean esMio, String fechaHora, boolean leido, String idMensaje) {
-
         JPanel fila = new JPanel(new BorderLayout());
         fila.setOpaque(false);
-        fila.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        fila.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
         fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
         String soloHora = formatearSoloHora(fechaHora);
         JPanel bubble = crearBurbuja(texto, esMio, soloHora, leido, idMensaje);
 
         if (esMio) {
-            // Mensaje propio: avatar a la DERECHA
-            JPanel contenedor = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+            JPanel contenedor = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
             contenedor.setOpaque(false);
             contenedor.add(bubble);
-            contenedor.add(crearFotoPerfilyo()); // avatar después de la burbuja
+            contenedor.add(crearFotoPerfilyo());
             fila.add(contenedor, BorderLayout.EAST);
         } else {
-            // Mensaje recibido: avatar a la IZQUIERDA
-            JPanel contenedor = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+            JPanel contenedor = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
             contenedor.setOpaque(false);
-            contenedor.add(crearFotoPerfil()); // avatar antes de la burbuja
+            contenedor.add(crearFotoPerfil());
             contenedor.add(bubble);
             fila.add(contenedor, BorderLayout.WEST);
         }
@@ -1203,17 +1201,9 @@ public class ChatUI extends JFrame implements iChatView {
     private String formatearSoloHora(String fechaHora) {
         try {
             java.time.LocalDateTime dateTime =
-                    java.time.LocalDateTime.parse(
-                            fechaHora,
-                            java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                    );
-
-            return dateTime.format(
-                    java.time.format.DateTimeFormatter.ofPattern("HH:mm")
-            );
-
+                    java.time.LocalDateTime.parse(fechaHora, java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            return dateTime.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
         } catch (Exception e) {
-            e.printStackTrace();
             return fechaHora;
         }
     }
@@ -1231,7 +1221,11 @@ public class ChatUI extends JFrame implements iChatView {
         jPanelChat.removeAll();
         jPanelChat.revalidate();
         jPanelChat.repaint();
+        mensajeFijadoId = null;
+        mensajeFijadoTexto = null;
+        if (panelMensajeFijado != null) panelMensajeFijado.setVisible(false);
     }
+
     private String mensajePorFecha(String fechaHora) {
         try {
             java.time.LocalDateTime dateTime =
@@ -1239,26 +1233,20 @@ public class ChatUI extends JFrame implements iChatView {
                             fechaHora,
                             java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
                     );
-
             return dateTime.format(
                     java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd")
             );
-
         } catch (Exception e) {
             return "";
         }
     }
     private void agregarSeparadorFecha(String fecha) {
-
         JPanel panelFecha = new JPanel(new FlowLayout(FlowLayout.CENTER));
         panelFecha.setOpaque(false);
-
-        JLabel lblFecha = new JLabel("---- " + fecha + " ----");
-        lblFecha.setForeground(Color.GRAY);
-        lblFecha.setFont(new Font("Arial", Font.BOLD, 12));
-
+        JLabel lblFecha = new JLabel("── " + fecha + " ──");
+        lblFecha.setForeground(TEXT_MUTED);
+        lblFecha.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         panelFecha.add(lblFecha);
-
         jPanelChat.add(panelFecha);
     }
     public void actualizarChecksAzules(String idMensaje) {
@@ -1271,14 +1259,12 @@ public class ChatUI extends JFrame implements iChatView {
                     for (Component inner : bubble.getComponents()) {
                         if (!(inner instanceof JPanel panelInferior)) continue;
                         for (Component checkComp : panelInferior.getComponents()) {
-                            if (checkComp instanceof JLabel lbl) {
-                                if (idMensaje.equals(lbl.getName())) {
-                                    lbl.setText("✔✔");
-                                    lbl.setForeground(Color.BLUE);
-                                    panelInferior.revalidate();
-                                    panelInferior.repaint();
-                                    return;
-                                }
+                            if (checkComp instanceof JLabel lbl && idMensaje.equals(lbl.getName())) {
+                                lbl.setText("✔✔");
+                                lbl.setForeground(new Color(167, 243, 208));
+                                panelInferior.revalidate();
+                                panelInferior.repaint();
+                                return;
                             }
                         }
                     }
@@ -1333,11 +1319,11 @@ public class ChatUI extends JFrame implements iChatView {
         }
         jContactos.repaint();
     }
-    public void marcarZumbido(String id, boolean estado) {
+    public void marcarZumbido(String id) {
         for (int i = 0; i < contacModel.size(); i++) {
             Contact c = contacModel.get(i);
             if (c.getId().equals(id)) {
-                c.setZumbido(estado);
+                c.setZumbido(true);
                 contacModel.set(i, c);
                 break;
             }
@@ -1400,6 +1386,11 @@ public class ChatUI extends JFrame implements iChatView {
     private JTextField jtName;
     private JTextField jtNameEnviarContacto;
     private JButton jBtnEnviarContacto;
+    private JLabel lblContactoSeleccionado;
+    private String mensajeFijadoId = null;
+    private String mensajeFijadoTexto = null;
+    private JPanel panelMensajeFijado;
+    private JLabel lblMensajeFijado;
 
     public void onMessage(Message message) {
         if (message instanceof Aceptar) {
@@ -1483,7 +1474,8 @@ public class ChatUI extends JFrame implements iChatView {
             this.chatsController.mensajeeliminadoPorCLiente(eliminarMensaje.getIdMensaje());
             actualizarMensajeEliminado(eliminarMensaje.getIdMensaje());
         }
-    }
+
+     }
 
     @Override
     public void onloadContacts(List<Contact> contacts) {
@@ -1527,6 +1519,33 @@ public class ChatUI extends JFrame implements iChatView {
                 Mediador.getInstance().actualizarLeidoBd(c.getIdMensaje());
             }
         }
+    }
+    static class RoundedBorder extends AbstractBorder {
+        private final int radius;
+        private final Color fill;
+        private final Color stroke;
+        private final int thickness;
+
+        RoundedBorder(int radius, Color fill, Color stroke, int thickness) {
+            this.radius = radius; this.fill = fill; this.stroke = stroke; this.thickness = thickness;
+        }
+
+        @Override
+        public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(fill);
+            g2.fillRoundRect(x, y, w - 1, h - 1, radius * 2, radius * 2);
+            g2.setColor(stroke);
+            g2.setStroke(new BasicStroke(thickness));
+            g2.drawRoundRect(x, y, w - 1, h - 1, radius * 2, radius * 2);
+            g2.dispose();
+        }
+
+        @Override
+        public Insets getBorderInsets(Component c) { return new Insets(thickness, thickness, thickness, thickness); }
+        @Override
+        public boolean isBorderOpaque() { return false; }
     }
     // End of variables declaration//GEN-END:variables
 }
