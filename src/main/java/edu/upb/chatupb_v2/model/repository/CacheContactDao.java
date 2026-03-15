@@ -65,5 +65,10 @@ public class CacheContactDao implements IContactDao{
         daoOriginal.update(contact);
         cacheContact.put(contact.getId(), contact);
     }
-
+    public void updateIp(String id, String ip) throws Exception {
+        daoOriginal.updateIp(id, ip);
+        if (cacheContact.containsKey(id)) {
+            cacheContact.get(id).setIp(ip);
+        }
+    }
 }

@@ -12,6 +12,11 @@ import javax.swing.*;
 public class ContactRenderer extends JLabel implements ListCellRenderer<Contact> {
 
     protected static final Font SELECTED_FONT = new Font("Comic Sans MS", Font.PLAIN, 12);
+    private int hoverIndex = -1;
+
+    public void setHoverIndex(int index) {
+        this.hoverIndex = index;
+    }
     static class PuntoRedondo extends JComponent {
 
         private boolean encendido = false;
@@ -63,8 +68,6 @@ public class ContactRenderer extends JLabel implements ListCellRenderer<Contact>
         add(derecha, BorderLayout.EAST);
     }
 
-
-
     @Override
     public Component getListCellRendererComponent(JList<? extends Contact> list, Contact contac, int index, boolean isSelected, boolean cellHasFocus) {
         ImageIcon imageIcon;
@@ -85,12 +88,14 @@ public class ContactRenderer extends JLabel implements ListCellRenderer<Contact>
         punto.setEncendido(contac.isMensajesNoLeidos());
 
         if (isSelected) {
-//            setBackground(Color.BLUE);
-            setBackground(new Color(220,220,220));
+            setBackground(new Color(200, 200, 200));
             setFont(SELECTED_FONT);
-        } else {
+        } else if (index == hoverIndex) {
+            setBackground(new Color(220, 220, 220));
             setFont(UIManager.getFont("Label.font"));
+        } else {
             setBackground(Color.WHITE);
+            setFont(UIManager.getFont("Label.font"));
         }
 
         setOpaque(true);

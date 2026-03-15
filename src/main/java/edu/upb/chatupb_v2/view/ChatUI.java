@@ -62,10 +62,12 @@ public class ChatUI extends JFrame implements iChatView {
         itemZumbido = new JMenuItem("Enviar Zumbido");
         itemInvitacion = new JMenuItem("Enviar invitacion");
         itemEnviarContacto = new JMenuItem("Enviar contacto");
+        itemActualizarIp = new JMenuItem("Actualizar Ip");
         jPopupMenu.add(itemHello);
         jPopupMenu.add(itemZumbido);
         jPopupMenu.add(itemInvitacion);
         jPopupMenu.add(itemEnviarContacto);
+        jPopupMenu.add(itemActualizarIp);
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(900, 600);
@@ -123,31 +125,67 @@ public class ChatUI extends JFrame implements iChatView {
             }
         });
 
+        jContactos.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                int index = jContactos.locationToIndex(e.getPoint());
+                if (index != -1) {
+                    Rectangle cellBounds = jContactos.getCellBounds(index, index);
+                    if (cellBounds != null && cellBounds.contains(e.getPoint())) {
+                        ((ContactRenderer) jContactos.getCellRenderer()).setHoverIndex(index);
+                    } else {
+                        ((ContactRenderer) jContactos.getCellRenderer()).setHoverIndex(-1);
+                    }
+                } else {
+                    ((ContactRenderer) jContactos.getCellRenderer()).setHoverIndex(-1);
+                }
+                jContactos.repaint();
+            }
+        });
+
         jContactos.addMouseListener(new MouseAdapter() {
+            private void mostrarMenu(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    int pos = jContactos.locationToIndex(e.getPoint());
+                    if (pos != -1) {
+                        Rectangle cellBounds = jContactos.getCellBounds(pos, pos);
+                        if (cellBounds != null && cellBounds.contains(e.getPoint())) {
+                            jContactos.setSelectedIndex(pos);
+                            jPopupMenu.show(jContactos, e.getX(), e.getY());
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                int index = jContactos.locationToIndex(e.getPoint());
+                if (index != -1) {
+                    Rectangle cellBounds = jContactos.getCellBounds(index, index);
+                    if (cellBounds == null || !cellBounds.contains(e.getPoint())) {
+                        jContactos.clearSelection();
+                        limpiarChat();
+                        idUsuarioActual = "";
+                    }
+                }
+                mostrarMenu(e);
+            }
 //            @Override
 //            public void mouseClicked(MouseEvent e) {
 //                if (SwingUtilities.isRightMouseButton(e)) {
 //                    System.out.println("click derecho");
 //                }
 //            }
-            private void mostrarMenu(MouseEvent e) {
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    int pos = jContactos.locationToIndex(e.getPoint());
-                    if (pos != -1) {
-                        jContactos.setSelectedIndex(pos);
-                        jPopupMenu.show(jContactos, e.getX(), e.getY());
-                    }
-                }
-            }
-            @Override
-            public void mousePressed(MouseEvent e) {
-                mostrarMenu(e);
-            }
-
             @Override
             public void mouseReleased(MouseEvent e) {
                 mostrarMenu(e);
             }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                ((ContactRenderer) jContactos.getCellRenderer()).setHoverIndex(-1);
+                jContactos.repaint();
+            }
+
         });
 
         itemHello.addActionListener(e -> {
@@ -173,6 +211,13 @@ public class ChatUI extends JFrame implements iChatView {
             if (seleccionado != null) {
                 idUsuarioActual = seleccionado.getId();
                 Mediador.getInstance().establecerConexion(seleccionado.getIp());
+            }
+        });
+        itemActualizarIp.addActionListener(e -> {
+            Contact seleccionado = jContactos.getSelectedValue();
+            if (seleccionado != null) {
+                idUsuarioActual = seleccionado.getId();
+                showIpPopup();
             }
         });
 
@@ -725,6 +770,75 @@ public class ChatUI extends JFrame implements iChatView {
         dialog.add(root);
         dialog.setVisible(true);
     }
+    public void showIpPopup() {
+
+        JDialog dialog = new JDialog(this, true);
+        dialog.setSize(420, 450);
+        dialog.setLocationRelativeTo(this);
+        dialog.setUndecorated(true);
+        dialog.setBackground(new Color(0,0,0,0));
+
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+
+        // ===== CARD PANEL =====
+        JPanel card = new JPanel();
+        card.setLayout(null);
+        card.setBackground(Color.WHITE);
+        card.setBounds(35, 80, 350, 300);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 1, true));
+
+        // ===== IMAGEN =====
+        JLabel imageLabel = new JLabel();
+        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        imageLabel.setBounds(155, 20, 110, 110);
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/robotAdd.png"));
+            Image img = icon.getImage().getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imageLabel.setText("Imagen no encontrada");
+        }
+
+        // ===== TITULO =====
+        JLabel title = new JLabel("Ingrese la ip");
+        title.setFont(new Font("Arial", Font.BOLD, 18));
+        title.setBounds(110, 70, 200, 30);
+
+        // ===== IP =====
+        JLabel ipLabel = new JLabel("Ip:");
+        ipLabel.setFont(new Font("Arial", Font.PLAIN, 13));
+        ipLabel.setBounds(30, 170, 200, 20);
+
+        jtName = new JTextField();
+        jtName.setBounds(30, 190, 290, 30);
+
+        // ===== BOTON =====
+        jBtnAceptar = new JButton("ACEPTAR");
+        jBtnAceptar.setBounds(75, 235, 200, 35);
+        jBtnAceptar.setBackground(Color.GRAY);
+        jBtnAceptar.setForeground(Color.BLACK);
+        jBtnAceptar.setFocusPainted(false);
+
+        jBtnAceptar.addActionListener(evt -> {
+            this.contactController.actualizarIp(idUsuarioActual, jtName.getText());
+            dialog.dispose();
+        });
+
+        // ===== AGREGAMOS AL CARD =====
+        card.add(title);
+        card.add(ipLabel);
+        card.add(jtName);
+        card.add(jBtnAceptar);
+
+        // ===== AGREGAMOS AL ROOT =====
+        root.add(imageLabel);
+        root.add(card);
+
+        dialog.add(root);
+        dialog.setVisible(true);
+    }
     private void showEnviarContactoPopup() {
 
         JDialog dialog = new JDialog(this, true);
@@ -990,7 +1104,7 @@ public class ChatUI extends JFrame implements iChatView {
         }
 
         JLabel lblTexto;
-        if (texto.equals("Eliminaste este mensaje")) {
+        if (texto.equals("Eliminaste este mensaje") || texto.equals("Se elimino este mensaje")) {
             lblTexto = new JLabel(
                     "<html><body style='max-width:220px; color:gray;'><i> " + texto + "</i></body></html>"
             );
@@ -1008,6 +1122,7 @@ public class ChatUI extends JFrame implements iChatView {
         JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 0));
         panelInferior.setOpaque(false);
         panelInferior.add(lblHora);
+        lblTexto.setName(idMensaje);
 
         if (esMio) {
             JLabel lblCheck = new JLabel(leido ? "✔✔" : "✔");
@@ -1147,7 +1262,6 @@ public class ChatUI extends JFrame implements iChatView {
         jPanelChat.add(panelFecha);
     }
     public void actualizarChecksAzules(String idMensaje) {
-
         for (Component filaComp : jPanelChat.getComponents()) {
             if (!(filaComp instanceof JPanel fila)) continue;
             for (Component contenedorComp : fila.getComponents()) {
@@ -1166,6 +1280,30 @@ public class ChatUI extends JFrame implements iChatView {
                                     return;
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    public void actualizarMensajeEliminado(String idMensaje) {
+        for (Component filaComp : jPanelChat.getComponents()) {
+            if (!(filaComp instanceof JPanel fila)) continue;
+            for (Component contenedorComp : fila.getComponents()) {
+                if (!(contenedorComp instanceof JPanel contenedor)) continue;
+                for (Component bubbleComp : contenedor.getComponents()) {
+                    if (!(bubbleComp instanceof JPanel bubble)) continue;
+                    for (Component inner : bubble.getComponents()) {
+                        if (inner instanceof JLabel lbl && idMensaje.equals(lbl.getName())) {
+                            Component centro = ((BorderLayout) bubble.getLayout()).getLayoutComponent(BorderLayout.CENTER);
+                            if (centro instanceof JLabel lblTexto) {
+                                SwingUtilities.invokeLater(() -> {
+                                    lblTexto.setText("<html><body style='max-width:220px; color:gray;'><i>Se eliminó este mensaje</i></body></html>");
+                                    bubble.revalidate();
+                                    bubble.repaint();
+                                });
+                            }
+                            return;
                         }
                     }
                 }
@@ -1255,6 +1393,7 @@ public class ChatUI extends JFrame implements iChatView {
     private JMenuItem itemHello;
     private JMenuItem itemInvitacion;
     private JMenuItem itemEnviarContacto;
+    private JMenuItem itemActualizarIp;
     private JButton jBtnConectar;
     private JButton jBtnAceptar;
     private JTextField jtIp;
@@ -1342,6 +1481,7 @@ public class ChatUI extends JFrame implements iChatView {
         if (message instanceof EliminarMensaje) {
             EliminarMensaje eliminarMensaje = (EliminarMensaje) message;
             this.chatsController.mensajeeliminadoPorCLiente(eliminarMensaje.getIdMensaje());
+            actualizarMensajeEliminado(eliminarMensaje.getIdMensaje());
         }
     }
 
