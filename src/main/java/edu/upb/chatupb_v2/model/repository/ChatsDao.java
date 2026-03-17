@@ -186,5 +186,15 @@ public class ChatsDao {
         String resultado = helper.executeQuerySingleString(query, params);
         return "1".equals(resultado);
     }
+    public boolean isLeido(String idMensaje) throws Exception {
+        String query = "SELECT leido FROM chats WHERE idMensaje = ?";
+
+        DaoHelper.QueryParameters params = pst -> {
+            pst.setString(1, idMensaje);
+        };
+
+        String resultado = helper.executeQuerySingleString(query, params);
+        return "1".equals(resultado);
+    }
 
 }

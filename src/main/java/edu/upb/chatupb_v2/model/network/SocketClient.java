@@ -8,6 +8,8 @@ import edu.upb.chatupb_v2.controller.Mediador;
 import edu.upb.chatupb_v2.controller.exception.OperationException;
 import edu.upb.chatupb_v2.model.entities.message.*;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;

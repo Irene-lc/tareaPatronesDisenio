@@ -7,15 +7,6 @@ import javax.swing.*;
 
 public class ContactRenderer extends JPanel implements ListCellRenderer<Contact> {
 
-    private static final Color BG_NORMAL   = new Color(18, 24, 42);
-    private static final Color BG_HOVER    = new Color(28, 36, 60);
-    private static final Color BG_SELECTED = new Color(79, 70, 229, 55);
-    private static final Color TEXT_NAME   = new Color(230, 235, 255);
-    private static final Color TEXT_MUTED  = new Color(148, 163, 184);
-    private static final Color ACCENT      = new Color(129, 140, 248);
-    private static final Color ONLINE_DOT  = new Color(52, 211, 153);
-    private static final Color OFFLINE_DOT = new Color(100, 116, 139);
-
     private int hoverIndex = -1;
 
     public void setHoverIndex(int index) {
@@ -54,7 +45,8 @@ public class ContactRenderer extends JPanel implements ListCellRenderer<Contact>
             g2.drawString(initial, tx, ty);
 
             // Indicador de estado (abajo a la derecha)
-            g2.setColor(online ? ONLINE_DOT : OFFLINE_DOT);
+            ThemeManager.ThemeColors c = ThemeManager.getColors();
+            g2.setColor(online ? c.ONLINE_DOT : c.OFFLINE_DOT);
             g2.fillOval(25, 25, 10, 10);
             g2.setColor(new Color(18, 24, 42)); // border
             g2.setStroke(new BasicStroke(1.5f));
@@ -82,7 +74,8 @@ public class ContactRenderer extends JPanel implements ListCellRenderer<Contact>
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 //            g2.setColor(new Color(129, 140, 248));
-            g2.setColor(new Color(20, 184, 166));
+            g2.setColor(ThemeManager.getColors().NOTIF_DOT);
+//            g2.setColor(new Color(20, 184, 166));
             g2.fillOval(0, 0, getWidth(), getHeight());
             g2.dispose();
         }
@@ -94,14 +87,6 @@ public class ContactRenderer extends JPanel implements ListCellRenderer<Contact>
     private final NotifDot notifDot = new NotifDot();
 
     // Paleta de colores para avatares
-    private static final Color[] AVATAR_COLORS = {
-            new Color(99, 102, 241),
-            new Color(168, 85, 247),
-            new Color(236, 72, 153),
-            new Color(20, 184, 166),
-            new Color(245, 158, 11),
-            new Color(59, 130, 246),
-    };
 
     public ContactRenderer() {
         setLayout(new BorderLayout(10, 0));
@@ -114,7 +99,8 @@ public class ContactRenderer extends JPanel implements ListCellRenderer<Contact>
         // Panel central: nombre
         lblName.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         lblName.setVerticalAlignment(SwingConstants.CENTER);
-        lblName.setForeground(TEXT_NAME);
+//        lblName.setForeground(TEXT_NAME);
+        lblName.setForeground(ThemeManager.getColors().TEXT_PRIMARY);
         add(lblName, BorderLayout.CENTER);
 
         // Panel derecho: notificaciones
@@ -135,18 +121,19 @@ public class ContactRenderer extends JPanel implements ListCellRenderer<Contact>
             boolean isSelected,
             boolean cellHasFocus) {
 
+        ThemeManager.ThemeColors colors = ThemeManager.getColors();
         // Avatar: initial + color determinístico por nombre
         String name = contact.getName() != null && !contact.getName().isEmpty()
                 ? contact.getName() : "?";
         String initial = String.valueOf(name.charAt(0)).toUpperCase();
-        Color avatarColor = AVATAR_COLORS[Math.abs(name.hashCode()) % AVATAR_COLORS.length];
+        Color avatarColor = colors.AVATAR_COLORS[Math.abs(name.hashCode()) % colors.AVATAR_COLORS.length];
         avatar.setInitial(initial);
         avatar.setColor(avatarColor);
         avatar.setOnline(contact.isStateConnect());
 
         // Nombre
         lblName.setText(name);
-        lblName.setForeground(isSelected ? new Color(224, 231, 255) : TEXT_NAME);
+        lblName.setForeground(isSelected ? colors.TEXT_PRIMARY : colors.TEXT_PRIMARY);
 
         // Notificaciones
         lblBell.setVisible(contact.isZumbido());
@@ -154,11 +141,11 @@ public class ContactRenderer extends JPanel implements ListCellRenderer<Contact>
 
         // Fondo
         if (isSelected) {
-            setBackground(BG_SELECTED);
+            setBackground(colors.BG_SELECTED);
         } else if (index == hoverIndex) {
-            setBackground(BG_HOVER);
+            setBackground(colors.BG_HOVER);
         } else {
-            setBackground(BG_NORMAL);
+            setBackground(colors.BG_NORMAL);
         }
 
         return this;
