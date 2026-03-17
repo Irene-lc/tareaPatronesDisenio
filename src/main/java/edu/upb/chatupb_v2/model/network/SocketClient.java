@@ -95,6 +95,14 @@ public class SocketClient extends Thread {
                         Zumbido zumbido = Zumbido.parse(message);
                         notificar(zumbido);
                         break;
+                    case "011":
+                        FijarMensaje fijarMensaje = FijarMensaje.parse(message);
+                        notificar(fijarMensaje);
+                        break;
+                    case "012":
+                        MensajeUnico mensajeUnico = MensajeUnico.parse(message);
+                        notificar(mensajeUnico);
+                        break;
                     case "0018":
                         FueraLinea fueraLinea = FueraLinea.parse(message);
                         notificar(fueraLinea);

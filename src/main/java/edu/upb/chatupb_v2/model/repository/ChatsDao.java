@@ -39,6 +39,12 @@ public class ChatsDao {
         if (existColumn(result, Chats.Column.LEIDO)) {
             prefacturaSync.setLeido(result.getString(Chats.Column.LEIDO));
         }
+        if (existColumn(result, Chats.Column.FIJADO)) {
+            prefacturaSync.setFijado(result.getString(Chats.Column.FIJADO));
+        }
+        if (existColumn(result, Chats.Column.UNICO)) {
+            prefacturaSync.setUnico(result.getString(Chats.Column.UNICO));
+        }
         return prefacturaSync;
     };
 
@@ -72,7 +78,7 @@ public class ChatsDao {
     }
 
     public void save(Chats chats) throws Exception {
-        String query = "INSERT INTO chats(idMensaje, mensajeTxt, hora, idEmisor, idReceptor, leido) values (?,?,?,?,?,?)";
+        String query = "INSERT INTO chats(idMensaje, mensajeTxt, hora, idEmisor, idReceptor, leido, fijado, unico) values (?,?,?,?,?,?,?,?)";
         DaoHelper.QueryParameters params = new DaoHelper.QueryParameters() {
             @Override
             public void setParameters(PreparedStatement pst) throws SQLException {
@@ -82,6 +88,8 @@ public class ChatsDao {
                 pst.setString(4, chats.getIdEmisor());
                 pst.setString(5, chats.getIdReceptor());
                 pst.setString(6, chats.getLeido());
+                pst.setString(7, chats.getFijado());
+                pst.setString(8, chats.getUnico());
             }
         };
         helper.insert(query, params, chats);
@@ -97,7 +105,7 @@ public class ChatsDao {
     }
     public List<Chats> findByContact(String idEmisor, String idReceptor) throws Exception {
         String query = """
-        SELECT idMensaje, mensajeTxt, hora, idEmisor, idReceptor, leido
+        SELECT idMensaje, mensajeTxt, hora, idEmisor, idReceptor, leido, fijado, unico
         FROM chats 
         WHERE (idEmisor = ? AND idReceptor = ?)
            OR (idEmisor = ? AND idReceptor = ?)
@@ -121,6 +129,21 @@ public class ChatsDao {
         };
         helper.update(query, params);
     }
+    public void updateFijado(String id, boolean fijado) throws Exception {
+        String query = "UPDATE chats SET fijado = ? WHERE idMensaje = ?";
+        DaoHelper.QueryParameters params = pst -> {
+            pst.setInt(1, fijado ? 1 : 0);
+            pst.setString(2, id);
+        };
+        helper.update(query, params);
+    }
+    public void updateUnico(String id) throws Exception {
+        String query = "UPDATE chats SET unico = 1 WHERE idMensaje = ?";
+        DaoHelper.QueryParameters params = pst -> {
+            pst.setString(1, id);
+        };
+        helper.update(query, params);
+    }
     public void updateEliminarMensaje(String id) throws Exception {
         String query = "UPDATE chats SET mensajeTxt = 'Eliminaste este mensaje' WHERE idMensaje = ?";
         DaoHelper.QueryParameters params = pst -> {
@@ -135,6 +158,13 @@ public class ChatsDao {
         };
         helper.update(query, params);
     }
+    public void updateMensajeUnico(String id) throws Exception {
+        String query = "UPDATE chats SET mensajeTxt = null WHERE idMensaje = ?";
+        DaoHelper.QueryParameters params = pst -> {
+            pst.setString(1, id);
+        };
+        helper.update(query, params);
+    }
 
     public String findMessage(String id) throws Exception {
         String query = "SELECT mensajeTxt FROM chats WHERE idMensaje = ?";
@@ -144,6 +174,17 @@ public class ChatsDao {
         };
 
         return helper.executeQuerySingleString(query, params);
+    }
+
+    public boolean isUnico(String idMensaje) throws Exception {
+        String query = "SELECT unico FROM chats WHERE idMensaje = ?";
+
+        DaoHelper.QueryParameters params = pst -> {
+            pst.setString(1, idMensaje);
+        };
+
+        String resultado = helper.executeQuerySingleString(query, params);
+        return "1".equals(resultado);
     }
 
 }

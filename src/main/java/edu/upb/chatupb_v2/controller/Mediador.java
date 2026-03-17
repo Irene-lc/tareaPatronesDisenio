@@ -78,11 +78,22 @@ public class Mediador implements SocketListener {
         }
         try {
             String idMensaje = UUID.randomUUID().toString();
-            Message message = new Mensaje(idMio, idMensaje, mensaje);
-            sendMessage(idCliente, message);
-            chatUI.chatsController.guardarEnBd(idMensaje, mensaje, idMio, idCliente, obtenerHoraActual());
-            if (chatUI != null)
-                chatUI.agregarMensajeUI(mensaje, true, obtenerHoraActual(), false, idMensaje);
+            if (!chatUI.modoMensajeUnico) {
+                Message message = new Mensaje(idMio, idMensaje, mensaje);
+                chatUI.chatsController.guardarEnBd(idMensaje, mensaje, idMio, idCliente, obtenerHoraActual(), false);
+                sendMessage(idCliente, message);
+                if (chatUI != null) {
+                    chatUI.agregarMensajeUI(mensaje, true, obtenerHoraActual(), false, idMensaje);
+                }
+            } else {
+                MensajeUnico mensajeUnico = new MensajeUnico(idMio, idMensaje, mensaje);
+                chatUI.chatsController.guardarEnBd(idMensaje, mensaje, idMio, idCliente, obtenerHoraActual(), true);
+                this.chatsDao.updateUnico(idMensaje);
+                sendMessage(idCliente, mensajeUnico);
+                if (chatUI != null) {
+                    chatUI.agregarMensajeUnicoUI(mensajeUnico.getMensaje(),true, obtenerHoraActual(), false, idMensaje);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -251,6 +262,13 @@ public class Mediador implements SocketListener {
             e.printStackTrace();
         }
     }
+    public void actualizarFijado(String id, boolean fijado) {
+        try {
+            this.chatsDao.updateFijado(id, fijado);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public synchronized void onMessage(SocketClient socketClient, Message message) {
@@ -291,7 +309,8 @@ public class Mediador implements SocketListener {
         if (message instanceof Zumbido) {
             Zumbido zumbido = (Zumbido) message;
             try {
-                chatUI.marcarZumbido(zumbido.getIdUsuario());
+                if (!chatUI.idUsuarioActual.equals(zumbido.getIdUsuario()))
+                    chatUI.marcarZumbido(zumbido.getIdUsuario());
                 Contact contact = this.contactDao.findById(zumbido.getIdUsuario());
                 if (contact != null) {
                     chatUI.showZumbidoPopup(contact.getName());
@@ -316,6 +335,26 @@ public class Mediador implements SocketListener {
                     String mensaje = chatsDao.findMessage(fijarMensaje.getIdMensaje());
                     if (chatUI != null)
                         chatUI.fijarMensajeUI(fijarMensaje.getIdMensaje(), mensaje);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (message instanceof MensajeUnico) {
+            MensajeUnico mensajeUnico = (MensajeUnico) message;
+            try {
+                this.chatsDao.updateUnico(mensajeUnico.getIdMensaje());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (chatUI != null) {
+                chatUI.agregarMensajeUnicoUI(mensajeUnico.getMensaje(), false, obtenerHoraActual(), false, mensajeUnico.getIdMensaje());
+            }
+        }
+        if (message instanceof ConfirmarRecibido) {
+            try {
+                if (this.chatsDao.isUnico(((ConfirmarRecibido) message).getIdMensaje())) {
+                    this.chatsDao.updateMensajeUnico(((ConfirmarRecibido) message).getIdMensaje());
                 }
             } catch (Exception e) {
                 e.printStackTrace();

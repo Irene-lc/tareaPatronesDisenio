@@ -12,11 +12,9 @@ import lombok.Setter;
 
 import javax.swing.*;
 import javax.swing.border.AbstractBorder;
+import javax.swing.text.DefaultEditorKit;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.List;
 
 
@@ -38,6 +36,7 @@ public class ChatUI extends JFrame implements iChatView {
     private static final Color BTN_SEND      = new Color(99, 102, 241);
     private static final Color BTN_SEND_HOV  = new Color(129, 140, 248);
     private static final Color SYSTEM_RED    = new Color(248, 113, 113);
+    private static final Color BTN_UNICO_ACTIVE = new Color(251, 191, 36); // Amarillo/dorado
 
     @Setter
     public ContactController contactController;
@@ -107,14 +106,14 @@ public class ChatUI extends JFrame implements iChatView {
             }
         });
 
-        jBtnNuevaConexion = createIconButton("+", "Agregar contacto");
+        jBtnNuevaConexion = createNuevaConexionButton("+", "Agregar contacto");
         jBtnNuevaConexion.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 jBtnNuevaConexionActionPerformed(evt);
             }
         });
 
-        jBtnOff = createDangerButton("⏻");
+        jBtnOff = createOffButton("⏻");
         jBtnOff.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 jBtnOffActionPerformed(evt);
@@ -213,7 +212,7 @@ public class ChatUI extends JFrame implements iChatView {
                     if (cellBounds == null || !cellBounds.contains(e.getPoint())) {
                         jContactos.clearSelection();
                         limpiarChat();
-                        idUsuarioActual = null;
+                        idUsuarioActual = " ";
                         lblContactoSeleccionado.setText("ChatUPB");
                     }
                 }
@@ -386,9 +385,41 @@ public class ChatUI extends JFrame implements iChatView {
         // Acción de Enter
         jtMensaje.addActionListener(evt -> jBtnEnviarActionPerformed(evt));
 
-        panelInferior.add(jtMensaje, BorderLayout.CENTER);
-        panelInferior.add(jBtnEnviar, BorderLayout.EAST);
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
+        panelBotones.setOpaque(false);
+        jBtnMensajeUnico = createMensajeUnicoButton();
+        jBtnMensajeUnico.addActionListener(evt -> {
+            modoMensajeUnico = !modoMensajeUnico;
+            jBtnMensajeUnico.setForeground(modoMensajeUnico ? BTN_UNICO_ACTIVE : ACCENT);
+            jBtnMensajeUnico.setToolTipText(modoMensajeUnico ?
+                    "Mensaje único ACTIVADO (clic para desactivar)" :
+                    "Mensaje único (se ve solo una vez)");
+            jBtnMensajeUnico.repaint();
+        });
 
+        panelBotones.add(jBtnMensajeUnico);
+        panelBotones.add(jBtnEnviar);
+
+        panelInferior.add(jtMensaje, BorderLayout.CENTER);
+        panelInferior.add(panelBotones, BorderLayout.EAST);
+
+        // Asegurar Ctrl+V en el campo de mensaje
+        jtMensaje.getInputMap(JComponent.WHEN_FOCUSED).put(
+                KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
+                DefaultEditorKit.pasteAction
+        );
+        jtMensaje.getInputMap(JComponent.WHEN_FOCUSED).put(
+                KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
+                DefaultEditorKit.copyAction
+        );
+        jtMensaje.getInputMap(JComponent.WHEN_FOCUSED).put(
+                KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
+                DefaultEditorKit.cutAction
+        );
+        jtMensaje.getInputMap(JComponent.WHEN_FOCUSED).put(
+                KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
+                DefaultEditorKit.selectAllAction
+        );
         return panelInferior;
     }
     private JButton createSendButton() {
@@ -414,7 +445,7 @@ public class ChatUI extends JFrame implements iChatView {
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
     }
-    private JButton createIconButton(String text, String tooltip) {
+    private JButton createNuevaConexionButton(String text, String tooltip) {
         JButton btn = new JButton(text) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -429,10 +460,10 @@ public class ChatUI extends JFrame implements iChatView {
                 super.paintComponent(g);
             }
         };
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btn.setForeground(ACCENT);
 //        btn.setPreferredSize(new Dimension(36, 32));
-        btn.setMargin(new Insets(4, 20, 4, 20));
+        btn.setMargin(new Insets(4, 10, 4, 10));
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
@@ -440,7 +471,7 @@ public class ChatUI extends JFrame implements iChatView {
         btn.setToolTipText(tooltip);
         return btn;
     }
-    private JButton createDangerButton(String text) {
+    private JButton createOffButton(String text) {
         JButton btn = new JButton(text) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -458,7 +489,7 @@ public class ChatUI extends JFrame implements iChatView {
         btn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
         btn.setForeground(new Color(248, 113, 113));
 //        btn.setPreferredSize(new Dimension(36, 32));
-        btn.setMargin(new Insets(4, 20, 4, 20));
+        btn.setMargin(new Insets(4, 10, 4, 10));
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
@@ -509,6 +540,34 @@ public class ChatUI extends JFrame implements iChatView {
         item.setBorder(BorderFactory.createEmptyBorder(7, 16, 7, 16));
         item.setOpaque(true);
         return item;
+    }
+    private JButton createMensajeUnicoButton() {
+        JButton btn = new JButton("⏱") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                Color bg;
+                if (modoMensajeUnico) {
+                    bg = getModel().isRollover() ? new Color(251, 191, 36, 120) : new Color(251, 191, 36, 80);
+                } else {
+                    bg = getModel().isRollover() ? new Color(79, 70, 229, 80) : new Color(79, 70, 229, 35);
+                }
+                g2.setColor(bg);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        btn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
+        btn.setForeground(ACCENT);
+        btn.setMargin(new Insets(4, 10, 4, 10));
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setToolTipText("Mensaje único (se ve solo una vez)");
+        return btn;
     }
 
     private JDialog createBaseDialog(int w, int h) {
@@ -971,13 +1030,34 @@ public class ChatUI extends JFrame implements iChatView {
         dialog.add(root); dialog.setVisible(true);
     }
 
+    public void showMensajeUnicoPopup(String mensaje) {
+        final boolean[] accepted = {false};
+        JDialog dialog = createBaseDialog(400, 270);
+        JPanel root = new JPanel(null); root.setOpaque(false);
+        JPanel card = createDarkCard(20, 40, 360, 200);
+        JLabel robot = createRobotIcon(260, -10, "/images/robotRequest.png");
+
+        JLabel title = new JLabel("Mensaje Único");
+        title.setFont(new Font("Georgia", Font.BOLD, 16));
+        title.setForeground(TEXT_PRIMARY);
+        title.setBounds(20, 20, 240, 28);
+
+        JLabel sub = new JLabel("<html><body style='color:#94a3b8;font-size:12px;'>" + mensaje + "</body></html>");
+        sub.setBounds(20, 54, 240, 24);
+
+        JButton ok = createPopupOkButton("OK", 20, 100, 90, 34);
+        ok.addActionListener(e -> dialog.dispose());
+
+        card.add(title); card.add(sub); card.add(ok);
+        root.add(robot); root.add(card);
+        dialog.add(root); dialog.setVisible(true);
+    }
     private void jBtnEnviarActionPerformed(ActionEvent evt) {//GEN-FIRST:event_jBtnEnviarActionPerformed
         String mensajeTxt = jtMensaje.getText().toString();
-        if (mensajeTxt.isEmpty() || idUsuarioActual == null) {
+        if (mensajeTxt.isEmpty() || idUsuarioActual == null || idUsuarioActual.equals(" ")) {
             System.out.println("Entra aca");
             return;
         }
-
         System.out.println("Enviando 007...");
         Mediador.getInstance().enviarMensajePorChat(idUsuarioActual, mensajeTxt);
         jtMensaje.setText("");
@@ -1045,14 +1125,46 @@ public class ChatUI extends JFrame implements iChatView {
     public void fijarMensajeUI(String idMensaje, String texto) {
         mensajeFijadoId = idMensaje;
         mensajeFijadoTexto = texto;
-        String textoCortado = texto.length() > 60 ? texto.substring(0, 57) + "…" : texto;
+        String textoCortado = texto.length() > 95 ? texto.substring(0, 90) + "…" : texto;
         lblMensajeFijado.setText(textoCortado);
         panelMensajeFijado.setVisible(true);
         panelMensajeFijado.revalidate();
         panelMensajeFijado.repaint();
+        panelMensajeFijado.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        Mediador.getInstance().actualizarFijado(idMensaje, true);
+        for (MouseListener ml : panelMensajeFijado.getMouseListeners()) {
+            panelMensajeFijado.removeMouseListener(ml);
+        }
+        panelMensajeFijado.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                scrollAlMensajeFijado(idMensaje);
+            }
+        });
     }
-
+    private void scrollAlMensajeFijado(String idMensaje) {
+        for (Component filaComp : jPanelChat.getComponents()) {
+            if (!(filaComp instanceof JPanel fila)) continue;
+            for (Component contenedorComp : fila.getComponents()) {
+                if (!(contenedorComp instanceof JPanel contenedor)) continue;
+                for (Component bubbleComp : contenedor.getComponents()) {
+                    if (!(bubbleComp instanceof JPanel bubble)) continue;
+                    for (Component inner : bubble.getComponents()) {
+                        if (inner instanceof JLabel lbl && idMensaje.equals(lbl.getName())) {
+                            Rectangle bounds = fila.getBounds();
+                            SwingUtilities.invokeLater(() -> {
+                                jScrollPaneChat.getVerticalScrollBar()
+                                        .setValue(bounds.y);
+                            });
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
     private void desfijarMensaje() {
+        Mediador.getInstance().actualizarFijado(mensajeFijadoId, false);
         mensajeFijadoId = null;
         mensajeFijadoTexto = null;
         panelMensajeFijado.setVisible(false);
@@ -1080,120 +1192,164 @@ public class ChatUI extends JFrame implements iChatView {
         }
         return foto;
     }
-
-
     private JPanel crearBurbuja(String texto, boolean esMio, String hora, boolean leido, String idMensaje) {
-        JPanel bubble = new JPanel(new BorderLayout()) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(getBackground());
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
-                g2.dispose();
-            }
-        };
-        bubble.setOpaque(false);
-        bubble.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
-        bubble.setMaximumSize(new Dimension(320, Integer.MAX_VALUE));
-        bubble.setBackground(esMio ? BG_BUBBLE_ME : BG_BUBBLE_YOU);
+    int maxBubbleWidth = 320;
+    int htmlWidth = maxBubbleWidth - 56;
+    String colorHex = esMio ? "#e0e7ff" : "#cbd5e1";
 
-        JLabel lblTexto;
-        String colorHex = esMio ? "#e0e7ff" : "#cbd5e1";
-
-        if (texto.equals("Eliminaste este mensaje") || texto.equals("Se elimino este mensaje")) {
+    JLabel lblTexto;
+    if (texto.equals("Eliminaste este mensaje") || texto.equals("Se elimino este mensaje")) {
+        lblTexto = new JLabel(
+                "<html><body style='max-width:" + htmlWidth + "px; color:#6b7280; font-style:italic; font-family:Segoe UI;'>" + texto + "</body></html>"
+        );
+    } else {
+        if (texto.length() > htmlWidth) {
             lblTexto = new JLabel(
-                    "<html><body style='max-width:230px; color:#6b7280; font-style:italic; font-family:Segoe UI;'>" + texto + "</body></html>"
+                    "<html><body style='width:" + htmlWidth + "px; color:" + colorHex + "; font-family:Segoe UI;'>" + texto + "</body></html>"
             );
         } else {
             lblTexto = new JLabel(
-                    "<html><body style='max-width:230px; color:" + colorHex + "; font-family:Segoe UI;'>" + texto + "</body></html>"
+                    "<html><body style='max-width:" + htmlWidth + "px; color:" + colorHex + "; font-family:Segoe UI;'>" + texto + "</body></html>"
             );
         }
-
-        JLabel lblHora = new JLabel(hora);
-        lblHora.setFont(new Font("Segoe UI", Font.PLAIN, 9));
-        lblHora.setForeground(esMio ? new Color(196, 181, 253, 180) : new Color(148, 163, 184, 180));
-
-        JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 0));
-        panelInferior.setOpaque(false);
-        panelInferior.add(lblHora);
-        lblTexto.setName(idMensaje);
-
-        if (esMio) {
-            JLabel lblCheck = new JLabel(leido ? "✔✔" : "✔");
-            lblCheck.setName(idMensaje);
-            lblCheck.setFont(new Font("Segoe UI", Font.PLAIN, 9));
-            lblCheck.setForeground(leido ? new Color(167, 243, 208) : new Color(148, 163, 184));
-            panelInferior.add(lblCheck);
-
-            JPopupMenu popupMensaje = new JPopupMenu();
-            stylePopupMenu(popupMensaje);
-            JMenuItem itemEliminar = createMenuItem("🗑  Eliminar mensaje");
-            if (!texto.equals("Eliminaste este mensaje")) {
-                itemEliminar.addActionListener(e -> {
-                    int confirm = JOptionPane.showConfirmDialog(
-                            this,
-                            "¿Deseas eliminar este mensaje?",
-                            "Eliminar",
-                            JOptionPane.YES_NO_OPTION
-                    );
-                    if (confirm == JOptionPane.YES_OPTION) {
-                        lblTexto.setText("<html><body style='max-width:230px; color:#6b7280; font-style:italic;'>Eliminaste este mensaje</body></html>");
-                        bubble.revalidate();
-                        bubble.repaint();
-                        this.chatsController.eliminarMensajeBD(idMensaje);
-                        EliminarMensaje eliminarMensaje = new EliminarMensaje(idMensaje);
-                        Mediador.getInstance().sendMessage(idUsuarioActual, eliminarMensaje);
-                    }
-                });
-                popupMensaje.add(itemEliminar);
-            }
-
-            JMenuItem itemFijar = createMenuItem("📌  Fijar mensaje");
-            itemFijar.addActionListener(e -> {
-                fijarMensajeUI(idMensaje, texto);
-                FijarMensaje fijarMsg = new FijarMensaje(idMensaje);
-                Mediador.getInstance().sendMessage(idUsuarioActual, fijarMsg);
-            });
-            popupMensaje.add(itemFijar);
-
-            bubble.addMouseListener(new MouseAdapter() {
-                private void mostrarPopup(MouseEvent e) {
-                    if (SwingUtilities.isRightMouseButton(e)) popupMensaje.show(bubble, e.getX(), e.getY());
-                }
-                @Override public void mousePressed(MouseEvent e) { mostrarPopup(e); }
-                @Override public void mouseReleased(MouseEvent e) { mostrarPopup(e); }
-            });
-
-
-        }
-
-        bubble.add(lblTexto, BorderLayout.CENTER);
-        bubble.add(panelInferior, BorderLayout.SOUTH);
-        return bubble;
     }
+    lblTexto.setName(idMensaje);
+    lblTexto.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+    JLabel lblHora = new JLabel(hora);
+    lblHora.setFont(new Font("Segoe UI", Font.PLAIN, 9));
+    lblHora.setForeground(esMio ? new Color(196, 181, 253, 180) : new Color(148, 163, 184, 180));
+
+    JPanel contenidoInterno = new JPanel();
+    contenidoInterno.setLayout(new BoxLayout(contenidoInterno, BoxLayout.Y_AXIS));
+    contenidoInterno.setOpaque(false);
+
+    JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 0)) {
+        @Override
+        public Dimension getPreferredSize() {
+            Dimension d = super.getPreferredSize();
+            int w = contenidoInterno.getWidth() > 0 ? contenidoInterno.getWidth() : Math.max(d.width, 95);
+            return new Dimension(w, d.height);
+        }
+        @Override
+        public Dimension getMaximumSize() {
+            return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
+        }
+    };
+    panelInferior.setOpaque(false);
+    panelInferior.setAlignmentX(Component.LEFT_ALIGNMENT);
+    panelInferior.add(lblHora);
+
+    contenidoInterno.add(lblTexto);
+    contenidoInterno.add(panelInferior);
+
+    JPopupMenu popupMensaje = new JPopupMenu();
+
+    JPanel bubble = new JPanel(new BorderLayout()) {
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(getBackground());
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
+            g2.dispose();
+        }
+        @Override
+        public Dimension getMaximumSize() {
+            Dimension pref = getPreferredSize();
+            return new Dimension(maxBubbleWidth, pref.height);
+        }
+        @Override
+        public Dimension getMinimumSize() {
+            return new Dimension(110, super.getMinimumSize().height);
+        }
+        @Override
+        public Dimension getPreferredSize() {
+            Dimension d = super.getPreferredSize();
+            return new Dimension(Math.max(d.width, 110), d.height);
+        }
+    };
+    bubble.setOpaque(false);
+    bubble.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
+    bubble.setBackground(esMio ? BG_BUBBLE_ME : BG_BUBBLE_YOU);
+    bubble.add(contenidoInterno, BorderLayout.CENTER);
+
+    if (esMio) {
+        stylePopupMenu(popupMensaje);
+        JLabel lblCheck = new JLabel(leido ? "✔✔" : "✔");
+        lblCheck.setName(idMensaje);
+        lblCheck.setFont(new Font("Segoe UI", Font.PLAIN, 9));
+        lblCheck.setForeground(leido ? new Color(167, 243, 208) : new Color(148, 163, 184));
+        panelInferior.add(lblCheck);
+
+        JMenuItem itemEliminar = createMenuItem("Eliminar mensaje");
+        if (!texto.equals("Eliminaste este mensaje")) {
+            itemEliminar.addActionListener(e -> {
+                boolean eliminar = showEliminarMensajePopup();
+                if (eliminar) {
+                    lblTexto.setText("<html><body style='max-width:230px; color:#6b7280; font-style:italic;'>Eliminaste este mensaje</body></html>");
+                    bubble.revalidate();
+                    bubble.repaint();
+                    this.chatsController.eliminarMensajeBD(idMensaje);
+                    EliminarMensaje eliminarMensaje = new EliminarMensaje(idMensaje);
+                    Mediador.getInstance().sendMessage(idUsuarioActual, eliminarMensaje);
+                }
+            });
+            popupMensaje.add(itemEliminar);
+        }
+    }
+
+    JMenuItem itemFijar = createMenuItem("Fijar mensaje");
+    if (!texto.equals("Eliminaste este mensaje") && !texto.equals("Se elimino este mensaje")) {
+        itemFijar.addActionListener(e -> {
+            fijarMensajeUI(idMensaje, texto);
+            FijarMensaje fijarMsg = new FijarMensaje(idMensaje);
+            Mediador.getInstance().sendMessage(idUsuarioActual, fijarMsg);
+        });
+        popupMensaje.add(itemFijar);
+    }
+
+    bubble.addMouseListener(new MouseAdapter() {
+        private void mostrarPopup(MouseEvent e) {
+            if (SwingUtilities.isRightMouseButton(e)) popupMensaje.show(bubble, e.getX(), e.getY());
+        }
+        @Override public void mousePressed(MouseEvent e) { mostrarPopup(e); }
+        @Override public void mouseReleased(MouseEvent e) { mostrarPopup(e); }
+    });
+
+    return bubble;
+}
     private JPanel crearFilaMensaje(String texto, boolean esMio, String fechaHora, boolean leido, String idMensaje) {
-        JPanel fila = new JPanel(new BorderLayout());
+        JPanel fila = new JPanel() {
+            @Override
+            public Dimension getMaximumSize() {
+                return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
+            }
+        };
+        fila.setLayout(new BoxLayout(fila, BoxLayout.X_AXIS));
         fila.setOpaque(false);
         fila.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
-        fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+        // Limitar altura de la fila a su preferredSize
+//        fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, Short.MAX_VALUE));
+        fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, fila.getPreferredSize().height));
 
         String soloHora = formatearSoloHora(fechaHora);
         JPanel bubble = crearBurbuja(texto, esMio, soloHora, leido, idMensaje);
+        bubble.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+
+        JLabel foto = esMio ? crearFotoPerfilyo() : crearFotoPerfil();
+        foto.setAlignmentY(Component.BOTTOM_ALIGNMENT);
 
         if (esMio) {
-            JPanel contenedor = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
-            contenedor.setOpaque(false);
-            contenedor.add(bubble);
-            contenedor.add(crearFotoPerfilyo());
-            fila.add(contenedor, BorderLayout.EAST);
+            fila.add(Box.createHorizontalGlue());
+            fila.add(bubble);
+            fila.add(Box.createHorizontalStrut(6));
+            fila.add(foto);
         } else {
-            JPanel contenedor = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
-            contenedor.setOpaque(false);
-            contenedor.add(crearFotoPerfil());
-            contenedor.add(bubble);
-            fila.add(contenedor, BorderLayout.WEST);
+            fila.add(foto);
+            fila.add(Box.createHorizontalStrut(6));
+            fila.add(bubble);
+            fila.add(Box.createHorizontalGlue());
         }
 
         return fila;
@@ -1226,6 +1382,231 @@ public class ChatUI extends JFrame implements iChatView {
         if (panelMensajeFijado != null) panelMensajeFijado.setVisible(false);
     }
 
+//    public void agregarMensajeUnicoUI(boolean esMio, String fechaHora, boolean leido, String idMensaje) {
+//        JPanel mensaje = crearFilaMensajeUnico(esMio, fechaHora, leido, idMensaje);
+//        jPanelChat.add(mensaje);
+//        jPanelChat.revalidate();
+//        jPanelChat.repaint();
+//        SwingUtilities.invokeLater(() -> {
+//            JScrollBar vertical = jScrollPaneChat.getVerticalScrollBar();
+//            vertical.setValue(vertical.getMaximum());
+//        });
+//    }
+    private JPanel crearFilaMensajeUnico(boolean esMio, String fechaHora, boolean leido, String idMensaje) {
+        JPanel fila = new JPanel() {
+            @Override
+            public Dimension getMaximumSize() {
+                return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
+            }
+        };
+        fila.setLayout(new BoxLayout(fila, BoxLayout.X_AXIS));
+        fila.setOpaque(false);
+        fila.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
+        fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, fila.getPreferredSize().height));
+
+        String soloHora = formatearSoloHora(fechaHora);
+        JPanel bubble = crearBurbujaUnica(esMio, soloHora, leido, idMensaje);
+        bubble.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+
+        JLabel foto = esMio ? crearFotoPerfilyo() : crearFotoPerfil();
+        foto.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+
+        if (esMio) {
+            fila.add(Box.createHorizontalGlue());
+            fila.add(bubble);
+            fila.add(Box.createHorizontalStrut(6));
+            fila.add(foto);
+        } else {
+            fila.add(foto);
+            fila.add(Box.createHorizontalStrut(6));
+            fila.add(bubble);
+            fila.add(Box.createHorizontalGlue());
+        }
+        return fila;
+    }
+
+    public void agregarMensajeUnicoUI(String mensaje, boolean esMio, String fechaHora, boolean leido, String idMensaje) {
+        JPanel fila = crearFilaMensajeUnicoBoton(mensaje, esMio, fechaHora, leido, idMensaje);
+        jPanelChat.add(fila);
+        jPanelChat.revalidate();
+        jPanelChat.repaint();
+        SwingUtilities.invokeLater(() -> {
+            JScrollBar vertical = jScrollPaneChat.getVerticalScrollBar();
+            vertical.setValue(vertical.getMaximum());
+        });
+    }
+    private JPanel crearFilaMensajeUnicoBoton(String mensaje, boolean esMio, String fechaHora, boolean leido, String idMensaje) {
+        JPanel fila = new JPanel() {
+            @Override
+            public Dimension getMaximumSize() {
+                return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
+            }
+        };
+        fila.setLayout(new BoxLayout(fila, BoxLayout.X_AXIS));
+        fila.setOpaque(false);
+        fila.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
+        fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, fila.getPreferredSize().height));
+
+        String soloHora = formatearSoloHora(fechaHora);
+        JButton btnMensajeUnico = crearBotonMensajeUnico(mensaje, esMio, soloHora, leido, idMensaje);
+        btnMensajeUnico.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+
+        JLabel foto = esMio ? crearFotoPerfilyo() : crearFotoPerfil();
+        foto.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+
+        if (esMio) {
+            fila.add(Box.createHorizontalGlue());
+            fila.add(btnMensajeUnico);
+            fila.add(Box.createHorizontalStrut(6));
+            fila.add(foto);
+        } else {
+            fila.add(foto);
+            fila.add(Box.createHorizontalStrut(6));
+            fila.add(btnMensajeUnico);
+            fila.add(Box.createHorizontalGlue());
+        }
+        return fila;
+    }
+    private JButton crearBotonMensajeUnico(String mensaje, boolean esMio, String hora, boolean leido, String idMensaje) {
+        Color bgNormal = new Color(120, 90, 40);
+        Color bgHover = new Color(140, 110, 50);
+        Color borderColor = new Color(251, 191, 36, 150);
+
+        JButton btn = new JButton() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                Color bg = getModel().isRollover() ? bgHover : bgNormal;
+                g2.setColor(bg);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
+
+                g2.setColor(borderColor);
+                g2.setStroke(new BasicStroke(1.5f));
+                g2.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 16, 16);
+
+                g2.dispose();
+                super.paintComponent(g);
+            }
+
+            @Override
+            public Dimension getPreferredSize() {
+                return new Dimension(180, 50);
+            }
+
+            @Override
+            public Dimension getMaximumSize() {
+                return new Dimension(200, 55);
+            }
+
+            @Override
+            public Dimension getMinimumSize() {
+                return new Dimension(150, 45);
+            }
+        };
+
+        String checkMark = esMio ? (leido ? " ✔✔" : " ✔") : "";
+        String checkColor = leido ? "#a7f3d0" : "#94a3b8";
+
+        btn.setText("<html><center>" +
+                "<span style='font-family:Segoe UI Emoji; font-size:14px;'>⏱</span> " +
+                "<span style='color:#fef3c7; font-family:Segoe UI; font-size:12px;'>Mensaje único</span><br>" +
+                "<span style='color:#fbbf24; font-family:Segoe UI; font-size:9px;'>" + hora + "</span>" +
+                "<span style='color:" + checkColor + "; font-family:Segoe UI; font-size:9px;'>" + checkMark + "</span>" +
+                "</center></html>");
+
+        btn.setName(idMensaje);
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setToolTipText("Clic para ver el mensaje único");
+
+        btn.addActionListener(e -> showMensajeUnicoPopup(mensaje));
+
+        return btn;
+    }
+
+    private JPanel crearBurbujaUnica(boolean esMio, String hora, boolean leido, String idMensaje) {
+        int maxBubbleWidth = 320;
+        int htmlWidth = maxBubbleWidth - 56;
+
+        // Color dorado/amarillo para mensajes únicos
+        Color bgBubble = new Color(120, 90, 40); // Fondo dorado oscuro
+        Color borderColor = new Color(251, 191, 36, 150); // Borde dorado
+
+        JLabel lblIcono = new JLabel("⏱ ");
+        lblIcono.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 12));
+        lblIcono.setForeground(new Color(251, 191, 36));
+
+        JLabel lblTexto = new JLabel(
+                "<html><body style='max-width:" + htmlWidth + "px; color:#fef3c7; font-family:Segoe UI;'>" + "Mensaje" + "</body></html>"
+        );
+        lblTexto.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel lblHora = new JLabel(hora);
+        lblHora.setFont(new Font("Segoe UI", Font.PLAIN, 9));
+        lblHora.setForeground(new Color(251, 191, 36, 180));
+
+        JLabel lblUnico = new JLabel("mensaje único");
+        lblUnico.setFont(new Font("Segoe UI", Font.ITALIC, 9));
+        lblUnico.setForeground(new Color(251, 191, 36, 150));
+
+        JPanel contenidoInterno = new JPanel();
+        contenidoInterno.setLayout(new BoxLayout(contenidoInterno, BoxLayout.Y_AXIS));
+        contenidoInterno.setOpaque(false);
+
+        JPanel panelTexto = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        panelTexto.setOpaque(false);
+        panelTexto.add(lblIcono);
+        panelTexto.add(lblTexto);
+
+        JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
+        panelInferior.setOpaque(false);
+        panelInferior.add(lblUnico);
+        panelInferior.add(lblHora);
+
+        contenidoInterno.add(panelTexto);
+        contenidoInterno.add(panelInferior);
+
+        if (esMio) {
+            JLabel lblCheck = new JLabel(leido ? "✔✔" : "✔");
+            lblCheck.setName(idMensaje);
+            lblCheck.setFont(new Font("Segoe UI", Font.PLAIN, 9));
+            lblCheck.setForeground(leido ? new Color(167, 243, 208) : new Color(148, 163, 184));
+            panelInferior.add(lblCheck);
+        }
+
+        JPanel bubble = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(bgBubble);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
+                // Borde dorado
+                g2.setColor(borderColor);
+                g2.setStroke(new BasicStroke(1.5f));
+                g2.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 16, 16);
+                g2.dispose();
+            }
+            @Override
+            public Dimension getMaximumSize() {
+                return new Dimension(maxBubbleWidth, getPreferredSize().height);
+            }
+            @Override
+            public Dimension getMinimumSize() {
+                return new Dimension(130, super.getMinimumSize().height);
+            }
+        };
+        bubble.setOpaque(false);
+        bubble.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
+        bubble.add(contenidoInterno, BorderLayout.CENTER);
+
+        return bubble;
+    }
+
     private String mensajePorFecha(String fechaHora) {
         try {
             java.time.LocalDateTime dateTime =
@@ -1252,12 +1633,12 @@ public class ChatUI extends JFrame implements iChatView {
     public void actualizarChecksAzules(String idMensaje) {
         for (Component filaComp : jPanelChat.getComponents()) {
             if (!(filaComp instanceof JPanel fila)) continue;
-            for (Component contenedorComp : fila.getComponents()) {
-                if (!(contenedorComp instanceof JPanel contenedor)) continue;
-                for (Component bubbleComp : contenedor.getComponents()) {
-                    if (!(bubbleComp instanceof JPanel bubble)) continue;
-                    for (Component inner : bubble.getComponents()) {
-                        if (!(inner instanceof JPanel panelInferior)) continue;
+            for (Component comp : fila.getComponents()) {
+                if (!(comp instanceof JPanel bubble)) continue;
+                for (Component bubbleChild : bubble.getComponents()) {
+                    if (!(bubbleChild instanceof JPanel contenidoInterno)) continue;
+                    for (Component innerComp : contenidoInterno.getComponents()) {
+                        if (!(innerComp instanceof JPanel panelInferior)) continue;
                         for (Component checkComp : panelInferior.getComponents()) {
                             if (checkComp instanceof JLabel lbl && idMensaje.equals(lbl.getName())) {
                                 lbl.setText("✔✔");
@@ -1275,22 +1656,20 @@ public class ChatUI extends JFrame implements iChatView {
     public void actualizarMensajeEliminado(String idMensaje) {
         for (Component filaComp : jPanelChat.getComponents()) {
             if (!(filaComp instanceof JPanel fila)) continue;
-            for (Component contenedorComp : fila.getComponents()) {
-                if (!(contenedorComp instanceof JPanel contenedor)) continue;
-                for (Component bubbleComp : contenedor.getComponents()) {
-                    if (!(bubbleComp instanceof JPanel bubble)) continue;
-                    for (Component inner : bubble.getComponents()) {
-                        if (inner instanceof JLabel lbl && idMensaje.equals(lbl.getName())) {
-                            Component centro = ((BorderLayout) bubble.getLayout()).getLayoutComponent(BorderLayout.CENTER);
-                            if (centro instanceof JLabel lblTexto) {
-                                SwingUtilities.invokeLater(() -> {
-                                    lblTexto.setText("<html><body style='max-width:220px; color:gray;'><i>Se eliminó este mensaje</i></body></html>");
-                                    bubble.revalidate();
-                                    bubble.repaint();
-                                });
-                            }
-                            return;
-                        }
+            for (Component comp : fila.getComponents()) {
+                if (!(comp instanceof JPanel bubble)) continue;
+                for (Component bubbleChild : bubble.getComponents()) {
+                    if (!(bubbleChild instanceof JPanel contenidoInterno)) continue;
+                    Component[] innerComps = contenidoInterno.getComponents();
+                    if (innerComps.length == 0) continue;
+                    if (!(innerComps[0] instanceof JLabel lblTexto)) continue;
+                    if (idMensaje.equals(lblTexto.getName())) {
+                        SwingUtilities.invokeLater(() -> {
+                            lblTexto.setText("<html><body style='max-width:220px; color:#6b7280; font-style:italic; font-family:Segoe UI;'>Se eliminó este mensaje</body></html>");
+                            bubble.revalidate();
+                            bubble.repaint();
+                        });
+                        return;
                     }
                 }
             }
@@ -1391,6 +1770,8 @@ public class ChatUI extends JFrame implements iChatView {
     private String mensajeFijadoTexto = null;
     private JPanel panelMensajeFijado;
     private JLabel lblMensajeFijado;
+    private JButton jBtnMensajeUnico;
+    public boolean modoMensajeUnico = false;
 
     public void onMessage(Message message) {
         if (message instanceof Aceptar) {
@@ -1410,7 +1791,7 @@ public class ChatUI extends JFrame implements iChatView {
                 agregarMensajeUI(mensaje.getMensaje(), false, Mediador.getInstance().obtenerHoraActual(), false, mensaje.getIdMensaje());
             }
             if (!idUsuarioActual.equals(Mediador.getInstance().getIdMio())) {
-                chatsController.guardarEnBd(mensaje.getIdMensaje(), mensaje.getMensaje(), mensaje.getIdUsuario(), Mediador.getInstance().getIdMio(), Mediador.getInstance().obtenerHoraActual());
+                chatsController.guardarEnBd(mensaje.getIdMensaje(), mensaje.getMensaje(), mensaje.getIdUsuario(), Mediador.getInstance().getIdMio(), Mediador.getInstance().obtenerHoraActual(), false);
             }
             if (mensaje.getIdUsuario().equals(idUsuarioActual)) {
                 ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(mensaje.getIdMensaje());
@@ -1441,7 +1822,6 @@ public class ChatUI extends JFrame implements iChatView {
             SwingUtilities.invokeLater(() ->
                     actualizarChecksAzules(((ConfirmarRecibido) message).getIdMensaje())
             );
-
         }
         if (message instanceof FueraLinea) {
             System.out.println("Conexión terminada por cliente");
@@ -1474,6 +1854,13 @@ public class ChatUI extends JFrame implements iChatView {
             this.chatsController.mensajeeliminadoPorCLiente(eliminarMensaje.getIdMensaje());
             actualizarMensajeEliminado(eliminarMensaje.getIdMensaje());
         }
+        if (message instanceof MensajeUnico) {
+            MensajeUnico mensajeUnico = (MensajeUnico) message;
+            if (!idUsuarioActual.equals(Mediador.getInstance().getIdMio())) {
+                chatsController.guardarEnBd(mensajeUnico.getIdMensaje(), mensajeUnico.getMensaje(), mensajeUnico.getIdUsuario(), Mediador.getInstance().getIdMio(), Mediador.getInstance().obtenerHoraActual(), true);
+            }
+
+        }
 
      }
 
@@ -1501,23 +1888,35 @@ public class ChatUI extends JFrame implements iChatView {
 //                agregarSeparadorFecha(fechaActual);
 //                ultimaFecha = fechaActual;
 //            }
-
             boolean esMio = c.getIdEmisor().equals(Mediador.getInstance().getIdMio());
             boolean leido = c.getLeido().equals("1");
-
-            agregarMensajeUI(
-                    c.getMensajeTxt(),
-                    esMio,
-                    c.getHora(),
-                    leido,
-                    c.getIdMensaje()
-            );
+            boolean fijado = c.getFijado().equals("1");
+            boolean unico = c.getUnico().equals("1");
+            if (unico) {
+                agregarMensajeUnicoUI(
+                        c.getMensajeTxt(),
+                        esMio,
+                        c.getHora(),
+                        leido,
+                        c.getIdMensaje()
+                        );
+            } else {
+                agregarMensajeUI(
+                        c.getMensajeTxt(),
+                        esMio,
+                        c.getHora(),
+                        leido,
+                        c.getIdMensaje()
+                );
+            }
             if (!esMio && !leido) {
                 System.out.println("Enviando 008...");
                 ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(c.getIdMensaje());
                 Mediador.getInstance().sendMessage(c.getIdEmisor(), confirmarRecibido);
                 Mediador.getInstance().actualizarLeidoBd(c.getIdMensaje());
             }
+            if (fijado)
+                fijarMensajeUI(c.getIdMensaje(), c.getMensajeTxt());
         }
     }
     static class RoundedBorder extends AbstractBorder {
