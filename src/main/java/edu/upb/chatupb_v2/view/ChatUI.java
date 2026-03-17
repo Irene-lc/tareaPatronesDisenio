@@ -1509,12 +1509,13 @@ public class ChatUI extends JFrame implements iChatView {
         String checkMark = esMio ? (leido ? " ✔✔" : " ✔") : "";
         String checkColor = leido ? "#a7f3d0" : "#94a3b8";
 
-        btn.setText("<html><center>" +
+
+        btn.setText("<html><body>" +
                 "<span style='font-family:Segoe UI Emoji; font-size:14px;'>⏱</span> " +
-                "<span style='color:#fef3c7; font-family:Segoe UI; font-size:12px;'>Mensaje único</span><br>" +
-                "<span style='color:#fbbf24; font-family:Segoe UI; font-size:9px;'>" + hora + "</span>" +
-                "<span style='color:" + checkColor + "; font-family:Segoe UI; font-size:9px;'>" + checkMark + "</span>" +
-                "</center></html>");
+                "<span style='color:#fef3c7; font-family:Segoe UI; '>Mensaje único</span><br>" +
+                "<span style='color:#fbbf24; font-family:Segoe UI; '>" + hora + "</span>" +
+                "<span style='color:" + checkColor + "; font-family:Segoe UI; '>" + checkMark + "</span>" +
+                "</body></html>");
 
         btn.setName(idMensaje);
         btn.setContentAreaFilled(false);
@@ -1523,7 +1524,11 @@ public class ChatUI extends JFrame implements iChatView {
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setToolTipText("Clic para ver el mensaje único");
 
-        btn.addActionListener(e -> showMensajeUnicoPopup(mensaje));
+        btn.addActionListener(e -> {
+            showMensajeUnicoPopup(mensaje);
+            ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(idMensaje);
+            Mediador.getInstance().sendMessage(idUsuarioActual, confirmarRecibido);
+        });
 
         return btn;
     }
