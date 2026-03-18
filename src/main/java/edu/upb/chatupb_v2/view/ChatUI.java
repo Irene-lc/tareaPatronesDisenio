@@ -170,7 +170,7 @@ public class ChatUI extends JFrame implements iChatView {
                     Graphics2D g2 = (Graphics2D) g.create();
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     g2.setColor(TEXT_MUTED);
-                    g2.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 13));
                     g2.drawString("Buscar contactos...", 12, getHeight() / 2 + 5);
                     g2.dispose();
                 }
@@ -183,7 +183,7 @@ public class ChatUI extends JFrame implements iChatView {
                 BorderFactory.createLineBorder(new Color(ACCENT.getRed(), ACCENT.getGreen(), ACCENT.getBlue(), 40), 1, true),
                 BorderFactory.createEmptyBorder(8, 12, 8, 12)
         ));
-        jtBuscadorContactos.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        jtBuscadorContactos.setFont(new Font("Impact", Font.PLAIN, 13));
 
 // Listener para filtrar contactos en tiempo real
         jtBuscadorContactos.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
@@ -355,7 +355,7 @@ public class ChatUI extends JFrame implements iChatView {
         panelSuperior.setBackground(BG_SIDEBAR);
         panelSuperior.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 16));
 
-        lblContactoSeleccionado.setFont(new Font("Georgia", Font.BOLD, 15));
+        lblContactoSeleccionado.setFont(new Font("Tahoma", Font.BOLD, 15));
         lblContactoSeleccionado.setForeground(ACCENT);
         panelSuperior.add(lblContactoSeleccionado, BorderLayout.WEST);
 
@@ -396,10 +396,10 @@ public class ChatUI extends JFrame implements iChatView {
 
         lblMensajeFijado = new JLabel("Mensaje fijado");
         lblMensajeFijado.setForeground(ACCENT);
-        lblMensajeFijado.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblMensajeFijado.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
         JButton btnDesfijar = new JButton("✕");
-        btnDesfijar.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        btnDesfijar.setFont(new Font("Tahoma", Font.PLAIN, 11));
         btnDesfijar.setForeground(TEXT_MUTED);
         btnDesfijar.setContentAreaFilled(false);
         btnDesfijar.setBorderPainted(false);
@@ -459,13 +459,12 @@ public class ChatUI extends JFrame implements iChatView {
         panelInferior.setBackground(BG_SIDEBAR);
         panelInferior.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
 
-        // Campo de texto estilizado
         jtMensaje = new JTextField();
         jtMensaje.setBackground(BG_INPUT);
         jtMensaje.setForeground(TEXT_PRIMARY);
         jtMensaje.setCaretColor(ACCENT);
         jtMensaje.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
-        jtMensaje.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        jtMensaje.setFont(new Font("Tahoma", Font.PLAIN, 14));
         jtMensaje.putClientProperty("JTextField.placeholderText", "Escribe un mensaje...");
 
         // Acción de Enter
@@ -521,7 +520,7 @@ public class ChatUI extends JFrame implements iChatView {
                 super.paintComponent(g);
             }
         };
-        btn.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        btn.setFont(new Font("Tahoma", Font.PLAIN, 16));
         btn.setForeground(Color.WHITE);
 //        btn.setPreferredSize(new Dimension(68, 44));
         btn.setMargin(new Insets(8, 20, 8, 20));
@@ -546,7 +545,7 @@ public class ChatUI extends JFrame implements iChatView {
                 super.paintComponent(g);
             }
         };
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btn.setFont(new Font("Tahoma", Font.BOLD, 16));
         btn.setForeground(ACCENT);
 //        btn.setPreferredSize(new Dimension(36, 32));
         btn.setMargin(new Insets(4, 10, 4, 10));
@@ -652,7 +651,7 @@ public class ChatUI extends JFrame implements iChatView {
         JMenuItem item = new JMenuItem(text);
         item.setBackground(new Color(26, 32, 54));
         item.setForeground(TEXT_PRIMARY);
-        item.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        item.setFont(new Font("Tahoma", Font.PLAIN, 13));
         item.setBorder(BorderFactory.createEmptyBorder(7, 16, 7, 16));
         item.setOpaque(true);
         return item;
@@ -728,7 +727,7 @@ public class ChatUI extends JFrame implements iChatView {
         };
         btn.setBounds(x, y, w, h);
         btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btn.setFont(new Font("Tahoma", Font.BOLD, 13));
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
@@ -741,7 +740,7 @@ public class ChatUI extends JFrame implements iChatView {
         tf.setBackground(BG_INPUT);
         tf.setForeground(TEXT_PRIMARY);
         tf.setCaretColor(ACCENT);
-        tf.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        tf.setFont(new Font("Tahoma", Font.PLAIN, 14));
         tf.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
         return tf;
     }
@@ -791,35 +790,35 @@ public class ChatUI extends JFrame implements iChatView {
         itemTema1.addActionListener(e-> {
             ThemeManager.setTheme(ThemeManager.Theme.MIDNIGHT);
             aplicarTema();
-            CambiarTema cambiarTema = new CambiarTema(idUsuarioActual, "1");
+            CambiarTema cambiarTema = new CambiarTema(Mediador.getInstance().getIdMio(), "1");
             Mediador.getInstance().sendMessage(idUsuarioActual, cambiarTema);
         });
         JMenuItem itemTema2 = createMenuItem("Forest");
         itemTema2.addActionListener(e-> {
             ThemeManager.setTheme(ThemeManager.Theme.FOREST);
             aplicarTema();
-            CambiarTema cambiarTema = new CambiarTema(idUsuarioActual, "2");
+            CambiarTema cambiarTema = new CambiarTema(Mediador.getInstance().getIdMio(), "2");
             Mediador.getInstance().sendMessage(idUsuarioActual, cambiarTema);
         });
         JMenuItem itemTema3 = createMenuItem("Ocean");
         itemTema3.addActionListener(e-> {
             ThemeManager.setTheme(ThemeManager.Theme.OCEAN);
             aplicarTema();
-            CambiarTema cambiarTema = new CambiarTema(idUsuarioActual, "3");
+            CambiarTema cambiarTema = new CambiarTema(Mediador.getInstance().getIdMio(), "3");
             Mediador.getInstance().sendMessage(idUsuarioActual, cambiarTema);
         });
         JMenuItem itemTema4 = createMenuItem("Sunset");
         itemTema4.addActionListener(e-> {
             ThemeManager.setTheme(ThemeManager.Theme.SUNSET);
             aplicarTema();
-            CambiarTema cambiarTema = new CambiarTema(idUsuarioActual, "4");
+            CambiarTema cambiarTema = new CambiarTema(Mediador.getInstance().getIdMio(), "4");
             Mediador.getInstance().sendMessage(idUsuarioActual, cambiarTema);
         });
         JMenuItem itemTema5 = createMenuItem("Blossom");
         itemTema5.addActionListener(e-> {
             ThemeManager.setTheme(ThemeManager.Theme.SAKURA);
             aplicarTema();
-            CambiarTema cambiarTema = new CambiarTema(idUsuarioActual, "5");
+            CambiarTema cambiarTema = new CambiarTema(Mediador.getInstance().getIdMio(), "5");
             Mediador.getInstance().sendMessage(idUsuarioActual, cambiarTema);
         });
 
@@ -893,15 +892,12 @@ public class ChatUI extends JFrame implements iChatView {
                 BorderFactory.createEmptyBorder(7, 16, 7, 16)
         ));
 
-        // IMPORTANTE: Aplicar estilo de scrollbars
         styleScrollBar(jScrollPaneChat);
         styleScrollBar(scrollContactos);
 
-        // Forzar repintado (NO usar updateComponentTreeUI - resetea las scrollbars)
         repaint();
         revalidate();
 
-        // Re-aplicar scrollbars después con invokeLater para garantizar que persistan
         SwingUtilities.invokeLater(() -> {
             styleScrollBar(jScrollPaneChat);
             styleScrollBar(scrollContactos);
@@ -928,7 +924,7 @@ public class ChatUI extends JFrame implements iChatView {
         title.setBounds(20, 30, 200, 28);
 
         JLabel sub = new JLabel("Tu sesión fue cerrada.");
-        sub.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        sub.setFont(new Font("Tahoma", Font.PLAIN, 12));
         sub.setForeground(TEXT_MUTED);
         sub.setBounds(20, 62, 200, 20);
 
@@ -1030,7 +1026,7 @@ public class ChatUI extends JFrame implements iChatView {
         };
         decline.setBounds(148, 140, 110, 36);
         decline.setForeground(SYSTEM_RED);
-        decline.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        decline.setFont(new Font("Tahoma", Font.BOLD, 13));
         decline.setContentAreaFilled(false);
         decline.setBorderPainted(false);
         decline.setFocusPainted(false);
@@ -1073,7 +1069,7 @@ public class ChatUI extends JFrame implements iChatView {
         };
         decline.setBounds(148, 90, 110, 36);
         decline.setForeground(SYSTEM_RED);
-        decline.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        decline.setFont(new Font("Tahoma", Font.BOLD, 13));
         decline.setContentAreaFilled(false);
         decline.setBorderPainted(false);
         decline.setFocusPainted(false);
@@ -1098,7 +1094,7 @@ public class ChatUI extends JFrame implements iChatView {
         title.setBounds(20, 25, 200, 28);
 
         JLabel sub = new JLabel("Selecciona un contacto primero.");
-        sub.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        sub.setFont(new Font("Tahoma", Font.PLAIN, 12));
         sub.setForeground(TEXT_MUTED);
         sub.setBounds(20, 56, 220, 20);
 
@@ -1128,7 +1124,7 @@ public class ChatUI extends JFrame implements iChatView {
 
         btnCerrar.setBounds(340, 12, 25, 25);
         btnCerrar.setForeground(TEXT_MUTED);
-        btnCerrar.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        btnCerrar.setFont(new Font("Tahoma", Font.PLAIN, 14));
         btnCerrar.setContentAreaFilled(false);
         btnCerrar.setBorderPainted(false);
         btnCerrar.setFocusPainted(false);
@@ -1141,7 +1137,7 @@ public class ChatUI extends JFrame implements iChatView {
         title.setBounds(24, 24, 240, 30);
 
         JLabel lbl = new JLabel("IP del contacto:");
-        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lbl.setFont(new Font("Tahoma", Font.PLAIN, 12));
         lbl.setForeground(TEXT_MUTED);
         lbl.setBounds(24, 76, 200, 20);
 
@@ -1170,7 +1166,7 @@ public class ChatUI extends JFrame implements iChatView {
         title.setBounds(24, 24, 200, 32);
 
         JLabel lbl = new JLabel("Tu nombre:");
-        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lbl.setFont(new Font("Tahoma", Font.PLAIN, 12));
         lbl.setForeground(TEXT_MUTED);
         lbl.setBounds(24, 76, 200, 20);
 
@@ -1205,7 +1201,7 @@ public class ChatUI extends JFrame implements iChatView {
 
         btnCerrar.setBounds(340, 12, 25, 25);
         btnCerrar.setForeground(TEXT_MUTED);
-        btnCerrar.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        btnCerrar.setFont(new Font("Tahoma", Font.PLAIN, 14));
         btnCerrar.setContentAreaFilled(false);
         btnCerrar.setBorderPainted(false);
         btnCerrar.setFocusPainted(false);
@@ -1218,7 +1214,7 @@ public class ChatUI extends JFrame implements iChatView {
         title.setBounds(24, 24, 200, 30);
 
         JLabel lbl = new JLabel("Nueva IP:");
-        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lbl.setFont(new Font("Tahoma", Font.PLAIN, 12));
         lbl.setForeground(TEXT_MUTED);
         lbl.setBounds(24, 70, 200, 20);
 
@@ -1252,7 +1248,7 @@ public class ChatUI extends JFrame implements iChatView {
 
         btnCerrar.setBounds(340, 12, 25, 25);
         btnCerrar.setForeground(TEXT_MUTED);
-        btnCerrar.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        btnCerrar.setFont(new Font("Tahoma", Font.PLAIN, 14));
         btnCerrar.setContentAreaFilled(false);
         btnCerrar.setBorderPainted(false);
         btnCerrar.setFocusPainted(false);
@@ -1265,7 +1261,7 @@ public class ChatUI extends JFrame implements iChatView {
         title.setBounds(24, 24, 240, 30);
 
         JLabel lbl = new JLabel("Nombre a compartir:");
-        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lbl.setFont(new Font("Tahoma", Font.PLAIN, 12));
         lbl.setForeground(TEXT_MUTED);
         lbl.setBounds(24, 76, 220, 20);
 
@@ -1301,27 +1297,50 @@ public class ChatUI extends JFrame implements iChatView {
         dialog.add(root); dialog.setVisible(true);
     }
     public void showMensajeUnicoPopup(String mensaje) {
-        final boolean[] accepted = {false};
-        JDialog dialog = createBaseDialog(400, 270);
-        JPanel root = new JPanel(null); root.setOpaque(false);
-        JPanel card = createDarkCard(20, 40, 360, 200);
-        JLabel robot = createRobotIcon(260, -10, "/images/robotRequest.png");
+    JDialog dialog = createBaseDialog(400, 300);
+    JPanel root = new JPanel(null);
+    root.setOpaque(false);
 
-        JLabel title = new JLabel("Mensaje Único");
-        title.setFont(new Font("Georgia", Font.BOLD, 16));
-        title.setForeground(TEXT_PRIMARY);
-        title.setBounds(20, 20, 240, 28);
+    JPanel card = createDarkCard(20, 40, 360, 230);
+    JLabel robot = createRobotIcon(260, -10, "/images/robotRequest.png");
 
-        JLabel sub = new JLabel("<html><body style='color:#94a3b8;font-size:12px;'>" + mensaje + "</body></html>");
-        sub.setBounds(20, 54, 240, 24);
+    JLabel title = new JLabel("Mensaje Único");
+    title.setFont(new Font("Georgia", Font.BOLD, 16));
+    title.setForeground(TEXT_PRIMARY);
+    title.setBounds(20, 20, 240, 28);
 
-        JButton ok = createPopupOkButton("OK", 20, 100, 90, 34);
-        ok.addActionListener(e -> dialog.dispose());
+    JTextArea textArea = new JTextArea(mensaje);
+    textArea.setFont(new Font("SansSerif", Font.PLAIN, 12));
+    textArea.setForeground(new Color(148, 163, 184));
+//    textArea.setBackground(new Color(30, 41, 59));
+    textArea.setOpaque(false);
+    textArea.setLineWrap(true);
+    textArea.setWrapStyleWord(true);
+    textArea.setEditable(false);
+    textArea.setFocusable(false);
+    textArea.setBorder(null);
 
-        card.add(title); card.add(sub); card.add(ok);
-        root.add(robot); root.add(card);
-        dialog.add(root); dialog.setVisible(true);
-    }
+    JScrollPane scrollPane = new JScrollPane(textArea);
+    scrollPane.setBounds(20, 54, 320, 100);
+    scrollPane.setBorder(null);
+    scrollPane.getViewport().setBackground(new Color(30, 41, 59));
+
+    // Estilizar scrollbar
+    styleScrollBar(scrollPane);
+//    scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(8, 0));
+//    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+    JButton ok = createPopupOkButton("OK", 20, 170, 90, 34);
+    ok.addActionListener(e -> dialog.dispose());
+
+    card.add(title);
+    card.add(scrollPane);
+    card.add(ok);
+    root.add(robot);
+    root.add(card);
+    dialog.add(root);
+    dialog.setVisible(true);
+}
     private void jBtnEnviarActionPerformed(ActionEvent evt) {//GEN-FIRST:event_jBtnEnviarActionPerformed
         String mensajeTxt = jtMensaje.getText().toString();
         if (mensajeTxt.isEmpty() || idUsuarioActual == null || idUsuarioActual.equals(" ")) {
@@ -1389,7 +1408,7 @@ public class ChatUI extends JFrame implements iChatView {
 
         JLabel lblSistema = new JLabel("⚠ " + texto);
         lblSistema.setForeground(SYSTEM_RED);
-        lblSistema.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        lblSistema.setFont(new Font("Tahoma", Font.BOLD, 11));
         lblSistema.setBorder(BorderFactory.createCompoundBorder(
                 new ChatUI.RoundedBorder(10, new Color(239, 68, 68, 25), new Color(239, 68, 68, 60), 1),
                 BorderFactory.createEmptyBorder(4, 12, 4, 12)
@@ -1526,16 +1545,16 @@ public class ChatUI extends JFrame implements iChatView {
     JLabel lblTexto;
     if (texto.equals("Eliminaste este mensaje") || texto.equals("Se elimino este mensaje")) {
         lblTexto = new JLabel(
-                "<html><body style='max-width:" + htmlWidth + "px; color:#6b7280; font-style:italic; font-family:Segoe UI;'>" + texto + "</body></html>"
+                "<html><body style='max-width:" + htmlWidth + "px; color:#6b7280; font-style:italic; font-family:Tahoma;'>" + texto + "</body></html>"
         );
     } else {
         if (texto.length() > htmlWidth) {
             lblTexto = new JLabel(
-                    "<html><body style='width:" + htmlWidth + "px; color:" + colorHex + "; font-family:Segoe UI;'>" + texto + "</body></html>"
+                    "<html><body style='width:" + htmlWidth + "px; color:" + colorHex + "; font-family:Tahoma;'>" + texto + "</body></html>"
             );
         } else {
             lblTexto = new JLabel(
-                    "<html><body style='max-width:" + htmlWidth + "px; color:" + colorHex + "; font-family:Segoe UI;'>" + texto + "</body></html>"
+                    "<html><body style='max-width:" + htmlWidth + "px; color:" + colorHex + "; font-family:Tahoma;'>" + texto + "</body></html>"
             );
         }
     }
@@ -1543,7 +1562,7 @@ public class ChatUI extends JFrame implements iChatView {
     lblTexto.setAlignmentX(Component.LEFT_ALIGNMENT);
 
     JLabel lblHora = new JLabel(hora);
-    lblHora.setFont(new Font("Segoe UI", Font.PLAIN, 9));
+    lblHora.setFont(new Font("Tahoma", Font.PLAIN, 9));
     lblHora.setForeground(esMio ? new Color(196, 181, 253, 180) : new Color(148, 163, 184, 180));
 
     JPanel contenidoInterno = new JPanel();
@@ -1604,7 +1623,7 @@ public class ChatUI extends JFrame implements iChatView {
         stylePopupMenu(popupMensaje);
         JLabel lblCheck = new JLabel(leido ? "✔✔" : "✔");
         lblCheck.setName(idMensaje);
-        lblCheck.setFont(new Font("Segoe UI", Font.PLAIN, 9));
+        lblCheck.setFont(new Font("Tahoma", Font.PLAIN, 9));
         lblCheck.setForeground(leido ? new Color(167, 243, 208) : new Color(148, 163, 184));
         panelInferior.add(lblCheck);
 
@@ -1763,16 +1782,16 @@ public class ChatUI extends JFrame implements iChatView {
         lblIcono.setForeground(new Color(251, 191, 36));
 
         JLabel lblTexto = new JLabel(
-                "<html><body style='max-width:" + htmlWidth + "px; color:#fef3c7; font-family:Segoe UI;'>" + "Mensaje" + "</body></html>"
+                "<html><body style='max-width:" + htmlWidth + "px; color:#fef3c7; font-family:Tahoma;'>" + "Mensaje" + "</body></html>"
         );
         lblTexto.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel lblHora = new JLabel(hora);
-        lblHora.setFont(new Font("Segoe UI", Font.PLAIN, 9));
+        lblHora.setFont(new Font("Tahoma", Font.PLAIN, 9));
         lblHora.setForeground(new Color(251, 191, 36, 180));
 
         JLabel lblUnico = new JLabel("mensaje único");
-        lblUnico.setFont(new Font("Segoe UI", Font.ITALIC, 9));
+        lblUnico.setFont(new Font("Tahoma", Font.ITALIC, 9));
         lblUnico.setForeground(new Color(251, 191, 36, 150));
 
         JPanel contenidoInterno = new JPanel();
@@ -1795,7 +1814,7 @@ public class ChatUI extends JFrame implements iChatView {
         if (esMio) {
             JLabel lblCheck = new JLabel(leido ? "✔✔" : "✔");
             lblCheck.setName(idMensaje);
-            lblCheck.setFont(new Font("Segoe UI", Font.PLAIN, 9));
+            lblCheck.setFont(new Font("Tahoma", Font.PLAIN, 9));
             lblCheck.setForeground(leido ? new Color(167, 243, 208) : new Color(148, 163, 184));
             panelInferior.add(lblCheck);
         }
@@ -1887,21 +1906,21 @@ public class ChatUI extends JFrame implements iChatView {
         lblIcono.setForeground(new Color(251, 191, 36));
 
         JLabel lblTexto = new JLabel(
-                "<html><body style='max-width:" + htmlWidth + "px; color:#fef3c7; font-family:Segoe UI;'>" + "Mensaje" + "</body></html>"
+                "<html><body style='max-width:" + htmlWidth + "px; color:#fef3c7; font-family:Tahoma;'>" + "Mensaje" + "</body></html>"
         );
         lblTexto.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
         JLabel lblUnico = new JLabel("mensaje único");
-        lblUnico.setFont(new Font("Segoe UI", Font.ITALIC, 9));
+        lblUnico.setFont(new Font("Tahoma", Font.ITALIC, 9));
         lblUnico.setForeground(new Color(251, 191, 36, 150));
 
         JLabel lblHora = new JLabel(hora);
-        lblHora.setFont(new Font("Segoe UI", Font.PLAIN, 9));
+        lblHora.setFont(new Font("Tahoma", Font.PLAIN, 9));
         lblHora.setForeground(new Color(251, 191, 36, 180));
 
         JLabel lblCheck = new JLabel(esMio ? (leido ? "✔✔" : "✔") : "");
         lblCheck.setName(idMensaje);
-        lblCheck.setFont(new Font("Segoe UI", Font.PLAIN, 9));
+        lblCheck.setFont(new Font("Tahoma", Font.PLAIN, 9));
         lblCheck.setForeground(leido ? new Color(167, 243, 208) : new Color(148, 163, 184));
 
         // Panel superior con icono y texto
@@ -1979,7 +1998,7 @@ public class ChatUI extends JFrame implements iChatView {
                 btn.setToolTipText("El mensaje ya fue leído");
                 btn.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
-                lblTexto.setText("<html><body style='color:#6b7280; font-family:Segoe UI; font-style:italic;'>Mensaje visto</body></html>");
+                lblTexto.setText("<html><body style='color:#6b7280; font-family:Tahoma; font-style:italic;'>Mensaje visto</body></html>");
                 lblIcono.setForeground(new Color(107,114,128));
                 btn.revalidate();
                 btn.repaint();
@@ -1988,7 +2007,7 @@ public class ChatUI extends JFrame implements iChatView {
             btn.setEnabled(false);
             btn.setToolTipText("El mensaje ya fue leído");
             btn.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            lblTexto.setText("<html><body style='color:#6b7280; font-family:Segoe UI; font-style:italic;'>Mensaje visto</body></html>");
+            lblTexto.setText("<html><body style='color:#6b7280; font-family:Tahoma; font-style:italic;'>Mensaje visto</body></html>");
             lblTexto.setForeground(new Color(148, 163, 184));
             lblIcono.setForeground(new Color(107,114,128));
         }
@@ -2020,7 +2039,7 @@ public class ChatUI extends JFrame implements iChatView {
         panelFecha.setOpaque(false);
         JLabel lblFecha = new JLabel("── " + fecha + " ──");
         lblFecha.setForeground(TEXT_MUTED);
-        lblFecha.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        lblFecha.setFont(new Font("Tahoma", Font.PLAIN, 11));
         panelFecha.add(lblFecha);
         jPanelChat.add(panelFecha);
     }
@@ -2059,7 +2078,7 @@ public class ChatUI extends JFrame implements iChatView {
                     if (!(innerComps[0] instanceof JLabel lblTexto)) continue;
                     if (idMensaje.equals(lblTexto.getName())) {
                         SwingUtilities.invokeLater(() -> {
-                            lblTexto.setText("<html><body style='max-width:220px; color:#6b7280; font-style:italic; font-family:Segoe UI;'>Se eliminó este mensaje</body></html>");
+                            lblTexto.setText("<html><body style='max-width:220px; color:#6b7280; font-style:italic; font-family:Tahoma;'>Se eliminó este mensaje</body></html>");
                             bubble.revalidate();
                             bubble.repaint();
                         });
@@ -2389,6 +2408,8 @@ public class ChatUI extends JFrame implements iChatView {
     public void onloadMessages(List<Chats> chats) {
         limpiarChat();
         String ultimaFecha = "";
+        if (jContactos.getSelectedValue() == null)
+            return;
 
         for (Chats c : chats) {
 //            String fechaActual = mensajePorFecha(c.getHora());

@@ -97,7 +97,7 @@ public class ContactRenderer extends JPanel implements ListCellRenderer<Contact>
         add(avatar, BorderLayout.WEST);
 
         // Panel central: nombre
-        lblName.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblName.setFont(new Font("Tahoma", Font.PLAIN, 14));
         lblName.setVerticalAlignment(SwingConstants.CENTER);
 //        lblName.setForeground(TEXT_NAME);
         lblName.setForeground(ThemeManager.getColors().TEXT_PRIMARY);
@@ -118,6 +118,7 @@ public class ContactRenderer extends JPanel implements ListCellRenderer<Contact>
             JList<? extends Contact> list,
             Contact contact,
             int index,
+
             boolean isSelected,
             boolean cellHasFocus) {
 

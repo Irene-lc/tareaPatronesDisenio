@@ -105,6 +105,10 @@ public class SocketClient extends Thread {
                         MensajeUnico mensajeUnico = MensajeUnico.parse(message);
                         notificar(mensajeUnico);
                         break;
+                    case "013":
+                        CambiarTema cambiarTema = CambiarTema.parse(message);
+                        notificar(cambiarTema);
+                        break;
                     case "0018":
                         FueraLinea fueraLinea = FueraLinea.parse(message);
                         notificar(fueraLinea);
