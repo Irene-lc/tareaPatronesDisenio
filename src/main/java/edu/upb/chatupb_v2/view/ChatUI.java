@@ -2448,7 +2448,7 @@ public class ChatUI extends JFrame implements iChatView {
                         c.getIdMensaje()
                 );
             }
-            if (!esMio && !leido) {
+            if (!esMio && !leido && !unico) {
                 System.out.println("Enviando 008...");
                 ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(c.getIdMensaje());
                 Mediador.getInstance().sendMessage(c.getIdEmisor(), confirmarRecibido);

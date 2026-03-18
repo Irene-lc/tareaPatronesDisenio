@@ -230,7 +230,8 @@ public class Mediador implements SocketListener {
         return false;
     }
     public void primerRegistro(String nombre) {
-        String idMio = "aed70cc4-7f4f-4e6d-974b-2dd32160a490";
+         this.idMio = UUID.randomUUID().toString();
+//        String idMio = "aed70cc4-7f4f-4e6d-974b-2dd32160a490";
         this.nombre = nombre;
         Contact contact = new Contact(idMio, nombre, "localhost",false,false, false);
         try {
@@ -299,7 +300,21 @@ public class Mediador implements SocketListener {
         }
         if (message instanceof Hello) {
             Hello hello = (Hello) message;
+            String idUsuario = hello.getIdUsuario();
             System.out.println("Llegó 004" + '\n');
+            try {
+                if (this.contactDao.existById(idUsuario)) {
+                    Contact contact = this.contactDao.findById(idUsuario);
+                    if (!contact.getIp().equals(socketClient.getIp())) {
+                        this.contactDao.updateIp(idUsuario, socketClient.getIp());
+                        contact.setIp(socketClient.getIp());
+                        if (chatUI != null)
+                            chatUI.actualizarContacto(contact);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             enviarRespuestaHello(socketClient, hello.getIdUsuario());
             chatUI.actualizarEstadoContacto(hello.getIdUsuario(), true);
         }
@@ -341,8 +356,10 @@ public class Mediador implements SocketListener {
             try {
                 if (chatsDao.existById(fijarMensaje.getIdMensaje())) {
                     String mensaje = chatsDao.findMessage(fijarMensaje.getIdMensaje());
-                    if (chatUI != null)
-                        chatUI.fijarMensajeUI(fijarMensaje.getIdMensaje(), mensaje);
+                    if (chatUI != null) {
+                        if (fijarMensaje.getIdMensaje().equals(chatUI.idUsuarioActual))
+                            chatUI.fijarMensajeUI(fijarMensaje.getIdMensaje(), mensaje);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
