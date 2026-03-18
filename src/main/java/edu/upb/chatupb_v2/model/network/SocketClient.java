@@ -8,6 +8,8 @@ import edu.upb.chatupb_v2.controller.Mediador;
 import edu.upb.chatupb_v2.controller.exception.OperationException;
 import edu.upb.chatupb_v2.model.entities.message.*;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -94,6 +96,18 @@ public class SocketClient extends Thread {
                     case "010":
                         Zumbido zumbido = Zumbido.parse(message);
                         notificar(zumbido);
+                        break;
+                    case "011":
+                        FijarMensaje fijarMensaje = FijarMensaje.parse(message);
+                        notificar(fijarMensaje);
+                        break;
+                    case "012":
+                        MensajeUnico mensajeUnico = MensajeUnico.parse(message);
+                        notificar(mensajeUnico);
+                        break;
+                    case "013":
+                        CambiarTema cambiarTema = CambiarTema.parse(message);
+                        notificar(cambiarTema);
                         break;
                     case "0018":
                         FueraLinea fueraLinea = FueraLinea.parse(message);

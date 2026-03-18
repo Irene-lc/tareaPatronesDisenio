@@ -16,6 +16,14 @@ public class ContactController {
         this.contactDao = new CacheContactDao(new ContactDao());
         this.view = view;
     }
+    public void actualizarIp(String id, String ip) {
+        try {
+            this.contactDao.updateIp(id, ip);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void onload() {
         try {
             List<Contact> contacts = contactDao.findAllMenosYo();

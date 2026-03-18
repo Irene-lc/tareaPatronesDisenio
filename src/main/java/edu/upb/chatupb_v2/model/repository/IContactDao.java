@@ -13,5 +13,6 @@ public interface IContactDao {
     boolean exist(String id) throws ConnectException, SQLException;
     void save(Contact contact) throws Exception;
     void update(Contact contact) throws Exception;
+    void updateIp(String id, String ip) throws Exception;
     List<Contact> findAllMenosYo() throws ConnectException, SQLException;
 }

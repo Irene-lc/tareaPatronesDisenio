@@ -82,11 +82,13 @@ public class ConnectionDB {
         String sqlChats = """
         CREATE TABLE IF NOT EXISTS chats (
             idMensaje TEXT PRIMARY KEY,
-            mensajeTxt TEXT NOT NULL,
+            mensajeTxt TEXT,
             hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             idEmisor TEXT NOT NULL,
             idReceptor TEXT NOT NULL,
             leido TEXT NOT NULL,
+            fijado TEXT,
+            unico TEXT,
 
             FOREIGN KEY (idEmisor) REFERENCES contact(id)
                 ON DELETE CASCADE

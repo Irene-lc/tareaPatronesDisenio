@@ -78,11 +78,22 @@ public class Mediador implements SocketListener {
         }
         try {
             String idMensaje = UUID.randomUUID().toString();
-            Message message = new Mensaje(idMio, idMensaje, mensaje);
-            sendMessage(idCliente, message);
-            chatUI.chatsController.guardarEnBd(idMensaje, mensaje, idMio, idCliente, obtenerHoraActual());
-            if (chatUI != null)
-                chatUI.agregarMensajeUI(mensaje, true, obtenerHoraActual(), false, idMensaje);
+            if (!chatUI.modoMensajeUnico) {
+                Message message = new Mensaje(idMio, idMensaje, mensaje);
+                chatUI.chatsController.guardarEnBd(idMensaje, mensaje, idMio, idCliente, obtenerHoraActual(), false);
+                sendMessage(idCliente, message);
+                if (chatUI != null) {
+                    chatUI.agregarMensajeUI(mensaje, true, obtenerHoraActual(), false, idMensaje);
+                }
+            } else {
+                MensajeUnico mensajeUnico = new MensajeUnico(idMio, idMensaje, mensaje);
+                chatUI.chatsController.guardarEnBd(idMensaje, mensaje, idMio, idCliente, obtenerHoraActual(), true);
+                this.chatsDao.updateUnico(idMensaje);
+                sendMessage(idCliente, mensajeUnico);
+                if (chatUI != null) {
+                    chatUI.agregarMensajeUnicoUI(true, obtenerHoraActual(), false, idMensaje);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -251,8 +262,22 @@ public class Mediador implements SocketListener {
             e.printStackTrace();
         }
     }
+    public void actualizarFijado(String id, boolean fijado) {
+        try {
+            this.chatsDao.updateFijado(id, fijado);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-
+    public boolean mensajeLeido(String idMensaje) {
+        try {
+            return this.chatsDao.isLeido(idMensaje);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
     @Override
     public synchronized void onMessage(SocketClient socketClient, Message message) {
         if (message instanceof Invitacion) {
@@ -271,7 +296,6 @@ public class Mediador implements SocketListener {
             Aceptar aceptar = (Aceptar) message;
             invitacionAceptada(socketClient, message);
             chatUI.actualizarEstadoContacto(aceptar.getIdUsuario(), true);
-
         }
         if (message instanceof Hello) {
             Hello hello = (Hello) message;
@@ -292,11 +316,13 @@ public class Mediador implements SocketListener {
         if (message instanceof Zumbido) {
             Zumbido zumbido = (Zumbido) message;
             try {
-                Contact contact = this.contactDao.findById(zumbido.getIdUsuario());
-                if (contact != null) {
-                    chatUI.marcarZumbido(zumbido.getIdUsuario(), true);
-                    chatUI.showZumbidoPopup(contact.getName());
-                }
+                if (!chatUI.idUsuarioActual.equals(zumbido.getIdUsuario()))
+                    chatUI.marcarZumbido(zumbido.getIdUsuario());
+//                Contact contact = this.contactDao.findById(zumbido.getIdUsuario());
+//                if (contact != null) {
+//                    chatUI.showZumbidoPopup(contact.getName());
+//                }
+                chatUI.ejecutarEfectoZumbido();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -310,13 +336,37 @@ public class Mediador implements SocketListener {
                 e.printStackTrace();
             }
         }
-        if (message instanceof EliminarMensaje) {
-
+        if (message instanceof FijarMensaje) {
+            FijarMensaje fijarMensaje = (FijarMensaje) message;
+            try {
+                if (chatsDao.existById(fijarMensaje.getIdMensaje())) {
+                    String mensaje = chatsDao.findMessage(fijarMensaje.getIdMensaje());
+                    if (chatUI != null)
+                        chatUI.fijarMensajeUI(fijarMensaje.getIdMensaje(), mensaje);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-
+        if (message instanceof ConfirmarRecibido) {
+            try {
+                if (this.chatsDao.isUnico(((ConfirmarRecibido) message).getIdMensaje())) {
+                    this.chatsDao.updateMensajeUnico(((ConfirmarRecibido) message).getIdMensaje());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         SwingUtilities.invokeLater(() -> {
             chatUI.onMessage(message);
         });
+    }
+    public void updateUnico(String idMensaje) {
+        try {
+            this.chatsDao.updateUnico(idMensaje);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

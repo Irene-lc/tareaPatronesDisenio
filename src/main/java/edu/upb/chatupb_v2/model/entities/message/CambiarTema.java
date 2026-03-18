@@ -4,7 +4,7 @@ import java.util.regex.Pattern;
 
 public class CambiarTema extends Message {
     private String idUsuario;
-    private String idTema;
+    private String idTema; // numero del 1 al 5
 
     public CambiarTema() {
         super("013");
