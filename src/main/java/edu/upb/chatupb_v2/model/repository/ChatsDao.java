@@ -196,5 +196,15 @@ public class ChatsDao {
         String resultado = helper.executeQuerySingleString(query, params);
         return "1".equals(resultado);
     }
+    public Chats findById(String idMensaje) throws Exception {
+        String query = "SELECT idMensaje, mensajeTxt, hora, idEmisor, idReceptor, leido, fijado, unico FROM chats WHERE idMensaje = ?";
+
+        DaoHelper.QueryParameters params = pst -> {
+            pst.setString(1, idMensaje);
+        };
+
+        List<Chats> resultados = helper.executeQuery(query, params, resultReader);
+        return resultados.isEmpty() ? null : resultados.get(0);
+    }
 
 }

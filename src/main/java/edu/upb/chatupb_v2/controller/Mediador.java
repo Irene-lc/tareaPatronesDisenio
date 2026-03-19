@@ -18,14 +18,14 @@ import java.util.UUID;
 // que el mediador se subscriba a los eventos
 @Data
 public class Mediador implements SocketListener {
+    public static String ID_MIO;
+    public static String NOMBRE;
 
     private ChatUI chatUI;
     private ContactDao contactDao = new ContactDao();
     private ChatsDao chatsDao = new ChatsDao();
     private static final Mediador mediador = new Mediador();
     private final HashMap<String, SocketClient> clientes = new HashMap<>();
-    private String idMio;
-    private String nombre;
 
     private Mediador() {
     }
@@ -36,6 +36,7 @@ public class Mediador implements SocketListener {
     public void addClient(String idUsuario, String nombreClient, SocketClient client) {
         this.clientes.put(idUsuario, client);
         Contact nuevo = new Contact(idUsuario, nombreClient, client.getIp(), false, false, false);
+        System.out.println(client.getIp());
         try {
             if (this.contactDao.existById(idUsuario)) {
                 Contact contact = this.contactDao.findById(idUsuario);
@@ -79,19 +80,21 @@ public class Mediador implements SocketListener {
         try {
             String idMensaje = UUID.randomUUID().toString();
             if (!chatUI.modoMensajeUnico) {
-                Message message = new Mensaje(idMio, idMensaje, mensaje);
-                chatUI.chatsController.guardarEnBd(idMensaje, mensaje, idMio, idCliente, obtenerHoraActual(), false);
+                Message message = new Mensaje(ID_MIO, idMensaje, mensaje);
+                chatUI.chatsController.guardarEnBd(idMensaje, mensaje, ID_MIO, idCliente, obtenerHoraActual(), false);
                 sendMessage(idCliente, message);
                 if (chatUI != null) {
-                    chatUI.agregarMensajeUI(mensaje, true, obtenerHoraActual(), false, idMensaje);
+                    if (chatUI.jContactos.getSelectedValue().getId().equals(idCliente))
+                        chatUI.agregarMensajeUI(mensaje, true, obtenerHoraActual(), false, idMensaje);
                 }
             } else {
-                MensajeUnico mensajeUnico = new MensajeUnico(idMio, idMensaje, mensaje);
-                chatUI.chatsController.guardarEnBd(idMensaje, mensaje, idMio, idCliente, obtenerHoraActual(), true);
+                MensajeUnico mensajeUnico = new MensajeUnico(ID_MIO, idMensaje, mensaje);
+                chatUI.chatsController.guardarEnBd(idMensaje, mensaje, ID_MIO, idCliente, obtenerHoraActual(), true);
                 this.chatsDao.updateUnico(idMensaje);
                 sendMessage(idCliente, mensajeUnico);
                 if (chatUI != null) {
-                    chatUI.agregarMensajeUnicoUI(true, obtenerHoraActual(), false, idMensaje);
+                    if (chatUI.jContactos.getSelectedValue().getId().equals(idCliente))
+                        chatUI.agregarMensajeUnicoUI(true, obtenerHoraActual(), false, idMensaje);
                 }
             }
         } catch (Exception e) {
@@ -131,7 +134,7 @@ public class Mediador implements SocketListener {
             e.printStackTrace();
             throw new OperationException("No se logró establecer la conexión");
         }
-        Message message = new Invitacion(idMio, nombre);
+        Message message = new Invitacion(ID_MIO, NOMBRE);
         try {
             client.send(message);
             System.out.println("Enviando 001...");
@@ -141,7 +144,7 @@ public class Mediador implements SocketListener {
     }
     public void aceptarInvitacion(SocketClient socketClient, Invitacion invitacion) {
         addClient(invitacion.getIdUsuario(), invitacion.getNombre(), socketClient);
-        Message aceptar = new Aceptar(idMio, nombre);
+        Message aceptar = new Aceptar(ID_MIO, NOMBRE);
         sendMessage(invitacion.getIdUsuario(), aceptar);
         if (chatUI != null) {
             chatUI.actualizarEstadoContacto(invitacion.getIdUsuario(), true);
@@ -184,7 +187,7 @@ public class Mediador implements SocketListener {
             e.printStackTrace();
             throw new OperationException("No se logró establecer la conexión");
         }
-        Message message = new Hello(idMio);
+        Message message = new Hello(ID_MIO);
         try {
             client.send(message);
             System.out.println("Enviando 004...");
@@ -204,7 +207,7 @@ public class Mediador implements SocketListener {
                 clientes.put(id, client);
                 chatUI.actualizarValores(id);
 //                chatUI.showHelloPopup(contact.getName());
-                Message message = new AceptarHello(idMio);
+                Message message = new AceptarHello(ID_MIO);
                 client.send(message);
             }
         } catch (Exception e) {
@@ -230,10 +233,9 @@ public class Mediador implements SocketListener {
         return false;
     }
     public void primerRegistro(String nombre) {
-         this.idMio = UUID.randomUUID().toString();
-//        String idMio = "aed70cc4-7f4f-4e6d-974b-2dd32160a490";
-        this.nombre = nombre;
-        Contact contact = new Contact(idMio, nombre, "localhost",false,false, false);
+        this.ID_MIO = UUID.randomUUID().toString();
+        this.NOMBRE = nombre;
+        Contact contact = new Contact(ID_MIO, nombre, "0",false,false, false);
         try {
             this.contactDao.save(contact);
         } catch (Exception e) {
@@ -244,8 +246,8 @@ public class Mediador implements SocketListener {
         try {
             Contact contact = this.contactDao.findUsuarioPrincipal();
             if (contact != null) {
-                idMio = contact.getId();
-                nombre = contact.getName();
+                ID_MIO = contact.getId();
+                NOMBRE = contact.getName();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -355,10 +357,11 @@ public class Mediador implements SocketListener {
             FijarMensaje fijarMensaje = (FijarMensaje) message;
             try {
                 if (chatsDao.existById(fijarMensaje.getIdMensaje())) {
-                    String mensaje = chatsDao.findMessage(fijarMensaje.getIdMensaje());
+                    Chats mensaje = chatsDao.findById(fijarMensaje.getIdMensaje());
                     if (chatUI != null) {
-                        if (fijarMensaje.getIdMensaje().equals(chatUI.idUsuarioActual))
-                            chatUI.fijarMensajeUI(fijarMensaje.getIdMensaje(), mensaje);
+                        if ((mensaje.getIdEmisor().equals(chatUI.idUsuarioActual) || mensaje.getIdReceptor().equals(chatUI.idUsuarioActual)) && chatUI.jContactos.getSelectedValue() != null) {
+                            chatUI.fijarMensajeUI(fijarMensaje.getIdMensaje(), mensaje.getMensajeTxt());
+                        }
                     }
                 }
             } catch (Exception e) {

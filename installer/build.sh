@@ -6,14 +6,14 @@
 # =============================================================================
 
 # ── CONFIGURACIÓN ─────────────────────────────────────────────────────────────
-APP_NAME="ChatUPB"                          # Nombre visible de la app
+APP_NAME="CHAT"                          # Nombre visible de la app
 APP_VERSION="1.0"                           # Versión del instalador
 MAIN_CLASS="edu.upb.chatupb_v2.ChatUPB_V2" # Clase principal Java
 
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"   # Raíz del proyecto (un nivel arriba de installer/)
 JAR_NAME="ChatUPB_V2-jar-with-dependencies.jar"   # Nombre del fat JAR generado por Maven
-ICON_FILE="$PROJECT_DIR/installer/icons/ChatUPB.icns"  # Ícono de la app
-OUTPUT_DIR="$PROJECT_DIR/installer/output"         # Carpeta donde se guarda el .pkg final
+ICON_FILE="$PROJECT_DIR/installer/icons/ChatUPB.icns"        # Ícono de la app
+OUTPUT_DIR="$PROJECT_DIR/installer/output"               # Carpeta donde se guarda el .pkg final
 
 JPACKAGE="/opt/homebrew/opt/openjdk@21/bin/jpackage"  # Ruta a jpackage
 MVN="mvn"                                              # Comando Maven
@@ -28,7 +28,7 @@ NC='\033[0m' # Sin color
 # PASO 1: Verificar que jpackage existe
 # =============================================================================
 echo ""
-echo "🔍 Verificando herramientas..."
+echo " Verificando herramientas..."
 
 if [ ! -f "$JPACKAGE" ]; then
   echo -e "${RED} jpackage no encontrado en: $JPACKAGE${NC}"
@@ -40,7 +40,7 @@ echo -e "${GREEN} jpackage encontrado${NC}"
 # =============================================================================
 # PASO 2: Verificar que el JAR existe (compilado desde IntelliJ)
 #
-# ⚠️  IMPORTANTE: Este script NO compila el código fuente.
+#   IMPORTANTE: Este script NO compila el código fuente.
 #     Antes de ejecutar este script debés hacer en IntelliJ:
 #     Build → Build Artifacts → ChatUPB_V2-jar-with-dependencies → Build
 #     (o usar Maven dentro de IntelliJ con: mvn clean package)

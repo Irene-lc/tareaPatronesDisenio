@@ -11,7 +11,6 @@ import edu.upb.chatupb_v2.controller.Mediador;
 import lombok.Setter;
 
 import javax.swing.*;
-import javax.swing.border.AbstractBorder;
 import javax.swing.text.DefaultEditorKit;
 import java.awt.*;
 import java.awt.event.*;
@@ -21,7 +20,6 @@ import java.util.List;
 public class ChatUI extends JFrame implements iChatView {
     public String idUsuarioActual;
     private DefaultListModel<Contact> contacModel = new DefaultListModel<>();
-
     private Color BG_DARK;
     private Color BG_PANEL;
     private Color BG_SIDEBAR;
@@ -37,18 +35,15 @@ public class ChatUI extends JFrame implements iChatView {
     private Color BTN_SEND_HOV;
     private Color SYSTEM_RED;
     private Color BTN_UNICO_ACTIVE;
-
     @Setter
     public ContactController contactController;
     @Setter
     public ChatsController chatsController;
-
     public ChatUI() {
         loadThemeColors();
         initComponents();
         this.jContactos.setCellRenderer(new ContactRenderer());
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -59,34 +54,25 @@ public class ChatUI extends JFrame implements iChatView {
 
 // </editor-fold>//GEN-END:initComponents
     private void initComponents() {
-
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        // ===== COMPONENTES CHAT =====
         jtMensaje = new JTextField();
         jPanelChat = new JPanel();
         jPanelChat.setLayout(new BoxLayout(jPanelChat, BoxLayout.Y_AXIS));
         jPanelChat.setBackground(BG_PANEL);
-
         jScrollPaneChat = new JScrollPane(jPanelChat);
         jScrollPaneChat.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         jScrollPaneChat.setBackground(BG_SIDEBAR);
         jScrollPaneChat.getVerticalScrollBar().setBackground(BG_SIDEBAR);
-
         jScrollPaneChat.setBorder(null);
         jScrollPaneChat.getViewport().setBackground(BG_PANEL);
-//        styleScrollBar(jScrollPaneChat, new Color(79, 70, 229, 100));
-//        styleScrollBar(jScrollPaneChat, new Color(100, 100, 100, 80));
         styleScrollBar(jScrollPaneChat);
-
         jContactos = new JList<>();
         jPopupMenu = new JPopupMenu();
         stylePopupMenu(jPopupMenu);
-
         itemHello = createMenuItem("Enviar hello");
         itemZumbido = createMenuItem("Enviar Zumbido");
         itemInvitacion = createMenuItem("Enviar invitacion");
@@ -97,75 +83,44 @@ public class ChatUI extends JFrame implements iChatView {
         jPopupMenu.add(itemInvitacion);
         jPopupMenu.add(itemEnviarContacto);
         jPopupMenu.add(itemActualizarIp);
-
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(900, 600);
         setLocationRelativeTo(null);
         setBackground(BG_DARK);
-
         jBtnEnviar = createSendButton();
         jBtnEnviar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 jBtnEnviarActionPerformed(evt);
             }
         });
-
         jBtnNuevaConexion = createNuevaConexionButton("+", "Agregar contacto");
         jBtnNuevaConexion.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 jBtnNuevaConexionActionPerformed(evt);
             }
         });
-
         jBtnOff = createOffButton("⏻");
         jBtnOff.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 jBtnOffActionPerformed(evt);
             }
         });
-
         jBtnTheme = createThemeButton();
         jBtnTheme.addActionListener(e -> showThemeSelector());
-
-
-        // ===== LAYOUT PRINCIPAL =====
         setLayout(new BorderLayout());
         getContentPane().setBackground(BG_DARK);
-
-        // ─── SIDEBAR IZQUIERDO ───
-//        JPanel panelContactos = new JPanel(new BorderLayout());
         panelContactos = new JPanel(new BorderLayout());
         panelContactos.setPreferredSize(new Dimension(240, 0));
         panelContactos.setBackground(BG_SIDEBAR);
         panelContactos.setBorder(BorderFactory.createMatteBorder(
                 0, 0, 0, 1, new Color(255, 255, 255, 18)));
-
-        // Header del sidebar
-//        JPanel sidebarHeader = new JPanel(new BorderLayout());
-//        sidebarHeader.setBackground(BG_SIDEBAR);
-//        sidebarHeader.setBorder(BorderFactory.createEmptyBorder(20, 16, 12, 16));
-//
-//        JLabel lblContactos = new JLabel("Contactos");
-//        lblContactos.setFont(new Font("Georgia", Font.BOLD, 17));
-//        lblContactos.setForeground(TEXT_PRIMARY);
-//
-//        sidebarHeader.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
-//
-//        sidebarHeader.add(lblContactos, BorderLayout.WEST);
-//        sidebarHeader.add(buildSidebarDivider(), BorderLayout.SOUTH);
-
-        // Header del sidebar con buscador
-//        JPanel sidebarHeader = new JPanel(new BorderLayout());
         sidebarHeader = new JPanel(new BorderLayout());
         sidebarHeader.setBackground(BG_SIDEBAR);
         sidebarHeader.setBorder(BorderFactory.createEmptyBorder(14, 12, 10, 12));
-
-// Campo de búsqueda
         jtBuscadorContactos = new JTextField() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                // Placeholder cuando está vacío
                 if (getText().isEmpty() && !hasFocus()) {
                     Graphics2D g2 = (Graphics2D) g.create();
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -184,8 +139,6 @@ public class ChatUI extends JFrame implements iChatView {
                 BorderFactory.createEmptyBorder(8, 12, 8, 12)
         ));
         jtBuscadorContactos.setFont(new Font("Impact", Font.PLAIN, 13));
-
-// Listener para filtrar contactos en tiempo real
         jtBuscadorContactos.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             @Override
             public void insertUpdate(javax.swing.event.DocumentEvent e) { filtrarContactos(); }
@@ -194,20 +147,16 @@ public class ChatUI extends JFrame implements iChatView {
             @Override
             public void changedUpdate(javax.swing.event.DocumentEvent e) { filtrarContactos(); }
         });
-
-        // Repintar cuando gana/pierde foco para mostrar/ocultar placeholder
         jtBuscadorContactos.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) { jtBuscadorContactos.repaint(); }
             @Override
             public void focusLost(FocusEvent e) { jtBuscadorContactos.repaint(); }
         });
-
         sidebarHeader.add(jtBuscadorContactos, BorderLayout.CENTER);
         sidebarHeader.add(buildSidebarDivider(), BorderLayout.SOUTH);
 
         lblContactoSeleccionado = new JLabel("ChatUPB");
-        // Lista de contactos
         jContactos = new JList<>(contacModel);
         jContactos.setCellRenderer(new ContactRenderer());
         jContactos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -216,7 +165,6 @@ public class ChatUI extends JFrame implements iChatView {
         jContactos.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
         jContactos.setSelectionBackground(new Color(79, 70, 229, 60));
         jContactos.setSelectionForeground(TEXT_PRIMARY);
-
         jContactos.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 Contact seleccionado = jContactos.getSelectedValue();
@@ -227,11 +175,10 @@ public class ChatUI extends JFrame implements iChatView {
                     jContactos.repaint();
                     idUsuarioActual = seleccionado.getId();
                     limpiarChat();
-                    chatsController.onloadMessages(Mediador.getInstance().getIdMio(), idUsuarioActual);
+                    chatsController.onloadMessages(Mediador.ID_MIO, idUsuarioActual);
                 }
             }
         });
-
         jContactos.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
@@ -249,7 +196,6 @@ public class ChatUI extends JFrame implements iChatView {
                 jContactos.repaint();
             }
         });
-
         jContactos.addMouseListener(new MouseAdapter() {
             private void mostrarMenu(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
@@ -278,12 +224,6 @@ public class ChatUI extends JFrame implements iChatView {
                 }
                 mostrarMenu(e);
             }
-//            @Override
-//            public void mouseClicked(MouseEvent e) {
-//                if (SwingUtilities.isRightMouseButton(e)) {
-//                    System.out.println("click derecho");
-//                }
-//            }
             @Override
             public void mouseReleased(MouseEvent e) {
                 mostrarMenu(e);
@@ -293,9 +233,7 @@ public class ChatUI extends JFrame implements iChatView {
                 ((ContactRenderer) jContactos.getCellRenderer()).setHoverIndex(-1);
                 jContactos.repaint();
             }
-
         });
-
         itemHello.addActionListener(e -> {
             Contact seleccionado = jContactos.getSelectedValue();
             if (seleccionado != null && chatsController != null) {
@@ -307,7 +245,7 @@ public class ChatUI extends JFrame implements iChatView {
             Contact seleccionado = jContactos.getSelectedValue();
             if (seleccionado != null) {
                 idUsuarioActual = seleccionado.getId();
-                Zumbido zumbido = new Zumbido(Mediador.getInstance().getIdMio());
+                Zumbido zumbido = new Zumbido(Mediador.ID_MIO);
                 Mediador.getInstance().sendMessage(idUsuarioActual, zumbido);
             }
         });
@@ -328,60 +266,38 @@ public class ChatUI extends JFrame implements iChatView {
                 showIpPopup();
             }
         });
-
-//        JScrollPane scrollContactos = new JScrollPane(jContactos);
         scrollContactos = new JScrollPane(jContactos);
         scrollContactos.setBorder(null);
         scrollContactos.getViewport().setBackground(BG_SIDEBAR);
         scrollContactos.setBackground(BG_SIDEBAR);
         scrollContactos.getVerticalScrollBar().setBackground(BG_SIDEBAR);
-
-//        styleScrollBar(scrollContactos, new Color(100, 100, 100, 80));
         styleScrollBar(scrollContactos);
-
-//        panelContactos.add(lblContactos, BorderLayout.NORTH);
-//        panelContactos.add(scrollContactos, BorderLayout.CENTER);
         panelContactos.add(sidebarHeader, BorderLayout.NORTH);
         panelContactos.add(scrollContactos, BorderLayout.CENTER);
-
-        // PANEL DERECHO (CHAT)
-//        JPanel panelChat = new JPanel(new BorderLayout());
         panelChat = new JPanel(new BorderLayout());
         panelChat.setBackground(BG_PANEL);
-
-        // Panel superior (botones off y +)
-//        JPanel panelSuperior = new JPanel(new BorderLayout());
         panelSuperior = new JPanel(new BorderLayout());
         panelSuperior.setBackground(BG_SIDEBAR);
         panelSuperior.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 16));
-
         lblContactoSeleccionado.setFont(new Font("Tahoma", Font.BOLD, 15));
         lblContactoSeleccionado.setForeground(ACCENT);
         panelSuperior.add(lblContactoSeleccionado, BorderLayout.WEST);
-
         JPanel botonesHeader = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         botonesHeader.setOpaque(false);
         botonesHeader.add(jBtnTheme);
         botonesHeader.add(jBtnOff);
         botonesHeader.add(jBtnNuevaConexion);
         panelSuperior.add(botonesHeader, BorderLayout.EAST);
-
         JSeparator sep = new JSeparator();
         sep.setForeground(DIVIDER);
         sep.setBackground(BG_SIDEBAR);
         panelSuperior.add(sep, BorderLayout.SOUTH);
-
-        // Panel inferior (campo mensaje + enviar)
         JPanel panelInferior = buildInputPanel();
-
         panelChat.add(panelSuperior, BorderLayout.NORTH);
         panelChat.add(jScrollPaneChat, BorderLayout.CENTER);
         panelChat.add(panelInferior, BorderLayout.SOUTH);
-
         add(panelContactos, BorderLayout.WEST);
         add(panelChat, BorderLayout.CENTER);
-
-        // ── BANNER MENSAJE FIJADO (nuevo) ──
         panelMensajeFijado = new JPanel(new BorderLayout());
         panelMensajeFijado.setBackground(new Color(45, 38, 90));
         panelMensajeFijado.setBorder(BorderFactory.createCompoundBorder(
@@ -389,15 +305,12 @@ public class ChatUI extends JFrame implements iChatView {
                 BorderFactory.createEmptyBorder(7, 16, 7, 16)
         ));
         panelMensajeFijado.setVisible(false);
-
         JLabel iconPin = new JLabel("📌");
         iconPin.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 13));
         iconPin.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
-
         lblMensajeFijado = new JLabel("Mensaje fijado");
         lblMensajeFijado.setForeground(ACCENT);
         lblMensajeFijado.setFont(new Font("Tahoma", Font.PLAIN, 12));
-
         JButton btnDesfijar = new JButton("✕");
         btnDesfijar.setFont(new Font("Tahoma", Font.PLAIN, 11));
         btnDesfijar.setForeground(TEXT_MUTED);
@@ -406,28 +319,24 @@ public class ChatUI extends JFrame implements iChatView {
         btnDesfijar.setFocusPainted(false);
         btnDesfijar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnDesfijar.addActionListener(e -> desfijarMensaje());
-
         JPanel pinLeft = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         pinLeft.setOpaque(false);
         pinLeft.add(iconPin);
         pinLeft.add(lblMensajeFijado);
-
         panelMensajeFijado.add(pinLeft, BorderLayout.WEST);
         panelMensajeFijado.add(btnDesfijar, BorderLayout.EAST);
-
         JPanel panelNorte = new JPanel(new BorderLayout());
         panelNorte.add(panelSuperior, BorderLayout.NORTH);
         panelNorte.add(panelMensajeFijado, BorderLayout.SOUTH);
-
         panelChat.add(panelNorte, BorderLayout.NORTH);
         panelChat.add(jScrollPaneChat, BorderLayout.CENTER);
         panelChat.add(panelInferior, BorderLayout.SOUTH);
-
         if (Mediador.getInstance().dbVacia()) {
             showNombrePopup();
         }
         Mediador.getInstance().cargarMisDatos();
     }
+
     private void loadThemeColors() {
         ThemeManager.ThemeColors colors = ThemeManager.getColors();
         BG_DARK = colors.BG_DARK;
@@ -446,66 +355,11 @@ public class ChatUI extends JFrame implements iChatView {
         SYSTEM_RED = colors.SYSTEM_RED;
         BTN_UNICO_ACTIVE = colors.BTN_UNIQUE_ACTIVE;
     }
-
     private JPanel buildSidebarDivider() {
         JPanel d = new JPanel();
         d.setPreferredSize(new Dimension(0, 1));
         d.setBackground(new Color(255, 255, 255, 15));
         return d;
-    }
-    private JPanel buildInputPanel() {
-//        JPanel panelInferior = new JPanel(new BorderLayout(10, 0));
-        panelInferior = new JPanel(new BorderLayout(10, 0));
-        panelInferior.setBackground(BG_SIDEBAR);
-        panelInferior.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
-
-        jtMensaje = new JTextField();
-        jtMensaje.setBackground(BG_INPUT);
-        jtMensaje.setForeground(TEXT_PRIMARY);
-        jtMensaje.setCaretColor(ACCENT);
-        jtMensaje.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
-        jtMensaje.setFont(new Font("Tahoma", Font.PLAIN, 14));
-        jtMensaje.putClientProperty("JTextField.placeholderText", "Escribe un mensaje...");
-
-        // Acción de Enter
-        jtMensaje.addActionListener(evt -> jBtnEnviarActionPerformed(evt));
-
-        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
-        panelBotones.setOpaque(false);
-        jBtnMensajeUnico = createMensajeUnicoButton();
-        jBtnMensajeUnico.addActionListener(evt -> {
-            modoMensajeUnico = !modoMensajeUnico;
-            jBtnMensajeUnico.setForeground(modoMensajeUnico ? BTN_UNICO_ACTIVE : ACCENT);
-            jBtnMensajeUnico.setToolTipText(modoMensajeUnico ?
-                    "Mensaje único ACTIVADO (clic para desactivar)" :
-                    "Mensaje único (se ve solo una vez)");
-            jBtnMensajeUnico.repaint();
-        });
-
-        panelBotones.add(jBtnMensajeUnico);
-        panelBotones.add(jBtnEnviar);
-
-        panelInferior.add(jtMensaje, BorderLayout.CENTER);
-        panelInferior.add(panelBotones, BorderLayout.EAST);
-
-        // Asegurar Ctrl+V en el campo de mensaje
-        jtMensaje.getInputMap(JComponent.WHEN_FOCUSED).put(
-                KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
-                DefaultEditorKit.pasteAction
-        );
-        jtMensaje.getInputMap(JComponent.WHEN_FOCUSED).put(
-                KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
-                DefaultEditorKit.copyAction
-        );
-        jtMensaje.getInputMap(JComponent.WHEN_FOCUSED).put(
-                KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
-                DefaultEditorKit.cutAction
-        );
-        jtMensaje.getInputMap(JComponent.WHEN_FOCUSED).put(
-                KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
-                DefaultEditorKit.selectAllAction
-        );
-        return panelInferior;
     }
     private JButton createSendButton() {
         JButton btn = new JButton("➤") {
@@ -522,7 +376,6 @@ public class ChatUI extends JFrame implements iChatView {
         };
         btn.setFont(new Font("Tahoma", Font.PLAIN, 16));
         btn.setForeground(Color.WHITE);
-//        btn.setPreferredSize(new Dimension(68, 44));
         btn.setMargin(new Insets(8, 20, 8, 20));
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
@@ -547,7 +400,6 @@ public class ChatUI extends JFrame implements iChatView {
         };
         btn.setFont(new Font("Tahoma", Font.BOLD, 16));
         btn.setForeground(ACCENT);
-//        btn.setPreferredSize(new Dimension(36, 32));
         btn.setMargin(new Insets(4, 10, 4, 10));
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
@@ -573,7 +425,6 @@ public class ChatUI extends JFrame implements iChatView {
         };
         btn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
         btn.setForeground(new Color(248, 113, 113));
-//        btn.setPreferredSize(new Dimension(36, 32));
         btn.setMargin(new Insets(4, 10, 4, 10));
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
@@ -587,56 +438,42 @@ public class ChatUI extends JFrame implements iChatView {
         vsb.setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
             @Override
             protected void configureScrollBarColors() {
-                // Track transparente (fondo de la scrollbar)
                 trackColor = new Color(0, 0, 0, 0);
             }
-
             @Override
             protected JButton createDecreaseButton(int o) { return zeroButton(); }
             @Override
             protected JButton createIncreaseButton(int o) { return zeroButton(); }
-
             private JButton zeroButton() {
                 JButton b = new JButton();
                 b.setPreferredSize(new Dimension(0, 0));
                 return b;
             }
-
             @Override
             protected void paintTrack(Graphics g, JComponent c, Rectangle r) {
-                // Track del mismo color que el fondo del sidebar
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setColor(BG_SIDEBAR);
                 g2.fillRect(r.x, r.y, r.width, r.height);
                 g2.dispose();
             }
-
             @Override
             protected void paintThumb(Graphics g, JComponent c, Rectangle r) {
                 if (r.isEmpty() || !sp.getVerticalScrollBar().isVisible()) return;
-
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                // Color del thumb basado en el ACCENT del tema con transparencia
                 Color thumbColor = new Color(
                         ACCENT.getRed(),
                         ACCENT.getGreen(),
                         ACCENT.getBlue(),
                         isThumbRollover() ? 140 : 80
                 );
-
                 g2.setColor(thumbColor);
-                // Thumb más redondeado y elegante
                 int padding = 2;
                 int width = r.width - (padding * 2);
                 g2.fillRoundRect(r.x + padding, r.y + padding, width, r.height - (padding * 2), 10, 10);
-
                 g2.dispose();
             }
         });
-
-        // Scrollbar más delgada y elegante
         vsb.setPreferredSize(new Dimension(8, 0));
         vsb.setOpaque(false);
     }
@@ -684,7 +521,6 @@ public class ChatUI extends JFrame implements iChatView {
         btn.setToolTipText("Mensaje único (se ve solo una vez)");
         return btn;
     }
-
     private JDialog createBaseDialog(int w, int h) {
         JDialog dialog = new JDialog(this, true);
         dialog.setSize(w, h);
@@ -783,42 +619,88 @@ public class ChatUI extends JFrame implements iChatView {
         btn.setToolTipText("Cambiar tema");
         return btn;
     }
+
+    private JPanel buildInputPanel() {
+        panelInferior = new JPanel(new BorderLayout(10, 0));
+        panelInferior.setBackground(BG_SIDEBAR);
+        panelInferior.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
+        jtMensaje = new JTextField();
+        jtMensaje.setBackground(BG_INPUT);
+        jtMensaje.setForeground(TEXT_PRIMARY);
+        jtMensaje.setCaretColor(ACCENT);
+        jtMensaje.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
+        jtMensaje.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        jtMensaje.putClientProperty("JTextField.placeholderText", "Escribe un mensaje...");
+        jtMensaje.addActionListener(evt -> jBtnEnviarActionPerformed(evt));
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
+        panelBotones.setOpaque(false);
+        jBtnMensajeUnico = createMensajeUnicoButton();
+        jBtnMensajeUnico.addActionListener(evt -> {
+            modoMensajeUnico = !modoMensajeUnico;
+            jBtnMensajeUnico.setForeground(modoMensajeUnico ? BTN_UNICO_ACTIVE : ACCENT);
+            jBtnMensajeUnico.setToolTipText(modoMensajeUnico ?
+                    "Mensaje único ACTIVADO (clic para desactivar)" :
+                    "Mensaje único (se ve solo una vez)");
+            jBtnMensajeUnico.repaint();
+        });
+        panelBotones.add(jBtnMensajeUnico);
+        panelBotones.add(jBtnEnviar);
+        panelInferior.add(jtMensaje, BorderLayout.CENTER);
+        panelInferior.add(panelBotones, BorderLayout.EAST);
+        jtMensaje.getInputMap(JComponent.WHEN_FOCUSED).put(
+                KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
+                DefaultEditorKit.pasteAction
+        );
+        jtMensaje.getInputMap(JComponent.WHEN_FOCUSED).put(
+                KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
+                DefaultEditorKit.copyAction
+        );
+        jtMensaje.getInputMap(JComponent.WHEN_FOCUSED).put(
+                KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
+                DefaultEditorKit.cutAction
+        );
+        jtMensaje.getInputMap(JComponent.WHEN_FOCUSED).put(
+                KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
+                DefaultEditorKit.selectAllAction
+        );
+        return panelInferior;
+    }
     public void showThemeSelector() {
         JPopupMenu popupTema = new JPopupMenu();
         stylePopupMenu(popupTema);
-        JMenuItem itemTema1 = createMenuItem("Midnight");
+        JMenuItem itemTema1 = createMenuItem("1");
         itemTema1.addActionListener(e-> {
-            ThemeManager.setTheme(ThemeManager.Theme.MIDNIGHT);
+            ThemeManager.setTheme(ThemeManager.Theme.UNO);
             aplicarTema();
-            CambiarTema cambiarTema = new CambiarTema(Mediador.getInstance().getIdMio(), "1");
+            CambiarTema cambiarTema = new CambiarTema(Mediador.ID_MIO, "1");
             Mediador.getInstance().sendMessage(idUsuarioActual, cambiarTema);
         });
-        JMenuItem itemTema2 = createMenuItem("Forest");
+        JMenuItem itemTema2 = createMenuItem("2");
         itemTema2.addActionListener(e-> {
-            ThemeManager.setTheme(ThemeManager.Theme.FOREST);
+            ThemeManager.setTheme(ThemeManager.Theme.DOS);
             aplicarTema();
-            CambiarTema cambiarTema = new CambiarTema(Mediador.getInstance().getIdMio(), "2");
+            CambiarTema cambiarTema = new CambiarTema(Mediador.ID_MIO, "2");
             Mediador.getInstance().sendMessage(idUsuarioActual, cambiarTema);
         });
-        JMenuItem itemTema3 = createMenuItem("Ocean");
+        JMenuItem itemTema3 = createMenuItem("3");
         itemTema3.addActionListener(e-> {
-            ThemeManager.setTheme(ThemeManager.Theme.OCEAN);
+            ThemeManager.setTheme(ThemeManager.Theme.CUATRO);
             aplicarTema();
-            CambiarTema cambiarTema = new CambiarTema(Mediador.getInstance().getIdMio(), "3");
+            CambiarTema cambiarTema = new CambiarTema(Mediador.ID_MIO, "3");
             Mediador.getInstance().sendMessage(idUsuarioActual, cambiarTema);
         });
-        JMenuItem itemTema4 = createMenuItem("Sunset");
+        JMenuItem itemTema4 = createMenuItem("4");
         itemTema4.addActionListener(e-> {
-            ThemeManager.setTheme(ThemeManager.Theme.SUNSET);
+            ThemeManager.setTheme(ThemeManager.Theme.TRES);
             aplicarTema();
-            CambiarTema cambiarTema = new CambiarTema(Mediador.getInstance().getIdMio(), "4");
+            CambiarTema cambiarTema = new CambiarTema(Mediador.ID_MIO, "4");
             Mediador.getInstance().sendMessage(idUsuarioActual, cambiarTema);
         });
-        JMenuItem itemTema5 = createMenuItem("Blossom");
+        JMenuItem itemTema5 = createMenuItem("5");
         itemTema5.addActionListener(e-> {
-            ThemeManager.setTheme(ThemeManager.Theme.SAKURA);
+            ThemeManager.setTheme(ThemeManager.Theme.CINCO);
             aplicarTema();
-            CambiarTema cambiarTema = new CambiarTema(Mediador.getInstance().getIdMio(), "5");
+            CambiarTema cambiarTema = new CambiarTema(Mediador.ID_MIO, "5");
             Mediador.getInstance().sendMessage(idUsuarioActual, cambiarTema);
         });
 
@@ -832,21 +714,13 @@ public class ChatUI extends JFrame implements iChatView {
     }
     private void aplicarTema() {
         loadThemeColors();
-
-        // Actualizar fondos principales
         getContentPane().setBackground(BG_DARK);
-
-        // Actualizar panel de chat
         jPanelChat.setBackground(BG_PANEL);
         jScrollPaneChat.getViewport().setBackground(BG_PANEL);
         jScrollPaneChat.setBackground(BG_PANEL);
-
-        // Actualizar sidebar de contactos
         jContactos.setBackground(BG_SIDEBAR);
         jContactos.setSelectionBackground(new Color(BG_BUBBLE_ME.getRed(), BG_BUBBLE_ME.getGreen(), BG_BUBBLE_ME.getBlue(), 60));
         jContactos.setSelectionForeground(TEXT_PRIMARY);
-
-        // Actualizar campo de búsqueda
         jtBuscadorContactos.setBackground(BG_INPUT);
         jtBuscadorContactos.setForeground(TEXT_PRIMARY);
         jtBuscadorContactos.setCaretColor(ACCENT);
@@ -854,83 +728,58 @@ public class ChatUI extends JFrame implements iChatView {
                 BorderFactory.createLineBorder(new Color(ACCENT.getRed(), ACCENT.getGreen(), ACCENT.getBlue(), 40), 1, true),
                 BorderFactory.createEmptyBorder(8, 12, 8, 12)
         ));
-
-        // Actualizar campo de mensaje
         jtMensaje.setBackground(BG_INPUT);
         jtMensaje.setForeground(TEXT_PRIMARY);
         jtMensaje.setCaretColor(ACCENT);
-
-        // Actualizar label del contacto seleccionado
         lblContactoSeleccionado.setForeground(ACCENT);
-
-        // Actualizar label mensaje fijado
         lblMensajeFijado.setForeground(ACCENT);
-
-        // Actualizar colores de botones
         jBtnMensajeUnico.setForeground(modoMensajeUnico ? BTN_UNICO_ACTIVE : ACCENT);
         jBtnNuevaConexion.setForeground(ACCENT);
         jBtnTheme.setForeground(ACCENT);
-
-        // Actualizar paneles principales
         panelContactos.setBackground(BG_SIDEBAR);
         panelContactos.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(255, 255, 255, 18)));
         sidebarHeader.setBackground(BG_SIDEBAR);
         panelChat.setBackground(BG_PANEL);
         panelSuperior.setBackground(BG_SIDEBAR);
         panelInferior.setBackground(BG_SIDEBAR);
-
-        // Actualizar fondo de los scrollpanes
         jScrollPaneChat.getViewport().setBackground(BG_PANEL);
         jScrollPaneChat.setBackground(BG_PANEL);
         scrollContactos.getViewport().setBackground(BG_SIDEBAR);
         scrollContactos.setBackground(BG_SIDEBAR);
-
-        // Actualizar panel mensaje fijado
         panelMensajeFijado.setBackground(ThemeManager.getColors().PIN_BACKGROUND);
         panelMensajeFijado.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getColors().PIN_BORDER),
                 BorderFactory.createEmptyBorder(7, 16, 7, 16)
         ));
-
         styleScrollBar(jScrollPaneChat);
         styleScrollBar(scrollContactos);
-
         repaint();
         revalidate();
-
         SwingUtilities.invokeLater(() -> {
             styleScrollBar(jScrollPaneChat);
             styleScrollBar(scrollContactos);
             jScrollPaneChat.getVerticalScrollBar().repaint();
             scrollContactos.getVerticalScrollBar().repaint();
         });
-
-        // Recargar mensajes del chat actual para aplicar nuevos colores a burbujas
         if (idUsuarioActual != null && !idUsuarioActual.equals(" ") && chatsController != null) {
-            chatsController.onloadMessages(Mediador.getInstance().getIdMio(), idUsuarioActual);
+            chatsController.onloadMessages(Mediador.ID_MIO, idUsuarioActual);
         }
     }
-
     private void showOffPopup() {
         JDialog dialog = createBaseDialog(360, 240);
         JPanel root = new JPanel(null); root.setOpaque(false);
-
         JPanel card = createDarkCard(20, 30, 320, 170);
-
         JLabel robot = createRobotIcon(230, -20, "/images/robotOff.png");
         JLabel title = new JLabel("Conexión terminada");
         title.setFont(new Font("Georgia", Font.BOLD, 16));
         title.setForeground(TEXT_PRIMARY);
         title.setBounds(20, 30, 200, 28);
-
         JLabel sub = new JLabel("Tu sesión fue cerrada.");
         sub.setFont(new Font("Tahoma", Font.PLAIN, 12));
         sub.setForeground(TEXT_MUTED);
         sub.setBounds(20, 62, 200, 20);
-
         JButton ok = createPopupOkButton("Aceptar", 20, 110, 100, 34);
         ok.addActionListener(e -> dialog.dispose());
-
         card.add(title); card.add(sub); card.add(ok);
         root.add(robot); root.add(card);
         dialog.add(root); dialog.setVisible(true);
@@ -938,18 +787,14 @@ public class ChatUI extends JFrame implements iChatView {
     private void showAcceptPopup() {
         JDialog dialog = createBaseDialog(340, 220);
         JPanel root = new JPanel(null); root.setOpaque(false);
-
         JPanel card = createDarkCard(20, 30, 300, 160);
-
         JLabel robot = createRobotIcon(210, -15, "/images/robotAccept.png");
         JLabel title = new JLabel("¡Conexión aceptada!");
         title.setFont(new Font("Georgia", Font.BOLD, 16));
         title.setForeground(TEXT_PRIMARY);
         title.setBounds(20, 30, 200, 28);
-
         JButton ok = createPopupOkButton("OK", 20, 100, 90, 34);
         ok.addActionListener(e -> dialog.dispose());
-
         card.add(title); card.add(ok);
         root.add(robot); root.add(card);
         dialog.add(root); dialog.setVisible(true);
@@ -957,37 +802,29 @@ public class ChatUI extends JFrame implements iChatView {
     private void showDeclinePopup() {
         JDialog dialog = createBaseDialog(340, 220);
         JPanel root = new JPanel(null); root.setOpaque(false);
-
         JPanel card = createDarkCard(20, 30, 300, 160);
-
         JLabel robot = createRobotIcon(210, -15, "/images/robotDecline.png");
         JLabel title = new JLabel("Conexión rechazada");
         title.setFont(new Font("Georgia", Font.BOLD, 16));
         title.setForeground(TEXT_PRIMARY);
         title.setBounds(20, 30, 200, 28);
-
         JButton ok = createPopupOkButton("OK", 20, 100, 90, 34);
         ok.addActionListener(e -> dialog.dispose());
-
         card.add(title); card.add(ok);
         root.add(robot); root.add(card);
         dialog.add(root); dialog.setVisible(true);
     }
-    public void showZumbidoPopup(String nombre) {
-        JDialog dialog = createBaseDialog(360, 230);
+    private void showHelloRechazadoPopup() {
+        JDialog dialog = createBaseDialog(340, 220);
         JPanel root = new JPanel(null); root.setOpaque(false);
-
-        JPanel card = createDarkCard(20, 30, 320, 170);
-
-        JLabel robot = createRobotIcon(230, -15, "/images/robotAccept.png");
-        JLabel title = new JLabel("🔔 " + nombre + " te zumbó");
-        title.setFont(new Font("Georgia", Font.BOLD, 15));
-        title.setForeground(new Color(251, 191, 36));
-        title.setBounds(20, 30, 230, 28);
-
-        JButton ok = createPopupOkButton("OK", 20, 110, 90, 34);
+        JPanel card = createDarkCard(20, 30, 300, 160);
+        JLabel robot = createRobotIcon(210, -15, "/images/robotDecline.png");
+        JLabel title = new JLabel("Hello rechazado");
+        title.setFont(new Font("Georgia", Font.BOLD, 16));
+        title.setForeground(TEXT_PRIMARY);
+        title.setBounds(20, 30, 200, 28);
+        JButton ok = createPopupOkButton("OK", 20, 100, 90, 34);
         ok.addActionListener(e -> dialog.dispose());
-
         card.add(title); card.add(ok);
         root.add(robot); root.add(card);
         dialog.add(root); dialog.setVisible(true);
@@ -998,21 +835,17 @@ public class ChatUI extends JFrame implements iChatView {
         JPanel root = new JPanel(null); root.setOpaque(false);
         JPanel card = createDarkCard(20, 40, 360, 200);
         JLabel robot = createRobotIcon(260, -10, "/images/robotRequest.png");
-
         JLabel title = new JLabel("Invitación de conexión");
         title.setFont(new Font("Georgia", Font.BOLD, 16));
         title.setForeground(TEXT_PRIMARY);
         title.setBounds(20, 20, 240, 28);
-
         JLabel sub = new JLabel("<html><body style='color:#94a3b8;font-size:12px;'>" + nombreContacto + " quiere conectarse</body></html>");
         sub.setBounds(20, 54, 240, 24);
-
         JButton accept = createPopupOkButton("Aceptar", 20, 140, 110, 36);
         accept.addActionListener(e -> {
             accepted[0] = true;
             dialog.dispose();
         });
-
         JButton decline = new JButton("Rechazar") {
             @Override
             protected void paintComponent(Graphics g) {
@@ -1032,7 +865,6 @@ public class ChatUI extends JFrame implements iChatView {
         decline.setFocusPainted(false);
         decline.setCursor(new Cursor(Cursor.HAND_CURSOR));
         decline.addActionListener(e -> { accepted[0] = false; dialog.dispose(); });
-
         card.add(title); card.add(sub); card.add(accept); card.add(decline);
         root.add(robot); root.add(card);
         dialog.add(root); dialog.setVisible(true);
@@ -1043,19 +875,16 @@ public class ChatUI extends JFrame implements iChatView {
         JDialog dialog = createBaseDialog(400, 270);
         JPanel root = new JPanel(null); root.setOpaque(false);
         JPanel card = createDarkCard(20, 40, 360, 150);
-        JLabel robot = createRobotIcon(260, -10, "/images/robotRequest.png");
-
+        JLabel robot = createRobotIcon(260, -10, "/images/delete.png");
         JLabel title = new JLabel("<html><div style='text-align:left;'>¿Seguro que desea eliminar el mensaje?</div></html>");
         title.setFont(new Font("Georgia", Font.BOLD, 16));
         title.setForeground(TEXT_PRIMARY);
-        title.setBounds(20, 20, 310, 60); 
-
+        title.setBounds(20, 20, 310, 60);
         JButton accept = createPopupOkButton("Si", 20, 90, 110, 36);
         accept.addActionListener(e -> {
             accepted[0] = true;
             dialog.dispose();
         });
-
         JButton decline = new JButton("No") {
             @Override
             protected void paintComponent(Graphics g) {
@@ -1075,7 +904,6 @@ public class ChatUI extends JFrame implements iChatView {
         decline.setFocusPainted(false);
         decline.setCursor(new Cursor(Cursor.HAND_CURSOR));
         decline.addActionListener(e -> { accepted[0] = false; dialog.dispose(); });
-
         card.add(title); card.add(accept); card.add(decline);
         root.add(robot); root.add(card);
         dialog.add(root); dialog.setVisible(true);
@@ -1084,23 +912,18 @@ public class ChatUI extends JFrame implements iChatView {
     private void showNoMessagePopup() {
         JDialog dialog = createBaseDialog(340, 200);
         JPanel root = new JPanel(null); root.setOpaque(false);
-
         JPanel card = createDarkCard(20, 25, 300, 150);
         JLabel robot = createRobotIcon(210, -15, "/images/robotNoMessage.png");
-
         JLabel title = new JLabel("Sin destinatario");
         title.setFont(new Font("Georgia", Font.BOLD, 15));
         title.setForeground(new Color(251, 191, 36));
         title.setBounds(20, 25, 200, 28);
-
         JLabel sub = new JLabel("Selecciona un contacto primero.");
         sub.setFont(new Font("Tahoma", Font.PLAIN, 12));
         sub.setForeground(TEXT_MUTED);
         sub.setBounds(20, 56, 220, 20);
-
         JButton ok = createPopupOkButton("OK", 20, 98, 90, 34);
         ok.addActionListener(e -> dialog.dispose());
-
         card.add(title); card.add(sub); card.add(ok);
         root.add(robot); root.add(card);
         dialog.add(root); dialog.setVisible(true);
@@ -1108,12 +931,9 @@ public class ChatUI extends JFrame implements iChatView {
     private void showNuevaConexionPopup() {
         JDialog dialog = createBaseDialog(420, 310);
         JPanel root = new JPanel(null); root.setOpaque(false);
-
         JPanel card = createDarkCard(20, 40, 380, 250);
         JLabel robot = createRobotIcon(280, -10, "/images/robotAdd.png");
-
         JButton btnCerrar = new JButton();
-
         try {
             ImageIcon icon = new ImageIcon(getClass().getResource("/images/x1.png"));
             Image img = icon.getImage().getScaledInstance(40, 30, Image.SCALE_SMOOTH);
@@ -1121,7 +941,6 @@ public class ChatUI extends JFrame implements iChatView {
         } catch (Exception e) {
             btnCerrar.setText("X");
         }
-
         btnCerrar.setBounds(340, 12, 25, 25);
         btnCerrar.setForeground(TEXT_MUTED);
         btnCerrar.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -1130,25 +949,20 @@ public class ChatUI extends JFrame implements iChatView {
         btnCerrar.setFocusPainted(false);
         btnCerrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnCerrar.addActionListener(e -> dialog.dispose());
-
         JLabel title = new JLabel("Agregar Contacto");
         title.setFont(new Font("Georgia", Font.BOLD, 18));
         title.setForeground(TEXT_PRIMARY);
         title.setBounds(24, 24, 240, 30);
-
         JLabel lbl = new JLabel("IP del contacto:");
         lbl.setFont(new Font("Tahoma", Font.PLAIN, 12));
         lbl.setForeground(TEXT_MUTED);
         lbl.setBounds(24, 76, 200, 20);
-
         jtIp = createDarkTextField(24, 100, 330, 40);
-
         jBtnConectar = createPopupOkButton("Conectar", 24, 162, 140, 38);
         jBtnConectar.addActionListener(evt -> {
             Mediador.getInstance().establecerConexion(jtIp.getText());
             dialog.dispose();
         });
-
         card.add(btnCerrar); card.add(title); card.add(lbl); card.add(jtIp); card.add(jBtnConectar);
         root.add(robot); root.add(card);
         dialog.add(root); dialog.setVisible(true);
@@ -1156,28 +970,22 @@ public class ChatUI extends JFrame implements iChatView {
     public void showNombrePopup() {
         JDialog dialog = createBaseDialog(420, 310);
         JPanel root = new JPanel(null); root.setOpaque(false);
-
         JPanel card = createDarkCard(20, 40, 380, 250);
         JLabel robot = createRobotIcon(280, -10, "/images/robotAdd.png");
-
         JLabel title = new JLabel("¡Bienvenido!");
         title.setFont(new Font("Georgia", Font.BOLD, 20));
         title.setForeground(ACCENT);
         title.setBounds(24, 24, 200, 32);
-
         JLabel lbl = new JLabel("Tu nombre:");
         lbl.setFont(new Font("Tahoma", Font.PLAIN, 12));
         lbl.setForeground(TEXT_MUTED);
         lbl.setBounds(24, 76, 200, 20);
-
         jtName = createDarkTextField(24, 100, 330, 40);
-
         jBtnAceptar = createPopupOkButton("Comenzar →", 24, 162, 150, 38);
         jBtnAceptar.addActionListener(evt -> {
             Mediador.getInstance().primerRegistro(jtName.getText());
             dialog.dispose();
         });
-
         card.add(title); card.add(lbl); card.add(jtName); card.add(jBtnAceptar);
         root.add(robot); root.add(card);
         dialog.add(root); dialog.setVisible(true);
@@ -1185,12 +993,9 @@ public class ChatUI extends JFrame implements iChatView {
     public void showIpPopup() {
         JDialog dialog = createBaseDialog(420, 300);
         JPanel root = new JPanel(null); root.setOpaque(false);
-
         JPanel card = createDarkCard(20, 40, 380, 240);
         JLabel robot = createRobotIcon(260, -10, "/images/robotAdd.png");
-
         JButton btnCerrar = new JButton();
-
         try {
             ImageIcon icon = new ImageIcon(getClass().getResource("/images/x1.png"));
             Image img = icon.getImage().getScaledInstance(40, 30, Image.SCALE_SMOOTH);
@@ -1198,7 +1003,6 @@ public class ChatUI extends JFrame implements iChatView {
         } catch (Exception e) {
             btnCerrar.setText("X");
         }
-
         btnCerrar.setBounds(340, 12, 25, 25);
         btnCerrar.setForeground(TEXT_MUTED);
         btnCerrar.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -1207,25 +1011,20 @@ public class ChatUI extends JFrame implements iChatView {
         btnCerrar.setFocusPainted(false);
         btnCerrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnCerrar.addActionListener(e -> dialog.dispose());
-
         JLabel title = new JLabel("Actualizar IP");
         title.setFont(new Font("Georgia", Font.BOLD, 18));
         title.setForeground(TEXT_PRIMARY);
         title.setBounds(24, 24, 200, 30);
-
         JLabel lbl = new JLabel("Nueva IP:");
         lbl.setFont(new Font("Tahoma", Font.PLAIN, 12));
         lbl.setForeground(TEXT_MUTED);
         lbl.setBounds(24, 70, 200, 20);
-
         jtName = createDarkTextField(24, 94, 330, 40);
-
         jBtnAceptar = createPopupOkButton("Guardar", 24, 155, 120, 38);
         jBtnAceptar.addActionListener(evt -> {
             this.contactController.actualizarIp(idUsuarioActual, jtName.getText());
             dialog.dispose();
         });
-
         card.add(btnCerrar); card.add(title); card.add(lbl); card.add(jtName); card.add(jBtnAceptar);
         root.add(robot); root.add(card);
         dialog.add(root); dialog.setVisible(true);
@@ -1233,10 +1032,8 @@ public class ChatUI extends JFrame implements iChatView {
     private void showEnviarContactoPopup() {
         JDialog dialog = createBaseDialog(420, 310);
         JPanel root = new JPanel(null); root.setOpaque(false);
-
         JPanel card = createDarkCard(20, 40, 380, 250);
         JLabel robot = createRobotIcon(280, -10, "/images/robotAdd.png");
-
         JButton btnCerrar = new JButton();
         try {
             ImageIcon icon = new ImageIcon(getClass().getResource("/images/x1.png"));
@@ -1245,7 +1042,6 @@ public class ChatUI extends JFrame implements iChatView {
         } catch (Exception e) {
             btnCerrar.setText("X");
         }
-
         btnCerrar.setBounds(340, 12, 25, 25);
         btnCerrar.setForeground(TEXT_MUTED);
         btnCerrar.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -1254,25 +1050,20 @@ public class ChatUI extends JFrame implements iChatView {
         btnCerrar.setFocusPainted(false);
         btnCerrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnCerrar.addActionListener(e -> dialog.dispose());
-
         JLabel title = new JLabel("Compartir Contacto");
         title.setFont(new Font("Georgia", Font.BOLD, 18));
         title.setForeground(TEXT_PRIMARY);
         title.setBounds(24, 24, 240, 30);
-
         JLabel lbl = new JLabel("Nombre a compartir:");
         lbl.setFont(new Font("Tahoma", Font.PLAIN, 12));
         lbl.setForeground(TEXT_MUTED);
         lbl.setBounds(24, 76, 220, 20);
-
         jtNameEnviarContacto = createDarkTextField(24, 100, 330, 40);
-
         jBtnEnviarContacto = createPopupOkButton("Enviar →", 24, 162, 120, 38);
         jBtnEnviarContacto.addActionListener(evt -> {
             Mediador.getInstance().enviarContacto(idUsuarioActual, jtNameEnviarContacto.getText());
             dialog.dispose();
         });
-
         card.add(btnCerrar); card.add(title); card.add(lbl); card.add(jtNameEnviarContacto); card.add(jBtnEnviarContacto);
         root.add(robot); root.add(card);
         dialog.add(root); dialog.setVisible(true);
@@ -1280,75 +1071,68 @@ public class ChatUI extends JFrame implements iChatView {
     private void showAgregarContactoPopup() {
         JDialog dialog = createBaseDialog(340, 210);
         JPanel root = new JPanel(null); root.setOpaque(false);
-
         JPanel card = createDarkCard(20, 30, 300, 160);
         JLabel robot = createRobotIcon(210, -10, "/images/robotAccept.png");
-
         JLabel title = new JLabel("✓ Contacto agregado");
         title.setFont(new Font("Georgia", Font.BOLD, 16));
         title.setForeground(new Color(134, 239, 172));
         title.setBounds(20, 28, 220, 28);
-
         JButton ok = createPopupOkButton("OK", 20, 100, 90, 34);
         ok.addActionListener(e -> dialog.dispose());
-
         card.add(title); card.add(ok);
         root.add(robot); root.add(card);
         dialog.add(root); dialog.setVisible(true);
     }
     public void showMensajeUnicoPopup(String mensaje) {
-    JDialog dialog = createBaseDialog(400, 300);
-    JPanel root = new JPanel(null);
-    root.setOpaque(false);
-
-    JPanel card = createDarkCard(20, 40, 360, 230);
-    JLabel robot = createRobotIcon(260, -10, "/images/robotRequest.png");
-
-    JLabel title = new JLabel("Mensaje Único");
-    title.setFont(new Font("Georgia", Font.BOLD, 16));
-    title.setForeground(TEXT_PRIMARY);
-    title.setBounds(20, 20, 240, 28);
-
-    JTextArea textArea = new JTextArea(mensaje);
-    textArea.setFont(new Font("SansSerif", Font.PLAIN, 12));
-    textArea.setForeground(new Color(148, 163, 184));
-//    textArea.setBackground(new Color(30, 41, 59));
-    textArea.setOpaque(false);
-    textArea.setLineWrap(true);
-    textArea.setWrapStyleWord(true);
-    textArea.setEditable(false);
-    textArea.setFocusable(false);
-    textArea.setBorder(null);
-
-    JScrollPane scrollPane = new JScrollPane(textArea);
-    scrollPane.setBounds(20, 54, 320, 100);
-    scrollPane.setBorder(null);
-    scrollPane.getViewport().setBackground(new Color(30, 41, 59));
-
-    // Estilizar scrollbar
-    styleScrollBar(scrollPane);
-//    scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(8, 0));
-//    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
-    JButton ok = createPopupOkButton("OK", 20, 170, 90, 34);
-    ok.addActionListener(e -> dialog.dispose());
-
-    card.add(title);
-    card.add(scrollPane);
-    card.add(ok);
-    root.add(robot);
-    root.add(card);
-    dialog.add(root);
-    dialog.setVisible(true);
-}
+        JDialog dialog = createBaseDialog(400, 300);
+        JPanel root = new JPanel(null);
+        root.setOpaque(false);
+        JPanel card = createDarkCard(20, 40, 360, 230);
+        JLabel robot = createRobotIcon(260, -10, "/images/robotRequest.png");
+        JLabel title = new JLabel("Mensaje Único");
+        title.setFont(new Font("Georgia", Font.BOLD, 16));
+        title.setForeground(TEXT_PRIMARY);
+        title.setBounds(20, 20, 240, 28);
+        int fontSize;
+        if (mensaje.length() <= 20) {
+            fontSize = 18;
+        } else if (mensaje.length() <= 50) {
+            fontSize = 17;
+        } else if (mensaje.length() <= 100) {
+            fontSize = 15;
+        } else {
+            fontSize = 12;
+        }
+        JTextArea textArea = new JTextArea(mensaje);
+        textArea.setFont(new Font("SansSerif", Font.PLAIN, fontSize));
+        textArea.setForeground(new Color(226, 232, 240));  // Color más claro para mejor legibilidad
+        textArea.setOpaque(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setEditable(false);
+        textArea.setFocusable(false);
+        textArea.setBorder(null);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setBounds(20, 54, 320, 100);
+        scrollPane.setBorder(null);
+        scrollPane.getViewport().setBackground(new Color(30, 41, 59));
+        styleScrollBar(scrollPane);
+        JButton ok = createPopupOkButton("OK", 20, 170, 90, 34);
+        ok.addActionListener(e -> dialog.dispose());
+        card.add(title);
+        card.add(scrollPane);
+        card.add(ok);
+        root.add(robot);
+        root.add(card);
+        dialog.add(root);
+        dialog.setVisible(true);
+    }
     private void jBtnEnviarActionPerformed(ActionEvent evt) {//GEN-FIRST:event_jBtnEnviarActionPerformed
         String mensajeTxt = jtMensaje.getText().toString();
         if (mensajeTxt.isEmpty() || idUsuarioActual == null || idUsuarioActual.equals(" ")) {
-            System.out.println("Entra aca");
             return;
         }
-        System.out.println("Enviando 007...");
-        Mediador.getInstance().enviarMensajePorChat(idUsuarioActual, mensajeTxt);
+        System.out.println("Enviando 007..."); Mediador.getInstance().enviarMensajePorChat(idUsuarioActual, mensajeTxt);
         jtMensaje.setText("");
         if (modoMensajeUnico) {
             modoMensajeUnico = false;
@@ -1356,13 +1140,10 @@ public class ChatUI extends JFrame implements iChatView {
             jBtnMensajeUnico.setToolTipText("Mensaje único (se ve solo una vez)");
             jBtnMensajeUnico.repaint();
         }
-
     }//GEN-LAST:event_jBtnEnviarActionPerformed
     private void jBtnOffActionPerformed(ActionEvent evt) {
         try {
-            System.out.println("Enviando 0018...");
-            System.out.println("Conexion terminada");
-            Message message = new FueraLinea(Mediador.getInstance().getIdMio());
+            System.out.println("Enviando 0018...");System.out.println("Conexion terminada");Message message = new FueraLinea(Mediador.ID_MIO);
             Mediador.getInstance().enviarMensajeATodos(message);
             mostrarMensajeSistema("CONEXION TERMINADA");
         } catch (Exception e) {
@@ -1382,9 +1163,7 @@ public class ChatUI extends JFrame implements iChatView {
                 return;
             }
         }
-//        contacModel.addElement(contact);
         todosLosContactos.add(contact);
-
         String filtro = jtBuscadorContactos.getText().toLowerCase().trim();
         if (filtro.isEmpty() || (contact.getName() != null && contact.getName().toLowerCase().contains(filtro))) {
             contacModel.addElement(contact);
@@ -1405,15 +1184,14 @@ public class ChatUI extends JFrame implements iChatView {
     public void mostrarMensajeSistema(String texto) {
         JPanel panelSistema = new JPanel(new FlowLayout(FlowLayout.CENTER));
         panelSistema.setOpaque(false);
-
         JLabel lblSistema = new JLabel("⚠ " + texto);
         lblSistema.setForeground(SYSTEM_RED);
         lblSistema.setFont(new Font("Tahoma", Font.BOLD, 11));
-        lblSistema.setBorder(BorderFactory.createCompoundBorder(
-                new ChatUI.RoundedBorder(10, new Color(239, 68, 68, 25), new Color(239, 68, 68, 60), 1),
-                BorderFactory.createEmptyBorder(4, 12, 4, 12)
-        ));
-
+        lblSistema.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
+//        lblSistema.setBorder(BorderFactory.createCompoundBorder(
+//                new ChatUI.RoundedBorder(10, new Color(239, 68, 68, 25), new Color(239, 68, 68, 60), 1),
+//                BorderFactory.createEmptyBorder(4, 12, 4, 12)
+//        ));
         panelSistema.add(lblSistema);
         jPanelChat.add(panelSistema);
         jPanelChat.revalidate();
@@ -1422,7 +1200,6 @@ public class ChatUI extends JFrame implements iChatView {
     public void actualizarValores(String idUsuarioActual) {
         this.idUsuarioActual = idUsuarioActual;
     }
-
     public void fijarMensajeUI(String idMensaje, String texto) {
         mensajeFijadoId = idMensaje;
         mensajeFijadoTexto = texto;
@@ -1472,16 +1249,13 @@ public class ChatUI extends JFrame implements iChatView {
     }
 
     private JComponent crearFotoPerfilyo() {
-        String miNombre = Mediador.getInstance().getNombre();
+        String miNombre = Mediador.NOMBRE;
         if (miNombre == null || miNombre.isEmpty()) {
-            miNombre = "Y"; // "Yo" por defecto
+            miNombre = "Y";
         }
         String initial = String.valueOf(miNombre.charAt(0)).toUpperCase();
-
-//        Color miColor = new Color(99, 102, 241);
-        Color miColor = BTN_SEND;
-
-        return crearAvatarCircular(initial, miColor, true);
+        Color miColor = ACCENT_HOVER;
+        return crearAvatarCircular(initial, miColor);
     }
     private JComponent crearFotoPerfil() {
         String nombreContacto = lblContactoSeleccionado.getText();
@@ -1489,181 +1263,152 @@ public class ChatUI extends JFrame implements iChatView {
             nombreContacto = "?";
         }
         String initial = String.valueOf(nombreContacto.charAt(0)).toUpperCase();
-
-        // Color determinístico basado en el nombre (igual que en ContactRenderer)
-//        Color avatarColor = AVATAR_COLORS[Math.abs(nombreContacto.hashCode()) % AVATAR_COLORS.length];
         Color[] avatarColors = ThemeManager.getColors().AVATAR_COLORS;
         Color avatarColor = avatarColors[Math.abs(nombreContacto.hashCode()) % avatarColors.length];
-        return crearAvatarCircular(initial, avatarColor, false);
+        return crearAvatarCircular(initial, avatarColor);
     }
-    private JComponent crearAvatarCircular(String initial, Color bgColor, boolean esMio) {
+    private JComponent crearAvatarCircular(String initial, Color bgColor) {
         JComponent avatar = new JComponent() {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                // Círculo del avatar
                 g2.setColor(bgColor);
                 g2.fillOval(0, 0, 30, 30);
-
-                // Inicial
                 g2.setColor(Color.WHITE);
                 g2.setFont(new Font("Georgia", Font.BOLD, 12));
                 FontMetrics fm = g2.getFontMetrics();
                 int tx = (30 - fm.stringWidth(initial)) / 2;
                 int ty = (30 + fm.getAscent() - fm.getDescent()) / 2;
                 g2.drawString(initial, tx, ty);
-
                 g2.dispose();
             }
-
             @Override
-            public Dimension getPreferredSize() {
-                return new Dimension(30, 30);
-            }
-
+            public Dimension getPreferredSize() {return new Dimension(30, 30);}
             @Override
-            public Dimension getMinimumSize() {
-                return new Dimension(30, 30);
-            }
-
+            public Dimension getMinimumSize() {return new Dimension(30, 30);}
             @Override
-            public Dimension getMaximumSize() {
-                return new Dimension(30, 30);
-            }
+            public Dimension getMaximumSize() {return new Dimension(30, 30);}
         };
-
         return avatar;
     }
-
     private JPanel crearBurbuja(String texto, boolean esMio, String hora, boolean leido, String idMensaje) {
-    int maxBubbleWidth = 320;
-    int htmlWidth = maxBubbleWidth - 56;
-    String colorHex = esMio ? "#e0e7ff" : "#cbd5e1";
-
-    JLabel lblTexto;
-    if (texto.equals("Eliminaste este mensaje") || texto.equals("Se elimino este mensaje")) {
-        lblTexto = new JLabel(
-                "<html><body style='max-width:" + htmlWidth + "px; color:#6b7280; font-style:italic; font-family:Tahoma;'>" + texto + "</body></html>"
-        );
-    } else {
-        if (texto.length() > htmlWidth) {
+        int maxBubbleWidth = 320;
+        int htmlWidth = maxBubbleWidth - 56;
+        String colorHex = esMio ? "#e0e7ff" : "#cbd5e1";
+        JLabel lblTexto;
+        if (texto.equals("Eliminaste este mensaje") || texto.equals("Se elimino este mensaje")) {
             lblTexto = new JLabel(
-                    "<html><body style='width:" + htmlWidth + "px; color:" + colorHex + "; font-family:Tahoma;'>" + texto + "</body></html>"
+                    "<html><body style='max-width:" + htmlWidth + "px; color:#6b7280; font-style:italic; font-family:Tahoma;'>" + texto + "</body></html>"
             );
         } else {
-            lblTexto = new JLabel(
-                    "<html><body style='max-width:" + htmlWidth + "px; color:" + colorHex + "; font-family:Tahoma;'>" + texto + "</body></html>"
-            );
+            if (texto.length() > htmlWidth) {
+                lblTexto = new JLabel(
+                        "<html><body style='width:" + htmlWidth + "px; color:" + colorHex + "; font-family:Tahoma;'>" + texto + "</body></html>"
+                );
+            } else {
+                lblTexto = new JLabel(
+                        "<html><body style='max-width:" + htmlWidth + "px; color:" + colorHex + "; font-family:Tahoma;'>" + texto + "</body></html>"
+                );
+            }
         }
-    }
-    lblTexto.setName(idMensaje);
-    lblTexto.setAlignmentX(Component.LEFT_ALIGNMENT);
+        lblTexto.setName(idMensaje);
+        lblTexto.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel lblHora = new JLabel(hora);
+        lblHora.setFont(new Font("Tahoma", Font.PLAIN, 9));
+        lblHora.setForeground(esMio ? new Color(196, 181, 253, 180) : new Color(148, 163, 184, 180));
+        JPanel contenidoInterno = new JPanel();
+        contenidoInterno.setLayout(new BoxLayout(contenidoInterno, BoxLayout.Y_AXIS));
+        contenidoInterno.setOpaque(false);
+        JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 0)) {
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension d = super.getPreferredSize();
+                int w = contenidoInterno.getWidth() > 0 ? contenidoInterno.getWidth() : Math.max(d.width, 95);
+                return new Dimension(w, d.height);
+            }
+            @Override
+            public Dimension getMaximumSize() {
+                return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
+            }
+        };
+        panelInferior.setOpaque(false);
+        panelInferior.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panelInferior.add(lblHora);
+        contenidoInterno.add(lblTexto);
+        contenidoInterno.add(panelInferior);
+        JPopupMenu popupMensaje = new JPopupMenu();
+        JPanel bubble = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
+                g2.dispose();
+            }
+            @Override
+            public Dimension getMaximumSize() {
+                Dimension pref = getPreferredSize();
+                return new Dimension(maxBubbleWidth, pref.height);
+            }
+            @Override
+            public Dimension getMinimumSize() {
+                return new Dimension(110, super.getMinimumSize().height);
+            }
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension d = super.getPreferredSize();
+                return new Dimension(Math.max(d.width, 110), d.height);
+            }
+        };
+        bubble.setOpaque(false);
+        bubble.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
+        bubble.setBackground(esMio ? BG_BUBBLE_ME : BG_BUBBLE_YOU);
+        bubble.add(contenidoInterno, BorderLayout.CENTER);
+        if (esMio) {
+            stylePopupMenu(popupMensaje);
+            JLabel lblCheck = new JLabel(leido ? "✔✔" : "✔");
+            lblCheck.setName(idMensaje);
+            lblCheck.setFont(new Font("Tahoma", Font.PLAIN, 9));
+            lblCheck.setForeground(leido ? new Color(167, 243, 208) : new Color(148, 163, 184));
+            panelInferior.add(lblCheck);
 
-    JLabel lblHora = new JLabel(hora);
-    lblHora.setFont(new Font("Tahoma", Font.PLAIN, 9));
-    lblHora.setForeground(esMio ? new Color(196, 181, 253, 180) : new Color(148, 163, 184, 180));
-
-    JPanel contenidoInterno = new JPanel();
-    contenidoInterno.setLayout(new BoxLayout(contenidoInterno, BoxLayout.Y_AXIS));
-    contenidoInterno.setOpaque(false);
-
-    JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 0)) {
-        @Override
-        public Dimension getPreferredSize() {
-            Dimension d = super.getPreferredSize();
-            int w = contenidoInterno.getWidth() > 0 ? contenidoInterno.getWidth() : Math.max(d.width, 95);
-            return new Dimension(w, d.height);
+            JMenuItem itemEliminar = createMenuItem("Eliminar mensaje");
+            if (!texto.equals("Eliminaste este mensaje")) {
+                itemEliminar.addActionListener(e -> {
+                    boolean eliminar = showEliminarMensajePopup();
+                    if (eliminar) {
+                        lblTexto.setText("<html><body style='max-width:230px; color:#6b7280; font-style:italic;'>Eliminaste este mensaje</body></html>");
+                        bubble.revalidate();
+                        bubble.repaint();
+                        this.chatsController.eliminarMensajeBD(idMensaje);
+                        EliminarMensaje eliminarMensaje = new EliminarMensaje(idMensaje);
+                        Mediador.getInstance().sendMessage(idUsuarioActual, eliminarMensaje);
+                    }
+                });
+                popupMensaje.add(itemEliminar);
+            }
         }
-        @Override
-        public Dimension getMaximumSize() {
-            return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
-        }
-    };
-    panelInferior.setOpaque(false);
-    panelInferior.setAlignmentX(Component.LEFT_ALIGNMENT);
-    panelInferior.add(lblHora);
-
-    contenidoInterno.add(lblTexto);
-    contenidoInterno.add(panelInferior);
-
-    JPopupMenu popupMensaje = new JPopupMenu();
-
-    JPanel bubble = new JPanel(new BorderLayout()) {
-        @Override
-        protected void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(getBackground());
-            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
-            g2.dispose();
-        }
-        @Override
-        public Dimension getMaximumSize() {
-            Dimension pref = getPreferredSize();
-            return new Dimension(maxBubbleWidth, pref.height);
-        }
-        @Override
-        public Dimension getMinimumSize() {
-            return new Dimension(110, super.getMinimumSize().height);
-        }
-        @Override
-        public Dimension getPreferredSize() {
-            Dimension d = super.getPreferredSize();
-            return new Dimension(Math.max(d.width, 110), d.height);
-        }
-    };
-    bubble.setOpaque(false);
-    bubble.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
-    bubble.setBackground(esMio ? BG_BUBBLE_ME : BG_BUBBLE_YOU);
-    bubble.add(contenidoInterno, BorderLayout.CENTER);
-
-    if (esMio) {
-        stylePopupMenu(popupMensaje);
-        JLabel lblCheck = new JLabel(leido ? "✔✔" : "✔");
-        lblCheck.setName(idMensaje);
-        lblCheck.setFont(new Font("Tahoma", Font.PLAIN, 9));
-        lblCheck.setForeground(leido ? new Color(167, 243, 208) : new Color(148, 163, 184));
-        panelInferior.add(lblCheck);
-
-        JMenuItem itemEliminar = createMenuItem("Eliminar mensaje");
-        if (!texto.equals("Eliminaste este mensaje")) {
-            itemEliminar.addActionListener(e -> {
-                boolean eliminar = showEliminarMensajePopup();
-                if (eliminar) {
-                    lblTexto.setText("<html><body style='max-width:230px; color:#6b7280; font-style:italic;'>Eliminaste este mensaje</body></html>");
-                    bubble.revalidate();
-                    bubble.repaint();
-                    this.chatsController.eliminarMensajeBD(idMensaje);
-                    EliminarMensaje eliminarMensaje = new EliminarMensaje(idMensaje);
-                    Mediador.getInstance().sendMessage(idUsuarioActual, eliminarMensaje);
-                }
+        JMenuItem itemFijar = createMenuItem("Fijar mensaje");
+        if (!texto.equals("Eliminaste este mensaje") && !texto.equals("Se elimino este mensaje")) {
+            itemFijar.addActionListener(e -> {
+                fijarMensajeUI(idMensaje, texto);
+                FijarMensaje fijarMsg = new FijarMensaje(idMensaje);
+                Mediador.getInstance().sendMessage(idUsuarioActual, fijarMsg);
             });
-            popupMensaje.add(itemEliminar);
+            popupMensaje.add(itemFijar);
         }
-    }
-
-    JMenuItem itemFijar = createMenuItem("Fijar mensaje");
-    if (!texto.equals("Eliminaste este mensaje") && !texto.equals("Se elimino este mensaje")) {
-        itemFijar.addActionListener(e -> {
-            fijarMensajeUI(idMensaje, texto);
-            FijarMensaje fijarMsg = new FijarMensaje(idMensaje);
-            Mediador.getInstance().sendMessage(idUsuarioActual, fijarMsg);
+        bubble.addMouseListener(new MouseAdapter() {
+            private void mostrarPopup(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) popupMensaje.show(bubble, e.getX(), e.getY());
+            }
+            @Override public void mousePressed(MouseEvent e) { mostrarPopup(e); }
+            @Override public void mouseReleased(MouseEvent e) { mostrarPopup(e); }
         });
-        popupMensaje.add(itemFijar);
+        return bubble;
     }
 
-    bubble.addMouseListener(new MouseAdapter() {
-        private void mostrarPopup(MouseEvent e) {
-            if (SwingUtilities.isRightMouseButton(e)) popupMensaje.show(bubble, e.getX(), e.getY());
-        }
-        @Override public void mousePressed(MouseEvent e) { mostrarPopup(e); }
-        @Override public void mouseReleased(MouseEvent e) { mostrarPopup(e); }
-    });
-
-    return bubble;
-}
     private JPanel crearFilaMensaje(String texto, boolean esMio, String fechaHora, boolean leido, String idMensaje) {
         JPanel fila = new JPanel() {
             @Override
@@ -1674,17 +1419,12 @@ public class ChatUI extends JFrame implements iChatView {
         fila.setLayout(new BoxLayout(fila, BoxLayout.X_AXIS));
         fila.setOpaque(false);
         fila.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
-        // Limitar altura de la fila a su preferredSize
-//        fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, Short.MAX_VALUE));
         fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, fila.getPreferredSize().height));
-
         String soloHora = formatearSoloHora(fechaHora);
         JPanel bubble = crearBurbuja(texto, esMio, soloHora, leido, idMensaje);
         bubble.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-
         JComponent foto = esMio ? crearFotoPerfilyo() : crearFotoPerfil();
         foto.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-
         if (esMio) {
             fila.add(Box.createHorizontalGlue());
             fila.add(bubble);
@@ -1696,7 +1436,6 @@ public class ChatUI extends JFrame implements iChatView {
             fila.add(bubble);
             fila.add(Box.createHorizontalGlue());
         }
-
         return fila;
     }
     private String formatearSoloHora(String fechaHora) {
@@ -1726,7 +1465,6 @@ public class ChatUI extends JFrame implements iChatView {
         mensajeFijadoTexto = null;
         if (panelMensajeFijado != null) panelMensajeFijado.setVisible(false);
     }
-
     public void agregarMensajeUnicoUI(boolean esMio, String fechaHora, boolean leido, String idMensaje) {
         JPanel mensaje = crearFilaMensajeUnico(esMio, fechaHora, leido, idMensaje);
         jPanelChat.add(mensaje);
@@ -1748,14 +1486,11 @@ public class ChatUI extends JFrame implements iChatView {
         fila.setOpaque(false);
         fila.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
         fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, fila.getPreferredSize().height));
-
         String soloHora = formatearSoloHora(fechaHora);
         JPanel bubble = crearBurbujaUnica(esMio, soloHora, leido, idMensaje);
         bubble.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-
         JComponent foto = esMio ? crearFotoPerfilyo() : crearFotoPerfil();
         foto.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-
         if (esMio) {
             fila.add(Box.createHorizontalGlue());
             fila.add(bubble);
@@ -1772,45 +1507,39 @@ public class ChatUI extends JFrame implements iChatView {
     private JPanel crearBurbujaUnica(boolean esMio, String hora, boolean leido, String idMensaje) {
         int maxBubbleWidth = 320;
         int htmlWidth = maxBubbleWidth - 56;
-
-        // Color dorado/amarillo para mensajes únicos
         Color bgBubble = new Color(120, 90, 40); // Fondo dorado oscuro
         Color borderColor = new Color(251, 191, 36, 150); // Borde dorado
-
         JLabel lblIcono = new JLabel("⏱ ");
         lblIcono.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 12));
         lblIcono.setForeground(new Color(251, 191, 36));
-
         JLabel lblTexto = new JLabel(
                 "<html><body style='max-width:" + htmlWidth + "px; color:#fef3c7; font-family:Tahoma;'>" + "Mensaje" + "</body></html>"
         );
+        if (Mediador.getInstance().mensajeLeido(idMensaje)) {
+            lblTexto.setText("<html><body style='color:#6b7280; font-family:Tahoma; font-style:italic;'>Mensaje visto</body></html>");
+            lblIcono.setForeground(new Color(107,114,128));
+            lblIcono.setForeground(new Color(107,114,128));
+        }
         lblTexto.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         JLabel lblHora = new JLabel(hora);
         lblHora.setFont(new Font("Tahoma", Font.PLAIN, 9));
         lblHora.setForeground(new Color(251, 191, 36, 180));
-
         JLabel lblUnico = new JLabel("mensaje único");
         lblUnico.setFont(new Font("Tahoma", Font.ITALIC, 9));
         lblUnico.setForeground(new Color(251, 191, 36, 150));
-
         JPanel contenidoInterno = new JPanel();
         contenidoInterno.setLayout(new BoxLayout(contenidoInterno, BoxLayout.Y_AXIS));
         contenidoInterno.setOpaque(false);
-
         JPanel panelTexto = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         panelTexto.setOpaque(false);
         panelTexto.add(lblIcono);
         panelTexto.add(lblTexto);
-
         JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
         panelInferior.setOpaque(false);
         panelInferior.add(lblUnico);
         panelInferior.add(lblHora);
-
         contenidoInterno.add(panelTexto);
         contenidoInterno.add(panelInferior);
-
         if (esMio) {
             JLabel lblCheck = new JLabel(leido ? "✔✔" : "✔");
             lblCheck.setName(idMensaje);
@@ -1818,7 +1547,6 @@ public class ChatUI extends JFrame implements iChatView {
             lblCheck.setForeground(leido ? new Color(167, 243, 208) : new Color(148, 163, 184));
             panelInferior.add(lblCheck);
         }
-
         JPanel bubble = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -1844,10 +1572,8 @@ public class ChatUI extends JFrame implements iChatView {
         bubble.setOpaque(false);
         bubble.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
         bubble.add(contenidoInterno, BorderLayout.CENTER);
-
         return bubble;
     }
-
     public void agregarMensajeUnicoUIBoton(String mensaje, boolean esMio, String fechaHora, boolean leido, String idMensaje) {
         JPanel fila = crearFilaMensajeUnicoBoton(mensaje, esMio, fechaHora, leido, idMensaje);
         jPanelChat.add(fila);
@@ -1869,16 +1595,11 @@ public class ChatUI extends JFrame implements iChatView {
         fila.setOpaque(false);
         fila.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
         fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, fila.getPreferredSize().height));
-
         String soloHora = formatearSoloHora(fechaHora);
-
-        // Crear el contenedor del botón con el check
         JPanel contenedorBoton = crearContenedorBotonUnico(mensaje, esMio, soloHora, leido, idMensaje);
         contenedorBoton.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-
         JComponent foto = esMio ? crearFotoPerfilyo() : crearFotoPerfil();
         foto.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-
         if (esMio) {
             fila.add(Box.createHorizontalGlue());
             fila.add(contenedorBoton);
@@ -1895,41 +1616,30 @@ public class ChatUI extends JFrame implements iChatView {
     private JPanel crearContenedorBotonUnico(String mensaje, boolean esMio, String hora, boolean leido, String idMensaje) {
         int maxBubbleWidth = 320;
         int htmlWidth = maxBubbleWidth - 56;
-
         Color bgNormal = new Color(120, 90, 40);
         Color bgHover = new Color(140, 110, 50);
         Color borderColor = new Color(251, 191, 36, 150);
-
-        // Crear los componentes internos igual que en crearBurbujaUnica
         JLabel lblIcono = new JLabel("⏱ ");
         lblIcono.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 12));
         lblIcono.setForeground(new Color(251, 191, 36));
-
         JLabel lblTexto = new JLabel(
                 "<html><body style='max-width:" + htmlWidth + "px; color:#fef3c7; font-family:Tahoma;'>" + "Mensaje" + "</body></html>"
         );
         lblTexto.setAlignmentX(Component.RIGHT_ALIGNMENT);
-
         JLabel lblUnico = new JLabel("mensaje único");
         lblUnico.setFont(new Font("Tahoma", Font.ITALIC, 9));
         lblUnico.setForeground(new Color(251, 191, 36, 150));
-
         JLabel lblHora = new JLabel(hora);
         lblHora.setFont(new Font("Tahoma", Font.PLAIN, 9));
         lblHora.setForeground(new Color(251, 191, 36, 180));
-
         JLabel lblCheck = new JLabel(esMio ? (leido ? "✔✔" : "✔") : "");
         lblCheck.setName(idMensaje);
         lblCheck.setFont(new Font("Tahoma", Font.PLAIN, 9));
         lblCheck.setForeground(leido ? new Color(167, 243, 208) : new Color(148, 163, 184));
-
-        // Panel superior con icono y texto
         JPanel panelTexto = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         panelTexto.setOpaque(false);
         panelTexto.add(lblIcono);
         panelTexto.add(lblTexto);
-
-        // Panel inferior con "mensaje único", hora y checks
         JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
         panelInferior.setOpaque(false);
         panelInferior.add(lblUnico);
@@ -1937,44 +1647,33 @@ public class ChatUI extends JFrame implements iChatView {
         if (esMio) {
             panelInferior.add(lblCheck);
         }
-
-        // Contenido interno
         JPanel contenidoInterno = new JPanel();
         contenidoInterno.setLayout(new BoxLayout(contenidoInterno, BoxLayout.Y_AXIS));
         contenidoInterno.setOpaque(false);
         contenidoInterno.add(panelTexto);
         contenidoInterno.add(panelInferior);
-
-        // El botón con el mismo estilo visual que la burbuja
         JButton btn = new JButton() {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
                 Color bg = getModel().isRollover() ? bgHover : bgNormal;
                 g2.setColor(bg);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
-
                 g2.setColor(borderColor);
                 g2.setStroke(new BasicStroke(1.5f));
                 g2.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 16, 16);
-
                 g2.dispose();
-                // NO llamar a super.paintComponent para evitar que pinte el texto del botón
             }
-
             @Override
             public Dimension getMaximumSize() {
                 return new Dimension(maxBubbleWidth, getPreferredSize().height);
             }
-
             @Override
             public Dimension getMinimumSize() {
                 return new Dimension(130, super.getMinimumSize().height);
             }
         };
-
         btn.setLayout(new BorderLayout());
         btn.setOpaque(false);
         btn.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
@@ -1983,21 +1682,16 @@ public class ChatUI extends JFrame implements iChatView {
         btn.setFocusPainted(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setToolTipText("Clic para ver el mensaje único");
-
-        // Agregar el contenido al botón
         btn.add(contenidoInterno, BorderLayout.CENTER);
-
         if (!Mediador.getInstance().mensajeLeido(idMensaje)) {
             btn.addActionListener(e -> {
                 showMensajeUnicoPopup(mensaje);
-                if (!esMio) {
-                    ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(idMensaje);
-                    Mediador.getInstance().sendMessage(idUsuarioActual, confirmarRecibido);
-                }
+                ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(idMensaje);
+                Mediador.getInstance().sendMessage(idUsuarioActual, confirmarRecibido);
+                Mediador.getInstance().actualizarLeidoBd(confirmarRecibido.getIdMensaje());
                 btn.setEnabled(false);
                 btn.setToolTipText("El mensaje ya fue leído");
                 btn.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-
                 lblTexto.setText("<html><body style='color:#6b7280; font-family:Tahoma; font-style:italic;'>Mensaje visto</body></html>");
                 lblIcono.setForeground(new Color(107,114,128));
                 btn.revalidate();
@@ -2011,15 +1705,11 @@ public class ChatUI extends JFrame implements iChatView {
             lblTexto.setForeground(new Color(148, 163, 184));
             lblIcono.setForeground(new Color(107,114,128));
         }
-
-        // Panel contenedor simple
         JPanel contenedor = new JPanel(new FlowLayout(esMio ? FlowLayout.RIGHT : FlowLayout.LEFT, 0, 0));
         contenedor.setOpaque(false);
         contenedor.add(btn);
-
         return contenedor;
     }
-
     private String mensajePorFecha(String fechaHora) {
         try {
             java.time.LocalDateTime dateTime =
@@ -2099,7 +1789,31 @@ public class ChatUI extends JFrame implements iChatView {
         }
         jContactos.repaint();
     }
-
+    public void actualizarBurbujaUnicaLeida(String idMensaje) {
+        SwingUtilities.invokeLater(() -> {
+            buscarYActualizarBurbuja(jPanelChat, idMensaje);
+            jPanelChat.revalidate();
+            jPanelChat.repaint();
+        });
+    }
+    private void buscarYActualizarBurbuja(Container container, String idMensaje) {
+        for (Component comp : container.getComponents()) {
+            if (comp instanceof JLabel label) {
+                if (idMensaje.equals(label.getName())) {
+                    String texto = label.getText();
+                    if (texto != null && texto.contains("Mensaje") && !texto.contains("único")) {
+                        label.setText("<html><body style='color:#6b7280; font-family:Tahoma; font-style:italic;'>Mensaje visto</body></html>");
+                    }
+                    if ("⏱ ".equals(texto)) {
+                        label.setForeground(new Color(107, 114, 128));
+                    }
+                }
+            }
+            if (comp instanceof Container cont) {
+                buscarYActualizarBurbuja(cont, idMensaje);
+            }
+        }
+    }
     public void marcarContactoConMensajeNuevo(String id) {
         for (int i = 0; i < contacModel.size(); i++) {
             Contact c = contacModel.get(i);
@@ -2122,20 +1836,15 @@ public class ChatUI extends JFrame implements iChatView {
         }
         jContactos.repaint();
     }
-
     public void ejecutarEfectoZumbido() {
         final Point posicionOriginal = getLocation();
-
         new Thread(() -> reproducirSonidoZumbido()).start();
-
         Timer timerVibracion = new Timer(20, null); // cada 20ms
         final long tiempoInicio = System.currentTimeMillis();
         final int duracion = 1000;
         final int intensidad = 5;
-
         timerVibracion.addActionListener(e -> {
             long tiempoTranscurrido = System.currentTimeMillis() - tiempoInicio;
-
             if (tiempoTranscurrido >= duracion) {
                 ((Timer) e.getSource()).stop();
                 setLocation(posicionOriginal);
@@ -2145,46 +1854,31 @@ public class ChatUI extends JFrame implements iChatView {
                 setLocation(posicionOriginal.x + dx, posicionOriginal.y + dy);
             }
         });
-
         timerVibracion.start();
     }
     private void reproducirSonidoZumbido() {
         try {
             float sampleRate = 8000f;
             int duracionMs = 1000;
-
             byte[] buf = new byte[(int) (sampleRate * duracionMs / 1000)];
-
-//            Do 262
-//            Re 294
-//            Mi 330
-//            Fa 349
-//            Sol 392
-//            La 440
-//            Si 494
             for (int i = 0; i < buf.length; i++) {
                 double angle = i / (sampleRate / 262) * 2.0 * Math.PI;
                 double modulacion = Math.sin(i / (sampleRate / 15) * 2.0 * Math.PI);
                 buf[i] = (byte) (Math.sin(angle) * 80 * (0.5 + 0.5 * modulacion));
             }
-
             javax.sound.sampled.AudioFormat af = new javax.sound.sampled.AudioFormat(
                     sampleRate, 8, 1, true, false
             );
-
             javax.sound.sampled.DataLine.Info info = new javax.sound.sampled.DataLine.Info(
                     javax.sound.sampled.SourceDataLine.class, af
             );
-
             javax.sound.sampled.SourceDataLine sdl = (javax.sound.sampled.SourceDataLine)
                     javax.sound.sampled.AudioSystem.getLine(info);
-
             sdl.open(af);
             sdl.start();
             sdl.write(buf, 0, buf.length);
             sdl.drain();
             sdl.close();
-
         } catch (Exception e) {
             java.awt.Toolkit.getDefaultToolkit().beep();
         }
@@ -2248,7 +1942,7 @@ public class ChatUI extends JFrame implements iChatView {
     private JScrollPane jScrollPaneChat;
     private JButton jBtnNuevaConexion;
     private JButton jBtnOff;
-    private JList<Contact> jContactos;
+    public JList<Contact> jContactos;
     private JPopupMenu jPopupMenu;
     private JMenuItem itemZumbido;
     private JMenuItem itemHello;
@@ -2277,56 +1971,53 @@ public class ChatUI extends JFrame implements iChatView {
     private JPanel panelInferior;
     private JPanel sidebarHeader;
     private JScrollPane scrollContactos;
-
-
     public void onMessage(Message message) {
-        if (message instanceof Aceptar) {
+        if (message instanceof Aceptar)
             showAcceptPopup();
-        }
-        if  (message instanceof Rechazar) {
+        if  (message instanceof Rechazar)
             showDeclinePopup();
-        }
+        if  (message instanceof RechazarHello)
+            showHelloRechazadoPopup();
         if (message instanceof Mensaje) {
             Mensaje mensaje = (Mensaje) message;
             System.out.println(idUsuarioActual);
             if (!mensaje.getIdUsuario().equals(idUsuarioActual) || jContactos.getSelectedValue() == null) {
                 marcarContactoConMensajeNuevo(mensaje.getIdUsuario());
             }
-            if (mensaje.getIdUsuario().equals(idUsuarioActual) && !idUsuarioActual.equals(Mediador.getInstance().getIdMio()) && jContactos.getSelectedValue() != null) {
+            if (mensaje.getIdUsuario().equals(idUsuarioActual) && !idUsuarioActual.equals(Mediador.ID_MIO) && jContactos.getSelectedValue() != null) {
                 agregarMensajeUI(mensaje.getMensaje(), false, Mediador.getInstance().obtenerHoraActual(), false, mensaje.getIdMensaje());
             }
-            if (!idUsuarioActual.equals(Mediador.getInstance().getIdMio())) {
-                chatsController.guardarEnBd(mensaje.getIdMensaje(), mensaje.getMensaje(), mensaje.getIdUsuario(), Mediador.getInstance().getIdMio(), Mediador.getInstance().obtenerHoraActual(), false);
+            if (!idUsuarioActual.equals(Mediador.ID_MIO)) {
+                chatsController.guardarEnBd(mensaje.getIdMensaje(), mensaje.getMensaje(), mensaje.getIdUsuario(), Mediador.ID_MIO, Mediador.getInstance().obtenerHoraActual(), false);
             }
             if (mensaje.getIdUsuario().equals(idUsuarioActual)) {
                 ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(mensaje.getIdMensaje());
-                System.out.println("Enviando 008...");
-                Mediador.getInstance().sendMessage(idUsuarioActual, confirmarRecibido);
+                System.out.println("Enviando 008..."); Mediador.getInstance().sendMessage(idUsuarioActual, confirmarRecibido);
                 Mediador.getInstance().actualizarLeidoBd(mensaje.getIdMensaje());
             }
 //            if (mensaje.getMensaje().toLowerCase().equals("chau")){
 //                System.out.println("Enviando 0018...");
 //                System.out.println("Conexion terminada");
-//                Message message1 = new FueraLinea(Mediador.getInstance().getIdMio());
+//                Message message1 = new FueraLinea(Mediador.ID_MIO);
 //                Mediador.getInstance().enviarChau(message1, mensaje.getIdUsuario());
 //                mostrarMensajeSistema("CONEXION TERMINADA");
 //                actualizarEstadoContacto(mensaje.getIdUsuario(), false);
 //            }
         }
         if (message instanceof ConfirmarRecibido) {
-            SwingUtilities.invokeLater(() ->
-                    actualizarChecksAzules(((ConfirmarRecibido) message).getIdMensaje())
-            );
+            ConfirmarRecibido confirmarRecibido = (ConfirmarRecibido) message;
+            SwingUtilities.invokeLater(() -> {
+                        actualizarChecksAzules(((ConfirmarRecibido) message).getIdMensaje());
+                        actualizarBurbujaUnicaLeida(confirmarRecibido.getIdMensaje());
+            });
         }
         if (message instanceof FueraLinea) {
-            System.out.println("Conexión terminada por cliente");
-            showOffPopup();
+            System.out.println("Conexión terminada por cliente"); showOffPopup();
             mostrarMensajeSistema("CONEXION TERMINADA");
             actualizarEstadoContacto(idUsuarioActual, false);
         }
         if (message instanceof EnviarContacto) {
-            System.out.println("contacto agregado");
-            EnviarContacto enviarContacto = (EnviarContacto) message;
+            System.out.println("contacto agregado"); EnviarContacto enviarContacto = (EnviarContacto) message;
             Contact nuevo = new Contact(
                     enviarContacto.getIdUsuario(),
                     enviarContacto.getNombreCliente(),
@@ -2335,7 +2026,6 @@ public class ChatUI extends JFrame implements iChatView {
                     false,
                     false
             );
-
             SwingUtilities.invokeLater(() -> {
                 agregarContacto(nuevo);
                 jContactos.revalidate();
@@ -2354,11 +2044,11 @@ public class ChatUI extends JFrame implements iChatView {
                 marcarContactoConMensajeNuevo(mensajeUnico.getIdUsuario());
             }
             Mediador.getInstance().updateUnico(mensajeUnico.getIdMensaje());
-            if (mensajeUnico.getIdUsuario().equals(idUsuarioActual) && !idUsuarioActual.equals(Mediador.getInstance().getIdMio()) && jContactos.getSelectedValue() != null) {
+            if (mensajeUnico.getIdUsuario().equals(idUsuarioActual) && !idUsuarioActual.equals(Mediador.ID_MIO) && jContactos.getSelectedValue() != null) {
                 agregarMensajeUnicoUIBoton(mensajeUnico.getMensaje(), false, Mediador.getInstance().obtenerHoraActual(), false, mensajeUnico.getIdMensaje());
             }
-            if (!idUsuarioActual.equals(Mediador.getInstance().getIdMio())) {
-                chatsController.guardarEnBd(mensajeUnico.getIdMensaje(), mensajeUnico.getMensaje(), mensajeUnico.getIdUsuario(), Mediador.getInstance().getIdMio(), Mediador.getInstance().obtenerHoraActual(), true);
+            if (!idUsuarioActual.equals(Mediador.ID_MIO)) {
+                chatsController.guardarEnBd(mensajeUnico.getIdMensaje(), mensajeUnico.getMensaje(), mensajeUnico.getIdUsuario(), Mediador.ID_MIO, Mediador.getInstance().obtenerHoraActual(), true);
             }
         }
         if (message instanceof CambiarTema) {
@@ -2366,36 +2056,33 @@ public class ChatUI extends JFrame implements iChatView {
             String tema = cambiarTema.getIdTema();
             switch (tema) {
                 case "1":
-                    ThemeManager.setTheme(ThemeManager.Theme.MIDNIGHT);
+                    ThemeManager.setTheme(ThemeManager.Theme.UNO);
                     aplicarTema();
                     break;
                 case "2":
-                    ThemeManager.setTheme(ThemeManager.Theme.FOREST);
+                    ThemeManager.setTheme(ThemeManager.Theme.DOS);
                     aplicarTema();
                     break;
                 case "3":
-                    ThemeManager.setTheme(ThemeManager.Theme.OCEAN);
+                    ThemeManager.setTheme(ThemeManager.Theme.CUATRO);
                     aplicarTema();
                     break;
                 case "4":
-                    ThemeManager.setTheme(ThemeManager.Theme.SUNSET);
+                    ThemeManager.setTheme(ThemeManager.Theme.TRES);
                     aplicarTema();
                     break;
                 case "5":
-                    ThemeManager.setTheme(ThemeManager.Theme.SAKURA);
+                    ThemeManager.setTheme(ThemeManager.Theme.CINCO);
                     aplicarTema();
                     break;
             }
         }
-     }
-
+    }
     @Override
     public void onloadContacts(List<Contact> contacts) {
         try {
             if (contacts.isEmpty())
-                System.out.println("BD vacia");
-
-            todosLosContactos.clear();
+                System.out.println("BD vacia"); todosLosContactos.clear();
             todosLosContactos.addAll(contacts);
             contacModel.clear();
             contacModel.addAll(contacts);
@@ -2403,54 +2090,33 @@ public class ChatUI extends JFrame implements iChatView {
             e.printStackTrace();
         }
     }
-
     @Override
     public void onloadMessages(List<Chats> chats) {
         limpiarChat();
         String ultimaFecha = "";
         if (jContactos.getSelectedValue() == null)
             return;
-
         for (Chats c : chats) {
 //            String fechaActual = mensajePorFecha(c.getHora());
-
 //            if (!fechaActual.equals(ultimaFecha)) {
 //                agregarSeparadorFecha(fechaActual);
 //                ultimaFecha = fechaActual;
 //            }
-            boolean esMio = c.getIdEmisor().equals(Mediador.getInstance().getIdMio());
+            boolean esMio = c.getIdEmisor().equals(Mediador.ID_MIO);
             boolean leido = c.getLeido().equals("1");
             boolean fijado = c.getFijado().equals("1");
             boolean unico = c.getUnico().equals("1");
             if (unico) {
                 if (esMio) {
-                    agregarMensajeUnicoUI(
-                            esMio,
-                            c.getHora(),
-                            leido,
-                            c.getIdMensaje()
-                    );
+                    agregarMensajeUnicoUI(esMio, c.getHora(), leido, c.getIdMensaje());
                 } else {
-                    agregarMensajeUnicoUIBoton(
-                            c.getMensajeTxt(),
-                            esMio,
-                            c.getHora(),
-                            leido,
-                            c.getIdMensaje()
-                    );
+                    agregarMensajeUnicoUIBoton(c.getMensajeTxt(), esMio, c.getHora(), leido, c.getIdMensaje());
                 }
             } else {
-                agregarMensajeUI(
-                        c.getMensajeTxt(),
-                        esMio,
-                        c.getHora(),
-                        leido,
-                        c.getIdMensaje()
-                );
+                agregarMensajeUI(c.getMensajeTxt(), esMio, c.getHora(), leido, c.getIdMensaje());
             }
             if (!esMio && !leido && !unico) {
-                System.out.println("Enviando 008...");
-                ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(c.getIdMensaje());
+                System.out.println("Enviando 008...");ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(c.getIdMensaje());
                 Mediador.getInstance().sendMessage(c.getIdEmisor(), confirmarRecibido);
                 Mediador.getInstance().actualizarLeidoBd(c.getIdMensaje());
             }
@@ -2458,40 +2124,5 @@ public class ChatUI extends JFrame implements iChatView {
                 fijarMensajeUI(c.getIdMensaje(), c.getMensajeTxt());
         }
     }
-    static class RoundedBorder extends AbstractBorder {
-        private final int radius;
-        private final Color fill;
-        private final Color stroke;
-        private final int thickness;
-
-        RoundedBorder(int radius, Color fill, Color stroke, int thickness) {
-            this.radius = radius; this.fill = fill; this.stroke = stroke; this.thickness = thickness;
-        }
-
-        @Override
-        public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(fill);
-            g2.fillRoundRect(x, y, w - 1, h - 1, radius * 2, radius * 2);
-            g2.setColor(stroke);
-            g2.setStroke(new BasicStroke(thickness));
-            g2.drawRoundRect(x, y, w - 1, h - 1, radius * 2, radius * 2);
-            g2.dispose();
-        }
-
-        @Override
-        public Insets getBorderInsets(Component c) { return new Insets(thickness, thickness, thickness, thickness); }
-        @Override
-        public boolean isBorderOpaque() { return false; }
-    }
-    private static final Color[] AVATAR_COLORS = {
-            new Color(99, 102, 241),   // Índigo
-            new Color(168, 85, 247),   // Púrpura
-            new Color(236, 72, 153),   // Rosa
-            new Color(20, 184, 166),   // Teal
-            new Color(245, 158, 11),   // Ámbar
-            new Color(59, 130, 246),   // Azul
-    };
     // End of variables declaration//GEN-END:variables
 }
