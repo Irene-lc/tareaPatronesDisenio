@@ -7,4 +7,5 @@ nbproject/private/
 
 # build
 /build/
-/dist/
+/dist/.claude/
+.claude/

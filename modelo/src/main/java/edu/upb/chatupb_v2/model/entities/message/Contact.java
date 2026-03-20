@@ -1,0 +1,40 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package edu.upb.chatupb_v2.model.entities.message;
+
+import edu.upb.chatupb_v2.model.repository.Model;
+import lombok.*;
+
+import java.io.Serializable;
+
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class Contact implements Serializable, Model {
+    public static final String ME_CODE = "af3bc20a-766c-4cd4-813d-b1067a01fa9a";
+
+
+    public static final class Column{
+        public static final String ID= "id";
+        public static final String NAME ="name";
+        public static final String IP ="ip";
+    }
+    @Override
+    public void setId(String id) {
+        this.id = id;
+    }
+    private String id;
+    private String name;
+    private String ip;
+    @Builder.Default
+    private boolean stateConnect = false;
+    @Builder.Default
+    private boolean mensajesNoLeidos = false;
+    @Builder.Default
+    private boolean zumbido = false;
+
+}
