@@ -18,6 +18,7 @@ public interface IChatView {
     void mostrarMensajeSistema(String texto);
     void fijarMensajeUI(String idMensaje, String texto);
     boolean showInvitationPopup(String nombreContacto);
+    void showSeleccioneContactoPopup();
     void ejecutarEfectoZumbido();
     void marcarZumbido(String idUsuario);
     void actualizarValores(String idUsuario);

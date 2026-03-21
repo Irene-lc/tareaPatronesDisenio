@@ -85,7 +85,9 @@ public class Mediador implements SocketListener {
                 chatUI.getChatsController().guardarEnBd(idMensaje, mensaje, ID_MIO, idCliente, obtenerHoraActual(), false);
                 sendMessage(idCliente, message);
                 if (chatUI != null) {
-                    if (chatUI.getSelectedContact().getId().equals(idCliente))
+                    if (chatUI.getSelectedContact() == null) {
+                        chatUI.showSeleccioneContactoPopup();
+                    } else if (chatUI.getSelectedContact().getId().equals(idCliente))
                         chatUI.agregarMensajeUI(mensaje, true, obtenerHoraActual(), false, idMensaje);
                 }
             } else {
@@ -94,8 +96,11 @@ public class Mediador implements SocketListener {
                 this.chatsDao.updateUnico(idMensaje);
                 sendMessage(idCliente, mensajeUnico);
                 if (chatUI != null) {
-                    if (chatUI.getSelectedContact() != null && chatUI.getSelectedContact().getId().equals(idCliente))
+                    if (chatUI.getSelectedContact() == null) {
+                        chatUI.showSeleccioneContactoPopup();
+                    } else if (chatUI.getSelectedContact() != null && chatUI.getSelectedContact().getId().equals(idCliente)) {
                         chatUI.agregarMensajeUnicoUI(true, obtenerHoraActual(), false, idMensaje);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -308,6 +313,8 @@ public class Mediador implements SocketListener {
             try {
                 if (this.contactDao.existById(idUsuario)) {
                     Contact contact = this.contactDao.findById(idUsuario);
+                    System.out.println(contact.getIp());
+                    System.out.println(socketClient.getIp());
                     if (!contact.getIp().equals(socketClient.getIp())) {
                         this.contactDao.updateIp(idUsuario, socketClient.getIp());
                         contact.setIp(socketClient.getIp());
@@ -334,7 +341,8 @@ public class Mediador implements SocketListener {
         if (message instanceof Zumbido) {
             Zumbido zumbido = (Zumbido) message;
             try {
-                if (!chatUI.getIdUsuarioActual().equals(zumbido.getIdUsuario()))
+                if (chatUI.getIdUsuarioActual() == null) {
+                } else if (!chatUI.getIdUsuarioActual().equals(zumbido.getIdUsuario()))
                     chatUI.marcarZumbido(zumbido.getIdUsuario());
 //                Contact contact = this.contactDao.findById(zumbido.getIdUsuario());
 //                if (contact != null) {
@@ -360,7 +368,9 @@ public class Mediador implements SocketListener {
                 if (chatsDao.existById(fijarMensaje.getIdMensaje())) {
                     Chats mensaje = chatsDao.findById(fijarMensaje.getIdMensaje());
                     if (chatUI != null) {
-                        if ((mensaje.getIdEmisor().equals(chatUI.getIdUsuarioActual()) || mensaje.getIdReceptor().equals(chatUI.getIdUsuarioActual())) && chatUI.getSelectedContact() != null) {
+                        if (chatUI.getSelectedContact() == null) {
+                            chatUI.showSeleccioneContactoPopup();
+                        } else if ((mensaje.getIdEmisor().equals(chatUI.getIdUsuarioActual()) || mensaje.getIdReceptor().equals(chatUI.getIdUsuarioActual())) && chatUI.getSelectedContact() != null) {
                             chatUI.fijarMensajeUI(fijarMensaje.getIdMensaje(), mensaje.getMensajeTxt());
                         }
                     }

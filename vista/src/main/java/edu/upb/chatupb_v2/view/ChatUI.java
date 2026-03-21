@@ -968,6 +968,39 @@ public class ChatUI extends JFrame implements IChatView {
         root.add(robot); root.add(card);
         dialog.add(root); dialog.setVisible(true);
     }
+    public void showSeleccioneContactoPopup() {
+        JDialog dialog = createBaseDialog(420, 310);
+        JPanel root = new JPanel(null); root.setOpaque(false);
+        JPanel card = createDarkCard(20, 40, 380, 250);
+        JLabel robot = createRobotIcon(280, -10, "/images/robotAdd.png");
+        JButton btnCerrar = new JButton();
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/x1.png"));
+            Image img = icon.getImage().getScaledInstance(40, 30, Image.SCALE_SMOOTH);
+            btnCerrar.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            btnCerrar.setText("X");
+        }
+        btnCerrar.setBounds(340, 12, 25, 25);
+        btnCerrar.setForeground(TEXT_MUTED);
+        btnCerrar.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        btnCerrar.setContentAreaFilled(false);
+        btnCerrar.setBorderPainted(false);
+        btnCerrar.setFocusPainted(false);
+        btnCerrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnCerrar.addActionListener(e -> dialog.dispose());
+        JLabel title = new JLabel("Seleccione un contacto primero");
+        title.setFont(new Font("Georgia", Font.BOLD, 18));
+        title.setForeground(TEXT_PRIMARY);
+        title.setBounds(24, 24, 240, 30);
+        jBtnConectar = createPopupOkButton("ok", 24, 162, 140, 38);
+        jBtnConectar.addActionListener(evt -> {
+            dialog.dispose();
+        });
+        card.add(btnCerrar); card.add(title); card.add(jBtnConectar);
+        root.add(robot); root.add(card);
+        dialog.add(root); dialog.setVisible(true);
+    }
     public void showNombrePopup() {
         JDialog dialog = createBaseDialog(420, 310);
         JPanel root = new JPanel(null); root.setOpaque(false);
@@ -982,7 +1015,7 @@ public class ChatUI extends JFrame implements IChatView {
         lbl.setForeground(TEXT_MUTED);
         lbl.setBounds(24, 76, 200, 20);
         jtName = createDarkTextField(24, 100, 330, 40);
-        jBtnAceptar = createPopupOkButton("Comenzar →", 24, 162, 150, 38);
+        jBtnAceptar = createPopupOkButton("Comenzar", 24, 162, 150, 38);
         jBtnAceptar.addActionListener(evt -> {
             Mediador.getInstance().primerRegistro(jtName.getText());
             dialog.dispose();
@@ -1060,7 +1093,7 @@ public class ChatUI extends JFrame implements IChatView {
         lbl.setForeground(TEXT_MUTED);
         lbl.setBounds(24, 76, 220, 20);
         jtNameEnviarContacto = createDarkTextField(24, 100, 330, 40);
-        jBtnEnviarContacto = createPopupOkButton("Enviar →", 24, 162, 120, 38);
+        jBtnEnviarContacto = createPopupOkButton("Enviar", 24, 162, 120, 38);
         jBtnEnviarContacto.addActionListener(evt -> {
             Mediador.getInstance().enviarContacto(idUsuarioActual, jtNameEnviarContacto.getText());
             dialog.dispose();
@@ -1133,13 +1166,18 @@ public class ChatUI extends JFrame implements IChatView {
         if (mensajeTxt.isEmpty() || idUsuarioActual == null || idUsuarioActual.equals(" ")) {
             return;
         }
-        System.out.println("Enviando 007..."); Mediador.getInstance().enviarMensajePorChat(idUsuarioActual, mensajeTxt);
-        jtMensaje.setText("");
-        if (modoMensajeUnico) {
-            modoMensajeUnico = false;
-            jBtnMensajeUnico.setForeground(ACCENT);
-            jBtnMensajeUnico.setToolTipText("Mensaje único (se ve solo una vez)");
-            jBtnMensajeUnico.repaint();
+        if (jContactos.getSelectedValue() == null) {
+            showSeleccioneContactoPopup();
+        } else {
+            System.out.println("Enviando 007...");
+            Mediador.getInstance().enviarMensajePorChat(idUsuarioActual, mensajeTxt);
+            jtMensaje.setText("");
+            if (modoMensajeUnico) {
+                modoMensajeUnico = false;
+                jBtnMensajeUnico.setForeground(ACCENT);
+                jBtnMensajeUnico.setToolTipText("Mensaje único (se ve solo una vez)");
+                jBtnMensajeUnico.repaint();
+            }
         }
     }//GEN-LAST:event_jBtnEnviarActionPerformed
     private void jBtnOffActionPerformed(ActionEvent evt) {
@@ -1519,8 +1557,9 @@ public class ChatUI extends JFrame implements IChatView {
         if (Mediador.getInstance().mensajeLeido(idMensaje)) {
             lblTexto.setText("<html><body style='color:#6b7280; font-family:Tahoma; font-style:italic;'>Mensaje visto</body></html>");
             lblIcono.setForeground(new Color(107,114,128));
-            lblIcono.setForeground(new Color(107,114,128));
         }
+        lblTexto.setName(idMensaje + "mensaje");
+        lblIcono.setName(idMensaje + "icono");
         lblTexto.setAlignmentX(Component.LEFT_ALIGNMENT);
         JLabel lblHora = new JLabel(hora);
         lblHora.setFont(new Font("Tahoma", Font.PLAIN, 9));
@@ -1791,27 +1830,31 @@ public class ChatUI extends JFrame implements IChatView {
         jContactos.repaint();
     }
     public void actualizarBurbujaUnicaLeida(String idMensaje) {
-        SwingUtilities.invokeLater(() -> {
-            buscarYActualizarBurbuja(jPanelChat, idMensaje);
-            jPanelChat.revalidate();
-            jPanelChat.repaint();
-        });
-    }
-    private void buscarYActualizarBurbuja(Container container, String idMensaje) {
-        for (Component comp : container.getComponents()) {
-            if (comp instanceof JLabel label) {
-                if (idMensaje.equals(label.getName())) {
-                    String texto = label.getText();
-                    if (texto != null && texto.contains("Mensaje") && !texto.contains("único")) {
-                        label.setText("<html><body style='color:#6b7280; font-family:Tahoma; font-style:italic;'>Mensaje visto</body></html>");
-                    }
-                    if ("⏱ ".equals(texto)) {
-                        label.setForeground(new Color(107, 114, 128));
+        for (Component filaComp : jPanelChat.getComponents()) {
+            if (!(filaComp instanceof JPanel fila)) continue;
+            for (Component comp : fila.getComponents()) {
+                if (!(comp instanceof JPanel bubble)) continue;
+                for (Component bubbleChild : bubble.getComponents()) {
+                    if (!(bubbleChild instanceof JPanel contenidoInterno)) continue;
+                    for (Component innerComp : contenidoInterno.getComponents()) {
+                        if (!(innerComp instanceof JPanel panelTexto)) continue;
+                        for (Component labelComp : panelTexto.getComponents()) {
+                            if (labelComp instanceof JLabel lbl) {
+                                String name = lbl.getName();
+                                if (name != null) {
+                                    if (name.equals(idMensaje + "mensaje")) {
+                                        lbl.setText("<html><body style='color:#6b7280; font-family:Tahoma; font-style:italic;'>Mensaje visto</body></html>");
+                                    }
+                                    if (name.equals(idMensaje + "icono")) {
+                                        lbl.setForeground(new Color(107, 114, 128));
+                                    }
+                                }
+                            }
+                        }
+                        panelTexto.revalidate();
+                        panelTexto.repaint();
                     }
                 }
-            }
-            if (comp instanceof Container cont) {
-                buscarYActualizarBurbuja(cont, idMensaje);
             }
         }
     }
@@ -1996,14 +2039,6 @@ public class ChatUI extends JFrame implements IChatView {
                 System.out.println("Enviando 008..."); Mediador.getInstance().sendMessage(idUsuarioActual, confirmarRecibido);
                 Mediador.getInstance().actualizarLeidoBd(mensaje.getIdMensaje());
             }
-//            if (mensaje.getMensaje().toLowerCase().equals("chau")){
-//                System.out.println("Enviando 0018...");
-//                System.out.println("Conexion terminada");
-//                Message message1 = new FueraLinea(Mediador.ID_MIO);
-//                Mediador.getInstance().enviarChau(message1, mensaje.getIdUsuario());
-//                mostrarMensajeSistema("CONEXION TERMINADA");
-//                actualizarEstadoContacto(mensaje.getIdUsuario(), false);
-//            }
         }
         if (message instanceof ConfirmarRecibido) {
             ConfirmarRecibido confirmarRecibido = (ConfirmarRecibido) message;
@@ -2035,7 +2070,9 @@ public class ChatUI extends JFrame implements IChatView {
             showAgregarContactoPopup();
         }
         if (message instanceof EliminarMensaje) {
+            System.out.println("Llego 009...");
             EliminarMensaje eliminarMensaje = (EliminarMensaje) message;
+            System.out.println(eliminarMensaje.getIdMensaje());
             this.chatsController.mensajeeliminadoPorCLiente(eliminarMensaje.getIdMensaje());
             actualizarMensajeEliminado(eliminarMensaje.getIdMensaje());
         }
@@ -2117,7 +2154,8 @@ public class ChatUI extends JFrame implements IChatView {
                 agregarMensajeUI(c.getMensajeTxt(), esMio, c.getHora(), leido, c.getIdMensaje());
             }
             if (!esMio && !leido && !unico) {
-                System.out.println("Enviando 008...");ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(c.getIdMensaje());
+                System.out.println("Enviando 008...");
+                ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(c.getIdMensaje());
                 Mediador.getInstance().sendMessage(c.getIdEmisor(), confirmarRecibido);
                 Mediador.getInstance().actualizarLeidoBd(c.getIdMensaje());
             }
@@ -2137,6 +2175,8 @@ public class ChatUI extends JFrame implements IChatView {
 
     @Override
     public Contact getSelectedContact() {
+        if (jContactos.getSelectedValue() == null)
+            return null;
         return this.jContactos.getSelectedValue();
     }
 

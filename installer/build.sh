@@ -6,7 +6,7 @@
 # =============================================================================
 
 # ── CONFIGURACIÓN ─────────────────────────────────────────────────────────────
-APP_NAME="CHAT"                          # Nombre visible de la app
+APP_NAME="CHATUPB"                          # Nombre visible de la app
 APP_VERSION="1.0"                           # Versión del instalador
 MAIN_CLASS="edu.upb.chatupb_v2.ChatUPB_V2" # Clase principal Java
 

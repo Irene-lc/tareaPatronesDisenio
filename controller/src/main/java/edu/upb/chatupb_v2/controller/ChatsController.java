@@ -36,7 +36,9 @@ public class ChatsController {
     }
     public void mensajeeliminadoPorCLiente(String idMensaje) {
         try {
+            System.out.println("a");
             if (chatsDao.existById(idMensaje)) {
+                System.out.println("b");
                 chatsDao.updateMensajeEliminado(idMensaje);
             }
         } catch (Exception e) {
