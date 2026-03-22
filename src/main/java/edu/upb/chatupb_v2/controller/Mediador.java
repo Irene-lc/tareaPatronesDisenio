@@ -333,7 +333,9 @@ public class Mediador implements SocketListener {
         if (message instanceof Zumbido) {
             Zumbido zumbido = (Zumbido) message;
             try {
-                if (!chatUI.idUsuarioActual.equals(zumbido.getIdUsuario()))
+                System.out.println( " 2" + chatUI.idUsuarioActual);
+                System.out.println(zumbido.getIdUsuario());
+                if (!chatUI.idUsuarioActual.equals(zumbido.getIdUsuario()) || chatUI.jContactos.getSelectedValue() == null)
                     chatUI.marcarZumbido(zumbido.getIdUsuario());
 //                Contact contact = this.contactDao.findById(zumbido.getIdUsuario());
 //                if (contact != null) {

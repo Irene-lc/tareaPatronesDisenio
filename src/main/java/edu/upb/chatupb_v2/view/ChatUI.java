@@ -138,7 +138,7 @@ public class ChatUI extends JFrame implements iChatView {
                 BorderFactory.createLineBorder(new Color(ACCENT.getRed(), ACCENT.getGreen(), ACCENT.getBlue(), 40), 1, true),
                 BorderFactory.createEmptyBorder(8, 12, 8, 12)
         ));
-        jtBuscadorContactos.setFont(new Font("Impact", Font.PLAIN, 13));
+        jtBuscadorContactos.setFont(new Font("Tahoma", Font.PLAIN, 13));
         jtBuscadorContactos.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             @Override
             public void insertUpdate(javax.swing.event.DocumentEvent e) { filtrarContactos(); }
@@ -829,6 +829,21 @@ public class ChatUI extends JFrame implements iChatView {
         root.add(robot); root.add(card);
         dialog.add(root); dialog.setVisible(true);
     }
+    private void showSeleccionarContactoPopup() {
+        JDialog dialog = createBaseDialog(340, 220);
+        JPanel root = new JPanel(null); root.setOpaque(false);
+        JPanel card = createDarkCard(20, 30, 300, 150);
+        JLabel robot = createRobotIcon(220, -15, "/images/contact.png");
+        JLabel title = new JLabel("Seleccione un contacto");
+        title.setFont(new Font("Georgia", Font.BOLD, 16));
+        title.setForeground(TEXT_PRIMARY);
+        title.setBounds(20, 30, 200, 28);
+        JButton ok = createPopupOkButton("OK", 20, 90, 90, 34);
+        ok.addActionListener(e -> dialog.dispose());
+        card.add(title); card.add(ok);
+        root.add(robot); root.add(card);
+        dialog.add(root); dialog.setVisible(true);
+    }
     public boolean showInvitationPopup(String nombreContacto) {
         final boolean[] accepted = {false};
         JDialog dialog = createBaseDialog(400, 270);
@@ -875,7 +890,7 @@ public class ChatUI extends JFrame implements iChatView {
         JDialog dialog = createBaseDialog(400, 270);
         JPanel root = new JPanel(null); root.setOpaque(false);
         JPanel card = createDarkCard(20, 40, 360, 150);
-        JLabel robot = createRobotIcon(260, -10, "/images/delete.png");
+        JLabel robot = createRobotIcon(285, -10, "/images/delete.png");
         JLabel title = new JLabel("<html><div style='text-align:left;'>¿Seguro que desea eliminar el mensaje?</div></html>");
         title.setFont(new Font("Georgia", Font.BOLD, 16));
         title.setForeground(TEXT_PRIMARY);
@@ -1129,6 +1144,10 @@ public class ChatUI extends JFrame implements iChatView {
     }
     private void jBtnEnviarActionPerformed(ActionEvent evt) {//GEN-FIRST:event_jBtnEnviarActionPerformed
         String mensajeTxt = jtMensaje.getText().toString();
+        if (!mensajeTxt.isEmpty() && jContactos.getSelectedValue() == null) {
+            showSeleccionarContactoPopup();
+            return;
+        }
         if (mensajeTxt.isEmpty() || idUsuarioActual == null || idUsuarioActual.equals(" ")) {
             return;
         }
@@ -1520,6 +1539,8 @@ public class ChatUI extends JFrame implements iChatView {
             lblIcono.setForeground(new Color(107,114,128));
             lblIcono.setForeground(new Color(107,114,128));
         }
+        lblTexto.setName(idMensaje + "texto");
+        lblIcono.setName(idMensaje + "icono");
         lblTexto.setAlignmentX(Component.LEFT_ALIGNMENT);
         JLabel lblHora = new JLabel(hora);
         lblHora.setFont(new Font("Tahoma", Font.PLAIN, 9));
@@ -1790,27 +1811,37 @@ public class ChatUI extends JFrame implements iChatView {
         jContactos.repaint();
     }
     public void actualizarBurbujaUnicaLeida(String idMensaje) {
-        SwingUtilities.invokeLater(() -> {
-            buscarYActualizarBurbuja(jPanelChat, idMensaje);
-            jPanelChat.revalidate();
-            jPanelChat.repaint();
-        });
-    }
-    private void buscarYActualizarBurbuja(Container container, String idMensaje) {
-        for (Component comp : container.getComponents()) {
-            if (comp instanceof JLabel label) {
-                if (idMensaje.equals(label.getName())) {
-                    String texto = label.getText();
-                    if (texto != null && texto.contains("Mensaje") && !texto.contains("único")) {
-                        label.setText("<html><body style='color:#6b7280; font-family:Tahoma; font-style:italic;'>Mensaje visto</body></html>");
-                    }
-                    if ("⏱ ".equals(texto)) {
-                        label.setForeground(new Color(107, 114, 128));
+        for (Component filaComp : jPanelChat.getComponents()) {
+            if (!(filaComp instanceof JPanel fila)) continue;
+            for (Component comp : fila.getComponents()) {
+                if (!(comp instanceof JPanel bubble)) continue;
+                for (Component bubbleChild : bubble.getComponents()) {
+                    if (!(bubbleChild instanceof JPanel contenidoInterno)) continue;
+                    for (Component innerComp : contenidoInterno.getComponents()) {
+                        if (!(innerComp instanceof JPanel panelTexto)) continue;
+                        boolean encontrado = false;
+                        for (Component labelComp : panelTexto.getComponents()) {
+                            if (labelComp instanceof JLabel lbl) {
+                                String name = lbl.getName();
+                                if (name != null) {
+                                    if (name.equals(idMensaje + "texto")) {
+                                        lbl.setText("<html><body style='color:#6b7280; font-family:Tahoma; font-style:italic;'>Mensaje visto</body></html>");
+                                        encontrado = true;
+                                    }
+                                    if (name.equals(idMensaje + "icono")) {
+                                        lbl.setForeground(new Color(107, 114, 128));
+                                        encontrado = true;
+                                    }
+                                }
+                            }
+                        }
+                        if (encontrado) {
+                            panelTexto.revalidate();
+                            panelTexto.repaint();
+                            return;
+                        }
                     }
                 }
-            }
-            if (comp instanceof Container cont) {
-                buscarYActualizarBurbuja(cont, idMensaje);
             }
         }
     }
@@ -1980,7 +2011,6 @@ public class ChatUI extends JFrame implements iChatView {
             showHelloRechazadoPopup();
         if (message instanceof Mensaje) {
             Mensaje mensaje = (Mensaje) message;
-            System.out.println(idUsuarioActual);
             if (!mensaje.getIdUsuario().equals(idUsuarioActual) || jContactos.getSelectedValue() == null) {
                 marcarContactoConMensajeNuevo(mensaje.getIdUsuario());
             }
@@ -1990,7 +2020,7 @@ public class ChatUI extends JFrame implements iChatView {
             if (!idUsuarioActual.equals(Mediador.ID_MIO)) {
                 chatsController.guardarEnBd(mensaje.getIdMensaje(), mensaje.getMensaje(), mensaje.getIdUsuario(), Mediador.ID_MIO, Mediador.getInstance().obtenerHoraActual(), false);
             }
-            if (mensaje.getIdUsuario().equals(idUsuarioActual)) {
+            if (mensaje.getIdUsuario().equals(idUsuarioActual) && jContactos.getSelectedValue() != null) {
                 ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(mensaje.getIdMensaje());
                 System.out.println("Enviando 008..."); Mediador.getInstance().sendMessage(idUsuarioActual, confirmarRecibido);
                 Mediador.getInstance().actualizarLeidoBd(mensaje.getIdMensaje());
@@ -2115,7 +2145,9 @@ public class ChatUI extends JFrame implements iChatView {
             } else {
                 agregarMensajeUI(c.getMensajeTxt(), esMio, c.getHora(), leido, c.getIdMensaje());
             }
-            if (!esMio && !leido && !unico) {
+
+            if (!esMio && !leido && !unico && jContactos.getSelectedValue() != null) {
+                System.out.println(jContactos.getSelectedValue() + "lalal");
                 System.out.println("Enviando 008...");ConfirmarRecibido confirmarRecibido = new ConfirmarRecibido(c.getIdMensaje());
                 Mediador.getInstance().sendMessage(c.getIdEmisor(), confirmarRecibido);
                 Mediador.getInstance().actualizarLeidoBd(c.getIdMensaje());

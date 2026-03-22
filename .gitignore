@@ -8,3 +8,4 @@ nbproject/private/
 # build
 /build/
 /dist/
+.claude/worktrees/

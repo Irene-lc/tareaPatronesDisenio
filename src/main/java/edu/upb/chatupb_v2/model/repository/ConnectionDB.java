@@ -35,8 +35,8 @@ public class ConnectionDB {
         Connection conn = null;
         try {
             Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection("jdbc:sqlite:chat_upb.sqlite");
-//            conn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
+//            conn = DriverManager.getConnection("jdbc:sqlite:chat_upb.sqlite");
+            conn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
             if (conn != null) {
 //                System.out.println("Conexión exitosa.");
                 crearTablaSiNoExiste(conn);
