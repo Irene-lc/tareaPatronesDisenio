@@ -47,17 +47,10 @@ public class ChatUIStyles {
     public Color getBgDark() { return BG_DARK; }
     public Color getBgPanel() { return BG_PANEL; }
     public Color getBgSidebar() { return BG_SIDEBAR; }
-    public Color getBgInput() { return BG_INPUT; }
-    public Color getBgBubbleMe() { return BG_BUBBLE_ME; }
-    public Color getBgBubbleYou() { return BG_BUBBLE_YOU; }
     public Color getAccent() { return ACCENT; }
-    public Color getAccentHover() { return ACCENT_HOVER; }
     public Color getTextPrimary() { return TEXT_PRIMARY; }
     public Color getTextMuted() { return TEXT_MUTED; }
     public Color getDivider() { return DIVIDER; }
-    public Color getBtnSend() { return BTN_SEND; }
-    public Color getBtnSendHov() { return BTN_SEND_HOV; }
-    public Color getSystemRed() { return SYSTEM_RED; }
     public Color getBtnUnicoActive() { return BTN_UNICO_ACTIVE; }
 
     public JButton createSendButton() {
@@ -232,6 +225,24 @@ public class ChatUIStyles {
         return decline;
     }
 
+    public JButton createCloseButton(Class<?> resourceClass) {
+        JButton btnCerrar = new JButton();
+        try {
+            ImageIcon icon = new ImageIcon(resourceClass.getResource("/images/x1.png"));
+            Image img = icon.getImage().getScaledInstance(40, 30, Image.SCALE_SMOOTH);
+            btnCerrar.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            btnCerrar.setText("X");
+        }
+        btnCerrar.setForeground(TEXT_MUTED);
+        btnCerrar.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        btnCerrar.setContentAreaFilled(false);
+        btnCerrar.setBorderPainted(false);
+        btnCerrar.setFocusPainted(false);
+        btnCerrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btnCerrar;
+    }
+
     public JTextField createDarkTextField(int x, int y, int w, int h) {
         JTextField tf = new JTextField();
         tf.setBounds(x, y, w, h);
@@ -265,7 +276,7 @@ public class ChatUIStyles {
                 BorderFactory.createLineBorder(new Color(ACCENT.getRed(), ACCENT.getGreen(), ACCENT.getBlue(), 40), 1, true),
                 BorderFactory.createEmptyBorder(8, 12, 8, 12)
         ));
-        jtBuscadorContactos.setFont(new Font("Impact", Font.PLAIN, 13));
+        jtBuscadorContactos.setFont(new Font("Tahoma", Font.PLAIN, 13));
         return jtBuscadorContactos;
     }
 
@@ -279,7 +290,6 @@ public class ChatUIStyles {
         jtMensaje.putClientProperty("JTextField.placeholderText", "Escribe un mensaje...");
         return jtMensaje;
     }
-
     public void styleScrollBar(JScrollPane sp) {
         JScrollBar vsb = sp.getVerticalScrollBar();
         final Color bgSidebar = BG_SIDEBAR;
@@ -381,6 +391,7 @@ public class ChatUIStyles {
         dialog.setBackground(new Color(0, 0, 0, 0));
         return dialog;
     }
+
     public JLabel createRobotIcon(int x, int y, String imagePath, Class<?> resourceClass) {
         JLabel lbl = new JLabel();
         lbl.setBounds(x, y, 90, 120);
@@ -396,22 +407,48 @@ public class ChatUIStyles {
         return lbl;
     }
 
-    public JButton createCloseButton(Class<?> resourceClass) {
-        JButton btnCerrar = new JButton();
-        try {
-            ImageIcon icon = new ImageIcon(resourceClass.getResource("/images/x1.png"));
-            Image img = icon.getImage().getScaledInstance(40, 30, Image.SCALE_SMOOTH);
-            btnCerrar.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            btnCerrar.setText("X");
+    public JComponent crearAvatarCircular(String initial, Color bgColor) {
+        JComponent avatar = new JComponent() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(bgColor);
+                g2.fillOval(0, 0, 30, 30);
+                g2.setColor(Color.WHITE);
+                g2.setFont(new Font("Georgia", Font.BOLD, 12));
+                FontMetrics fm = g2.getFontMetrics();
+                int tx = (30 - fm.stringWidth(initial)) / 2;
+                int ty = (30 + fm.getAscent() - fm.getDescent()) / 2;
+                g2.drawString(initial, tx, ty);
+                g2.dispose();
+            }
+            @Override
+            public Dimension getPreferredSize() { return new Dimension(30, 30); }
+            @Override
+            public Dimension getMinimumSize() { return new Dimension(30, 30); }
+            @Override
+            public Dimension getMaximumSize() { return new Dimension(30, 30); }
+        };
+        return avatar;
+    }
+
+    public JComponent crearFotoPerfilYo(String miNombre) {
+        if (miNombre == null || miNombre.isEmpty()) {
+            miNombre = "Y";
         }
-        btnCerrar.setForeground(TEXT_MUTED);
-        btnCerrar.setFont(new Font("Tahoma", Font.PLAIN, 14));
-        btnCerrar.setContentAreaFilled(false);
-        btnCerrar.setBorderPainted(false);
-        btnCerrar.setFocusPainted(false);
-        btnCerrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        return btnCerrar;
+        String initial = String.valueOf(miNombre.charAt(0)).toUpperCase();
+        return crearAvatarCircular(initial, ACCENT_HOVER);
+    }
+
+    public JComponent crearFotoPerfil(String nombreContacto) {
+        if (nombreContacto == null || nombreContacto.isEmpty() || nombreContacto.equals("ChatUPB")) {
+            nombreContacto = "?";
+        }
+        String initial = String.valueOf(nombreContacto.charAt(0)).toUpperCase();
+        Color[] avatarColors = ThemeManager.getColors().AVATAR_COLORS;
+        Color avatarColor = avatarColors[Math.abs(nombreContacto.hashCode()) % avatarColors.length];
+        return crearAvatarCircular(initial, avatarColor);
     }
 
     public JPanel crearBurbuja(String texto, boolean esMio, String hora, boolean leido, String idMensaje) {
@@ -525,6 +562,8 @@ public class ChatUIStyles {
             lblTexto.setText("<html><body style='color:#6b7280; font-family:Tahoma; font-style:italic;'>Mensaje visto</body></html>");
             lblIcono.setForeground(new Color(107, 114, 128));
         }
+        lblTexto.setName(idMensaje + "texto");
+        lblIcono.setName(idMensaje + "icono");
         lblTexto.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel lblHora = new JLabel(hora);
@@ -668,7 +707,6 @@ public class ChatUIStyles {
         btn.setToolTipText("Clic para ver el mensaje único");
         btn.add(contenidoInterno, BorderLayout.CENTER);
 
-        // Si ya fue leído, deshabilitar
         if (mensajeYaLeido) {
             btn.setEnabled(false);
             btn.setToolTipText("El mensaje ya fue leído");
@@ -681,47 +719,97 @@ public class ChatUIStyles {
         return btn;
     }
 
-    public JComponent crearAvatarCircular(String initial, Color bgColor) {
-        JComponent avatar = new JComponent() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(bgColor);
-                g2.fillOval(0, 0, 30, 30);
-                g2.setColor(Color.WHITE);
-                g2.setFont(new Font("Georgia", Font.BOLD, 12));
-                FontMetrics fm = g2.getFontMetrics();
-                int tx = (30 - fm.stringWidth(initial)) / 2;
-                int ty = (30 + fm.getAscent() - fm.getDescent()) / 2;
-                g2.drawString(initial, tx, ty);
-                g2.dispose();
-            }
-            @Override
-            public Dimension getPreferredSize() { return new Dimension(30, 30); }
-            @Override
-            public Dimension getMinimumSize() { return new Dimension(30, 30); }
-            @Override
-            public Dimension getMaximumSize() { return new Dimension(30, 30); }
-        };
-        return avatar;
+    public JPanel crearPanelMensajeSistema(String texto) {
+        JPanel panelSistema = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        panelSistema.setOpaque(false);
+        JLabel lblSistema = new JLabel("⚠ " + texto);
+        lblSistema.setForeground(SYSTEM_RED);
+        lblSistema.setFont(new Font("Tahoma", Font.BOLD, 11));
+        lblSistema.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
+        panelSistema.add(lblSistema);
+        return panelSistema;
     }
 
-    public JComponent crearFotoPerfilYo(String miNombre) {
-        if (miNombre == null || miNombre.isEmpty()) {
-            miNombre = "Y";
+    public JTextArea crearTextAreaMensajeUnico(String mensaje) {
+        int fontSize;
+        if (mensaje.length() <= 20) {
+            fontSize = 18;
+        } else if (mensaje.length() <= 50) {
+            fontSize = 17;
+        } else if (mensaje.length() <= 100) {
+            fontSize = 15;
+        } else {
+            fontSize = 12;
         }
-        String initial = String.valueOf(miNombre.charAt(0)).toUpperCase();
-        return crearAvatarCircular(initial, ACCENT_HOVER);
+        JTextArea textArea = new JTextArea(mensaje);
+        textArea.setFont(new Font("SansSerif", Font.PLAIN, fontSize));
+        textArea.setForeground(new Color(226, 232, 240));
+        textArea.setOpaque(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setEditable(false);
+        textArea.setFocusable(false);
+        textArea.setBorder(null);
+        return textArea;
     }
 
-    public JComponent crearFotoPerfil(String nombreContacto) {
-        if (nombreContacto == null || nombreContacto.isEmpty() || nombreContacto.equals("ChatUPB")) {
-            nombreContacto = "?";
-        }
-        String initial = String.valueOf(nombreContacto.charAt(0)).toUpperCase();
-        Color[] avatarColors = ThemeManager.getColors().AVATAR_COLORS;
-        Color avatarColor = avatarColors[Math.abs(nombreContacto.hashCode()) % avatarColors.length];
-        return crearAvatarCircular(initial, avatarColor);
+    public void aplicarTemaComponentes(
+            JFrame frame, JPanel jPanelChat, JScrollPane jScrollPaneChat,
+            JList<?> jContactos, JTextField jtBuscadorContactos, JTextField jtMensaje,
+            JLabel lblContactoSeleccionado, JLabel lblMensajeFijado,
+            JButton jBtnMensajeUnico, boolean modoMensajeUnico,
+            JButton jBtnNuevaConexion, JButton jBtnTheme,
+            JPanel panelContactos, JPanel panelChat, JPanel panelSuperior,
+            JPanel panelInferior, JPanel sidebarHeader,
+            JScrollPane scrollContactos, JPanel panelMensajeFijado
+    ) {
+        loadThemeColors();
+        frame.getContentPane().setBackground(BG_DARK);
+        jPanelChat.setBackground(BG_PANEL);
+        jScrollPaneChat.getViewport().setBackground(BG_PANEL);
+        jScrollPaneChat.setBackground(BG_PANEL);
+        jContactos.setBackground(BG_SIDEBAR);
+        jContactos.setSelectionBackground(new Color(BG_BUBBLE_ME.getRed(), BG_BUBBLE_ME.getGreen(), BG_BUBBLE_ME.getBlue(), 60));
+        jContactos.setSelectionForeground(TEXT_PRIMARY);
+        jtBuscadorContactos.setBackground(BG_INPUT);
+        jtBuscadorContactos.setForeground(TEXT_PRIMARY);
+        jtBuscadorContactos.setCaretColor(ACCENT);
+        jtBuscadorContactos.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(ACCENT.getRed(), ACCENT.getGreen(), ACCENT.getBlue(), 40), 1, true),
+                BorderFactory.createEmptyBorder(8, 12, 8, 12)
+        ));
+        jtMensaje.setBackground(BG_INPUT);
+        jtMensaje.setForeground(TEXT_PRIMARY);
+        jtMensaje.setCaretColor(ACCENT);
+        lblContactoSeleccionado.setForeground(ACCENT);
+        lblMensajeFijado.setForeground(ACCENT);
+        jBtnMensajeUnico.setForeground(modoMensajeUnico ? BTN_UNICO_ACTIVE : ACCENT);
+        jBtnNuevaConexion.setForeground(ACCENT);
+        jBtnTheme.setForeground(ACCENT);
+        panelContactos.setBackground(BG_SIDEBAR);
+        panelContactos.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(255, 255, 255, 18)));
+        sidebarHeader.setBackground(BG_SIDEBAR);
+        panelChat.setBackground(BG_PANEL);
+        panelSuperior.setBackground(BG_SIDEBAR);
+        panelInferior.setBackground(BG_SIDEBAR);
+        jScrollPaneChat.getViewport().setBackground(BG_PANEL);
+        jScrollPaneChat.setBackground(BG_PANEL);
+        scrollContactos.getViewport().setBackground(BG_SIDEBAR);
+        scrollContactos.setBackground(BG_SIDEBAR);
+        panelMensajeFijado.setBackground(ThemeManager.getColors().PIN_BACKGROUND);
+        panelMensajeFijado.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getColors().PIN_BORDER),
+                BorderFactory.createEmptyBorder(7, 16, 7, 16)
+        ));
+        styleScrollBar(jScrollPaneChat);
+        styleScrollBar(scrollContactos);
+        frame.repaint();
+        frame.revalidate();
+        SwingUtilities.invokeLater(() -> {
+            styleScrollBar(jScrollPaneChat);
+            styleScrollBar(scrollContactos);
+            jScrollPaneChat.getVerticalScrollBar().repaint();
+            scrollContactos.getVerticalScrollBar().repaint();
+        });
     }
 }
