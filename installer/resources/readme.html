@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acerca de ChatUPB</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #1d1d1f;
+            background: linear-gradient(180deg, #ffffff 0%, #f5f5f7 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e2;
+        }
+        
+        .version-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #E85D04 0%, #FAA307 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1d1d1f;
+            margin-bottom: 6px;
+        }
+        
+        .tagline {
+            font-size: 14px;
+            color: #6e6e73;
+        }
+        
+        /* Section styling */
+        .section {
+            margin-bottom: 24px;
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 12px;
+        }
+        
+        .section-title .icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #E85D04 0%, #FAA307 100%);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        /* Feature cards */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            border: 1px solid #f0f0f2;
+        }
+        
+        .feature-card .emoji {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .feature-card h3 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 4px;
+        }
+        
+        .feature-card p {
+            font-size: 11px;
+            color: #6e6e73;
+            line-height: 1.4;
+        }
+        
+        /* What's new card */
+        .whats-new {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+            border: 1px solid #f0f0f2;
+        }
+        
+        .update-item {
+            display: flex;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        
+        .update-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .update-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .update-content h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 2px;
+        }
+        
+        .update-content p {
+            font-size: 12px;
+            color: #6e6e73;
+        }
+        
+        /* Tech specs */
+        .specs-card {
+            background: #f5f5f7;
+            border-radius: 12px;
+            padding: 16px;
+        }
+        
+        .spec-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 12px;
+            border-bottom: 1px solid #e8e8ed;
+        }
+        
+        .spec-row:last-child {
+            border-bottom: none;
+        }
+        
+        .spec-label {
+            color: #6e6e73;
+        }
+        
+        .spec-value {
+            font-weight: 500;
+            color: #1d1d1f;
+        }
+        
+        /* Contact info */
+        .contact-card {
+            background: linear-gradient(135deg, #E85D04 0%, #F48C06 100%);
+            border-radius: 12px;
+            padding: 16px;
+            color: white;
+            text-align: center;
+        }
+        
+        .contact-card h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .contact-card p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .contact-card a {
+            color: white;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <span class="version-badge">Versión 1.0</span>
+            <h1> Acerca de ChatUPB</h1>
+            <p class="tagline">Todo lo que necesitas saber antes de instalar</p>
+        </div>
+
+        <!-- Especificaciones técnicas -->
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">⚙️</span>
+                Especificaciones Técnicas
+            </div>
+            <div class="specs-card">
+                <div class="spec-row">
+                    <span class="spec-label">Versión</span>
+                    <span class="spec-value">1.0.0</span>
+                </div>
+                <div class="spec-row">
+                    <span class="spec-label">Plataforma</span>
+                    <span class="spec-value">Java 21 (incluido)</span>
+                </div>
+                <div class="spec-row">
+                    <span class="spec-label">Tamaño de instalación</span>
+                    <span class="spec-value">~180 MB</span>
+                </div>
+                <div class="spec-row">
+                    <span class="spec-label">Arquitectura</span>
+                    <span class="spec-value">Universal (Intel + Apple Silicon)</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Soporte -->
+        <div class="section">
+            <div class="contact-card">
+                <h4>¿Necesitas ayuda?</h4>
+                <a href="mailto:irenelandivarc1@upb.edu">irenelandivarc1@upb.edu</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

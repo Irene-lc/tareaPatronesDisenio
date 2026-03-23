@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido a ChatUPB</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #1d1d1f;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            padding: 20px;
+            min-height: 100%;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        
+        /* Header con logo */
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .logo-container {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #E85D04 0%, #F48C06 50%, #FAA307 100%);
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(232, 93, 4, 0.3);
+            margin-bottom: 16px;
+        }
+        
+        .logo-icon {
+            font-size: 40px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1d1d1f;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+        
+        .subtitle {
+            font-size: 15px;
+            color: #6e6e73;
+            font-weight: 400;
+        }
+        
+        /* Card principal */
+        .welcome-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+        
+        .welcome-text {
+            font-size: 14px;
+            color: #424245;
+            margin-bottom: 20px;
+        }
+        
+        /* Features list */
+        .features {
+            list-style: none;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f2;
+        }
+        
+        .feature-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .feature-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #E85D04 0%, #FAA307 100%);
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+        
+        .feature-icon span {
+            font-size: 18px;
+        }
+        
+        .feature-content h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 2px;
+        }
+        
+        .feature-content p {
+            font-size: 12px;
+            color: #6e6e73;
+        }
+        
+        /* Info box */
+        .info-box {
+            background: linear-gradient(135deg, #E85D04 0%, #F48C06 100%);
+            border-radius: 12px;
+            padding: 16px;
+            color: white;
+        }
+        
+        .info-box h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-box ul {
+            list-style: none;
+            font-size: 12px;
+        }
+        
+        .info-box li {
+            padding: 3px 0;
+            padding-left: 16px;
+            position: relative;
+        }
+        
+        .info-box li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 11px;
+            color: #86868b;
+        }
+        
+        .upb-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: white;
+            padding: 8px 14px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        
+        .upb-badge img {
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>ChatUPB</h1>
+        </div>
+        
+        <!-- Card principal -->
+        <div class="welcome-card">
+            <p class="welcome-text">
+                ¡Bienvenido al instalador de <strong>ChatUPB</strong>! Se te guiará
+                con los pasos necesarios para instalar la aplicación en tu Mac.
+            </p>
+        </div>
+        
+        <!-- Info box -->
+        <div class="info-box">
+            <h4>📋 Requisitos del Sistema</h4>
+            <ul>
+                <li>macOS 10.14 (Mojave) o superior</li>
+                <li>200 MB de espacio disponible</li>
+                <li>Conexión a internet </li>
+            </ul>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="upb-badge">
+                 Creado por: Irene Landivar
+            </div>
+        </div>
+    </div>
+</body>
+</html>

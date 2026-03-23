@@ -30,8 +30,12 @@ public class Contact implements Serializable, Model {
     private String id;
     private String name;
     private String ip;
+
+    @Builder.Default
     private boolean stateConnect = false;
+    @Builder.Default
     private boolean mensajesNoLeidos = false;
+    @Builder.Default
     private boolean zumbido = false;
 
 }

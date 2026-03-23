@@ -318,7 +318,9 @@ public class ChatUI extends JFrame implements iChatView {
         btnDesfijar.setBorderPainted(false);
         btnDesfijar.setFocusPainted(false);
         btnDesfijar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnDesfijar.addActionListener(e -> desfijarMensaje());
+        btnDesfijar.addActionListener(e -> {
+            desfijarMensaje();
+        });
         JPanel pinLeft = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         pinLeft.setOpaque(false);
         pinLeft.add(iconPin);
@@ -1162,9 +1164,13 @@ public class ChatUI extends JFrame implements iChatView {
     }//GEN-LAST:event_jBtnEnviarActionPerformed
     private void jBtnOffActionPerformed(ActionEvent evt) {
         try {
+            for (Contact c : todosLosContactos) {
+                c.setStateConnect(false);
+            }
             System.out.println("Enviando 0018...");System.out.println("Conexion terminada");Message message = new FueraLinea(Mediador.ID_MIO);
             Mediador.getInstance().enviarMensajeATodos(message);
-            mostrarMensajeSistema("CONEXION TERMINADA");
+            if (jContactos.getSelectedValue() != null)
+                mostrarMensajeSistema("CONEXION TERMINADA");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1220,6 +1226,7 @@ public class ChatUI extends JFrame implements iChatView {
         this.idUsuarioActual = idUsuarioActual;
     }
     public void fijarMensajeUI(String idMensaje, String texto) {
+        Mediador.getInstance().desfijarMensajes();
         mensajeFijadoId = idMensaje;
         mensajeFijadoTexto = texto;
         String textoCortado = texto.length() > 95 ? texto.substring(0, 90) + "…" : texto;

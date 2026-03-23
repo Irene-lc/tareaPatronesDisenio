@@ -102,10 +102,10 @@ public class Mediador implements SocketListener {
         }
     }
 
-    public void enviarMensajeATodos(Message message) {
+    public void enviarMensajeATodos(Message mensaje) {
         for (SocketClient cliente : clientes.values()) {
             try {
-                cliente.send(message);
+                cliente.send(mensaje);
                 cliente.close();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -280,6 +280,13 @@ public class Mediador implements SocketListener {
             e.printStackTrace();
         }
         return false;
+    }
+    public void desfijarMensajes() {
+        try {
+            this.chatsDao.desfijarMensajes();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     @Override
     public synchronized void onMessage(SocketClient socketClient, Message message) {

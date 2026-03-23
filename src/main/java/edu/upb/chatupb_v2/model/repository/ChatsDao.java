@@ -196,6 +196,11 @@ public class ChatsDao {
         String resultado = helper.executeQuerySingleString(query, params);
         return "1".equals(resultado);
     }
+    public void desfijarMensajes() throws Exception {
+        String query = "UPDATE chats SET fijado = 0";
+
+        helper.update(query, null);
+    }
     public Chats findById(String idMensaje) throws Exception {
         String query = "SELECT idMensaje, mensajeTxt, hora, idEmisor, idReceptor, leido, fijado, unico FROM chats WHERE idMensaje = ?";
 
